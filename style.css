@@ -279,7 +279,7 @@ a:hover {
 .cover__body {
   display: grid;
   gap: var(--s6);
-  padding-block: var(--s6) var(--s8);
+  padding-block: var(--s5) var(--s7);
 }
 
 .cover__name {
@@ -328,10 +328,34 @@ a:hover {
   object-position: center 20%;
 }
 
+/* home cover: photo sits beside the name on phones, beside the whole block on wider screens */
+.cover__body--home {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name photo"
+    "lead lead"
+    "meta meta";
+  column-gap: var(--s4);
+  row-gap: 0;
+  align-items: end;
+}
+
+.cover__text {
+  display: contents;
+}
+
+.cover__body--home .cover__name { grid-area: name; }
+.cover__body--home .cover__lead { grid-area: lead; }
+.cover__body--home .cover__meta { grid-area: meta; }
+.cover__body--home .passport-photo { grid-area: photo; width: clamp(5.5rem, 24vw, 11rem); }
+
 @media (min-width: 48rem) {
-  .cover__body {
-    grid-template-columns: 1fr auto;
-    align-items: end;
+  .cover__body--home {
+    grid-template-areas:
+      "name photo"
+      "lead photo"
+      "meta photo";
+    column-gap: var(--s6);
   }
 
   .passport-photo {
@@ -377,12 +401,12 @@ a:hover {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .photo-grid .photo:nth-child(7n + 1) {
+  .photo-grid .photo:first-child:not(:last-child) {
     grid-column: span 2;
     grid-row: span 2;
   }
 
-  .photo-grid .photo:nth-child(7n + 5) {
+  .photo-grid .photo:nth-child(7n + 5):not(:last-child) {
     grid-column: span 2;
   }
 }
@@ -390,7 +414,7 @@ a:hover {
 .photo {
   position: relative;
   margin: 0;
-  padding: 0.4rem 0.4rem 0.4rem;
+  padding: 0.4rem 0.4rem 3.2rem;
   background: var(--print);
   box-shadow: var(--shadow);
   transform: rotate(var(--tilt, 0deg));
@@ -413,16 +437,16 @@ a:hover {
   background: var(--paper-deep);
 }
 
-.photo-grid .photo:nth-child(7n + 5) img {
+.photo-grid .photo:nth-child(7n + 5):not(:last-child) img {
   aspect-ratio: 8 / 5;
 }
 
 /* entry stamp: place and date */
 .photo__label {
   position: absolute;
-  right: -0.4rem;
-  bottom: -0.9rem;
-  max-width: calc(100% - 0.5rem);
+  right: 0.7rem;
+  bottom: 0.55rem;
+  max-width: calc(100% - 1.4rem);
   padding: 0.3rem 0.55rem 0.25rem;
   border: 2px solid var(--stamp);
   border-radius: 6px;
@@ -439,8 +463,8 @@ a:hover {
   mix-blend-mode: var(--stamp-blend);
 }
 
-.photo:nth-child(3n + 2) .photo__label { --stamp-tilt: 3deg; right: auto; left: -0.4rem; }
-.photo:nth-child(3n) .photo__label { --stamp-tilt: -7deg; }
+.photo:nth-child(3n + 2) .photo__label { --stamp-tilt: 3deg; right: auto; left: 0.7rem; }
+.photo:nth-child(3n) .photo__label { --stamp-tilt: -2.5deg; }
 
 .photo__place {
   display: block;
@@ -526,7 +550,7 @@ main {
 
 @media (min-width: 48rem) {
   .project {
-    grid-template-columns: 14rem minmax(0, 1fr) auto;
+    grid-template-columns: 17rem minmax(0, 1fr) auto;
     align-items: baseline;
   }
 }
@@ -649,5 +673,9 @@ html.js .fade.is-visible .photo__label {
 }
 
 .more-link {
+  margin-top: var(--s6);
+}
+
+.lately h2 {
   margin-top: var(--s6);
 }
