@@ -91,6 +91,7 @@
 .button:hover {
   background: var(--cover);
   border-color: var(--cover);
+  color: var(--on-cover);
 }
 
 .button:disabled {
@@ -117,8 +118,8 @@
 }
 
 .button--on-cover:hover {
-  background: var(--paper);
-  border-color: var(--paper);
+  background: var(--print);
+  border-color: var(--print);
   color: var(--cover);
 }
 
