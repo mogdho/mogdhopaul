@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": "104", "media_type": "CAROUSEL_ALBUM", "media_url": "https://cdn.example/104.mp4",
+     "permalink": "https://www.instagram.com/p/DDD104/", "timestamp": "2025-03-01T10:00:00+0000",
+     "children": {"data": [{"id": "104a", "media_type": "VIDEO", "media_url": "https://cdn.example/104a.mp4"}]}},
+    {"id": "105", "caption": "❄️❄️", "media_type": "IMAGE",
+     "media_url": "https://cdn.example/105.jpg", "permalink": "https://www.instagram.com/p/EEE105/",
+     "timestamp": "2025-01-20T10:00:00+0000"}
+  ]
+}
