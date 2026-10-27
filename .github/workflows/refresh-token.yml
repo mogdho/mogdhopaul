@@ -1,0 +1,29 @@
+name: Refresh Instagram token
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"   # 1st of every month; tokens last 60 days
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Refresh token and save it as the IG_TOKEN secret
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          NEW=$(python -c "import os; from scripts.instagram import refresh_token; print(refresh_token(os.environ['IG_TOKEN']))")
+          echo "::add-mask::$NEW"
+          gh secret set IG_TOKEN --repo "${{ github.repository }}" --body "$NEW"
+          echo "Token refreshed."
