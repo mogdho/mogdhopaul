@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   refresh:
@@ -27,3 +28,12 @@ jobs:
           echo "::add-mask::$NEW"
           gh secret set IG_TOKEN --repo "${{ github.repository }}" --body "$NEW"
           echo "Token refreshed."
+
+      # GitHub pauses scheduled workflows after 60 days without repo activity.
+      - name: Keep schedules alive
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow enable photos.yml --repo "${{ github.repository }}" || true
+          gh workflow enable refresh-token.yml --repo "${{ github.repository }}" || true

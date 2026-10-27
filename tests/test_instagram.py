@@ -54,6 +54,13 @@ class ExtractPlace(unittest.TestCase):
     def test_html_chars_dropped(self):
         self.assertEqual(extract_place("Rock & <Roll> Café"), "Rock Roll Café")
 
+    def test_bengali_digits_rejected(self):
+        self.assertIsNone(extract_place("Cox's Bazar ২০২৪"))
+
+    def test_banned_name_spellings_rejected(self):
+        self.assertIsNone(extract_place("Mogdha's birthday"))
+        self.assertIsNone(extract_place("with mugdho in Dhaka"))
+
     def test_mentions_dropped(self):
         self.assertEqual(extract_place("Louvre, Paris @someone"), "Louvre, Paris")
 
@@ -90,6 +97,11 @@ class SelectPosts(unittest.TestCase):
 
     def test_limit(self):
         self.assertEqual(len(select_posts(self.media, set(), limit=1)), 1)
+
+    def test_exclude_link_pasted_from_app(self):
+        posts = select_posts(self.media, {"https://www.instagram.com/p/AAA101/?igsh=xyz123",
+                                          "https://instagram.com/p/CCC103"})
+        self.assertEqual(self.ids(posts), ["105"])
 
 
 class Fetch(unittest.TestCase):

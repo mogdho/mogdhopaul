@@ -9,7 +9,7 @@ from unittest import mock
 from PIL import Image
 
 from scripts import build_photos
-from scripts.build_photos import alt_text, render_items, replace_region
+from scripts.build_photos import alt_text, local_date, render_items, replace_region
 from scripts.instagram import InstagramError
 from tests.helpers import ROOT
 
@@ -61,6 +61,20 @@ class Render(unittest.TestCase):
         self.assertIn('width="1200" height="1500"', out)
         self.assertIn('loading="lazy"', out)
         self.assertIn('alt="Travel photo by Mogdho Paul in Paris, France, May 2025"', out)
+
+
+class Dates(unittest.TestCase):
+    def test_dhaka_date_after_local_midnight(self):
+        self.assertEqual(local_date("2025-05-14T20:30:00+0000"), "2025-05-15")
+
+    def test_dhaka_date_same_day(self):
+        self.assertEqual(local_date("2025-05-14T10:00:00+0000"), "2025-05-14")
+
+
+class Loading(unittest.TestCase):
+    def test_first_prints_eager(self):
+        out = render_items([photo(pid=str(i)) for i in range(5)], None, eager=3).split("<figure")[1:]
+        self.assertEqual(['loading="lazy"' in f for f in out], [False, False, False, True, True])
 
 
 class Regions(unittest.TestCase):

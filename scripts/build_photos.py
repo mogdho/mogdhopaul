@@ -14,7 +14,7 @@ import json
 import os
 import sys
 import urllib.request
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from PIL import Image
@@ -25,8 +25,14 @@ ROOT = Path(__file__).resolve().parent.parent
 STRIP_COUNT = 6
 SIZES = (1200, 600)
 EMPTY = '<p class="empty-note">Photos from the road are on their way.</p>'
+DHAKA = timezone(timedelta(hours=6))  # Bangladesh has no daylight saving
 MONTHS = ["January", "February", "March", "April", "May", "June", "July",
           "August", "September", "October", "November", "December"]
+
+
+def local_date(timestamp):
+    """Instagram UTC timestamp -> calendar date in Bangladesh, as YYYY-MM-DD."""
+    return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S%z").astimezone(DHAKA).date().isoformat()
 
 
 def _date(photo):
@@ -41,21 +47,23 @@ def alt_text(photo):
     return f"Travel photo by Mogdho Paul, {when}"
 
 
-def render_items(photos, limit):
+def render_items(photos, limit, eager=0):
+    """Print markup for photos; the first `eager` images load immediately (they sit in the first screen)."""
     shown = photos[:limit] if limit else photos
     if not shown:
         return EMPTY
     e = html.escape
     out = []
-    for p in shown:
+    for i, p in enumerate(shown):
         d = _date(p)
+        load = 'fetchpriority="high"' if i == 0 and eager else ("" if i < eager else 'loading="lazy" ')
         place = f'<span class="photo__place">{e(p["place"])}</span>' if p.get("place") else ""
         out.append(
             f'<figure class="photo fade">'
             f'<a href="{e(p["permalink"])}">'
             f'<img src="{e(p["thumb"])}" srcset="{e(p["thumb"])} 600w, {e(p["src"])} 1200w" '
             f'sizes="(min-width: 48rem) 25vw, 50vw" alt="{e(alt_text(p))}" '
-            f'width="{p["width"]}" height="{p["height"]}" loading="lazy" decoding="async">'
+            f'width="{p["width"]}" height="{p["height"]}" {load}decoding="async">'
             f'</a>'
             f'<figcaption class="photo__label">{place}'
             f'<time datetime="{d.isoformat()}">{d.day} {MONTHS[d.month - 1]} {d.year}</time>'
@@ -137,13 +145,13 @@ def main(argv=None, download=None):
             print(f"Image for post {post.id} failed, nothing changed: {exc}", file=sys.stderr)
             return 1
         photos.append({
-            "id": post.id, "permalink": post.permalink, "date": post.timestamp[:10], "place": post.place,
+            "id": post.id, "permalink": post.permalink, "date": local_date(post.timestamp), "place": post.place,
             "src": f"/photos/img/{big.name}", "thumb": f"/photos/img/{small.name}",
             "width": size[0], "height": size[1],
         })
 
     home_path, grid_path = ROOT / "index.html", ROOT / "photos" / "index.html"
-    home = replace_region(home_path.read_text(encoding="utf-8"), "strip", render_items(photos, STRIP_COUNT))
+    home = replace_region(home_path.read_text(encoding="utf-8"), "strip", render_items(photos, STRIP_COUNT, eager=3))
     grid = replace_region(grid_path.read_text(encoding="utf-8"), "grid", render_items(photos, None))
 
     # 3. Write

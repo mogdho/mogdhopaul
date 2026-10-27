@@ -39,8 +39,8 @@ It takes about 15 minutes. You never need to paste a token into a chat or a file
 
 ## Hiding a photo
 
-Add the post's link (for example `https://www.instagram.com/p/ABC123/`) on its own line in
-`data/photos-exclude.txt`. It disappears on the next nightly run.
+Add the post's link on its own line in `data/photos-exclude.txt`. A link copied straight from the
+app works too (for example `https://www.instagram.com/p/ABC123/?igsh=...`). It disappears on the next nightly run.
 
 ## Captions
 
@@ -51,3 +51,7 @@ for example `📍 Paris, France`. Hashtags and other text are ignored.
 
 If Instagram stops answering (for example the token expired), the nightly job fails, GitHub emails you,
 and the site keeps the photos it already has. Generate a new token (step 3) and update `IG_TOKEN`.
+
+GitHub pauses scheduled jobs in repos with no activity for 60 days. The jobs re-enable each other on every
+run to prevent this, but if you ever see "This scheduled workflow is disabled" in the Actions tab, click
+**Enable workflow** on both "Update photos" and "Refresh Instagram token".
