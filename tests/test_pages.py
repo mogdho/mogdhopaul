@@ -140,10 +140,21 @@ class Sitemap(unittest.TestCase):
 
 
 class Publishing(unittest.TestCase):
-    def test_private_files_not_published(self):
+    def test_tooling_not_published(self):
         cfg = (ROOT / "_config.yml").read_text(encoding="utf-8")
-        for name in ("docs", "tests", "scripts", "PRODUCT.md", "DESIGN.md", "data"):
+        for name in ("content", "templates", "scripts", "tests", "docs", "PRODUCT.md", "DESIGN.md"):
             self.assertIn(f"- {name}", cfg)
+
+
+class AdminPrivacy(unittest.TestCase):
+    def test_robots_disallows_admin(self):
+        self.assertIn("Disallow: /admin/", (ROOT / "robots.txt").read_text(encoding="utf-8"))
+
+    def test_admin_noindex(self):
+        self.assertIn('content="noindex, nofollow"', (ROOT / "admin" / "index.html").read_text(encoding="utf-8"))
+
+    def test_admin_not_in_sitemap(self):
+        self.assertNotIn("/admin", (ROOT / "sitemap.xml").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
