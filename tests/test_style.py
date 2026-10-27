@@ -34,6 +34,15 @@ class StyleRules(unittest.TestCase):
     def test_js_sets_js_class(self):
         self.assertIn("classList.add('js')", self.js)
 
+    def test_link_hover_is_instant(self):
+        # Links behave like the menu: no animated underline or colour fade.
+        self.assertNotIn("text-decoration-thickness 150ms", self.css)
+        self.assertNotIn("text-decoration-thickness: 2px", self.css)
+
+    def test_standalone_links_underline_only_on_hover(self):
+        for sel in (".section-head a", ".profile-links a", ".project h3 a"):
+            self.assertRegex(self.css, re.escape(sel) + r"[^{]*\{[^}]*text-decoration: none")
+
     def test_gitignore_has_claude(self):
         self.assertIn(".claude/", (ROOT / ".gitignore").read_text())
 

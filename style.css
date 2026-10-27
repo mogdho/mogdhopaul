@@ -158,11 +158,20 @@ a {
   color: var(--stamp);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
-  transition: text-decoration-thickness 150ms var(--ease-out);
 }
 
-a:hover {
-  text-decoration-thickness: 2px;
+/* Stand-alone links work like the top menu: no underline at rest, underline on hover, no animation. */
+.section-head a,
+.profile-links a,
+.more-link a {
+  text-decoration: none;
+}
+
+.section-head a:hover,
+.profile-links a:hover,
+.more-link a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 :focus-visible {
@@ -524,8 +533,8 @@ main {
 }
 
 .project h3 a:hover {
-  color: var(--stamp);
   text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 .project p {
@@ -554,6 +563,14 @@ main {
 }
 
 .site-footer a {
+  color: var(--on-cover);
+}
+
+.site-footer .profile-links a {
+  color: var(--on-cover-soft);
+}
+
+.site-footer .profile-links a:hover {
   color: var(--on-cover);
 }
 
@@ -625,10 +642,6 @@ html.js .fade.is-visible .photo__label {
   html.js .fade .photo__label {
     opacity: 1;
     animation: none;
-  }
-
-  a {
-    transition: none;
   }
 }
 
