@@ -142,6 +142,12 @@ class Publishing(unittest.TestCase):
         for name in ("content", "templates", "scripts", "tests", "docs", "PRODUCT.md", "DESIGN.md"):
             self.assertIn(f"- {name}", cfg)
 
+    def test_build_starts_from_latest_main(self):
+        # Two saves close together: the second run must rebuild on top of the first run's pages,
+        # not on its own older commit, or its push conflicts.
+        wf = (ROOT / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
+        self.assertRegex(wf, r"uses: actions/checkout@v4\n\s+with:\n\s+ref: main")
+
 
 class AdminPrivacy(unittest.TestCase):
     def test_robots_disallows_admin(self):

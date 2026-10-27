@@ -1,6 +1,6 @@
 // Admin page: log in with a GitHub key, edit content/*.json and photos, save as one commit, watch publishing.
 import {
-  FEATURED_COUNT, isSupportedImage, newPhotoId, photoChanges, toJson, validateContent,
+  FEATURED_COUNT, filesToSave, isSupportedImage, newPhotoId, validateContent, watchPublishing,
 } from './core.js';
 import { AuthError, ConflictError, Repo } from './github.js';
 import { resizeImage } from './images.js';
@@ -16,6 +16,7 @@ const state = {
   newImages: new Map(), // repo path -> Blob, for photos added since the last save
   previews: new Map(), // photo id -> object URL
   dirty: false, saving: false,
+  resumeSave: false, // a save stopped by a bad key: log in again and it continues, edits kept
 };
 
 // ---------- small DOM helpers ----------
@@ -300,52 +301,52 @@ async function save() {
   state.saving = true;
   $('save').disabled = true;
   setStatus('Saving…');
+  let sha = null;
   try {
-    const files = [
-      { path: 'content/site.json', base64: base64FromText(toJson(state.site)) },
-      { path: 'content/projects.json', base64: base64FromText(toJson(state.projects)) },
-      { path: 'content/photos.json', base64: base64FromText(toJson(state.photos)) },
-    ];
+    const files = filesToSave(content).map(({ path, text }) => ({ path, base64: base64FromText(text) }));
     for (const [path, blob] of state.newImages) {
       files.push({ path, base64: base64FromBytes(new Uint8Array(await blob.arrayBuffer())) });
     }
-    for (const path of photoChanges(state.original.photos, state.photos).deletePaths) {
-      files.push({ path, delete: true });
-    }
-    const sha = await state.repo.commitFiles(state.sha, files, 'admin: update site');
+    sha = await state.repo.saveFiles(state.sha, files, 'admin: update site');
     state.sha = sha;
-    state.original = structuredClone({ site: state.site, projects: state.projects, photos: state.photos });
+    state.original = structuredClone(content);
     state.newImages.clear();
     state.dirty = false;
     renderPhotos();
-    await watchPublishing(sha);
   } catch (err) {
     handleError(err);
   } finally {
     state.saving = false;
     $('save').disabled = !state.dirty;
   }
+  // Outside the try: once the commit exists, nothing that goes wrong while checking can undo the save.
+  if (sha) {
+    const watch = ++publishWatch;
+    await watchPublishing(state.repo, sha, {
+      intervalMs: demo ? 1000 : 5000,
+      onStatus: (s) => { if (watch === publishWatch) showPublishStatus(s); },
+    });
+  }
 }
 
-async function watchPublishing(sha) {
-  setStatus('Saved. Publishing… (about two minutes)');
-  const started = Date.now();
-  while (Date.now() - started < 5 * 60 * 1000) {
-    await new Promise((r) => setTimeout(r, demo ? 1000 : 5000));
-    const status = await state.repo.buildStatus(sha);
-    if (status === 'success') { setStatus('Live — your changes are on mogdhopaul.com.'); return; }
-    if (status === 'failure') {
-      setStatus('Publishing failed. The site still shows the previous version.', { href: ACTIONS_URL, text: 'See what went wrong' });
-      return;
-    }
-  }
-  setStatus('Saved. Publishing is taking longer than usual.', { href: ACTIONS_URL, text: 'Check progress' });
+let publishWatch = 0;
+function showPublishStatus(status) {
+  const check = { href: ACTIONS_URL, text: 'Check progress' };
+  if (status === 'publishing') setStatus('Saved. Publishing… (about two minutes)');
+  else if (status === 'success') setStatus('Live — your changes are on mogdhopaul.com.');
+  else if (status === 'failure') {
+    setStatus('Saved, but publishing failed. The site still shows the previous version.', { href: ACTIONS_URL, text: 'See what went wrong' });
+  } else if (status === 'unchecked') setStatus('Saved. Couldn’t check publishing; it usually takes about two minutes.', check);
+  else setStatus('Saved. Publishing is taking longer than usual.', check);
 }
 
 function handleError(err) {
   if (err instanceof AuthError) {
-    logout();
-    $('login-error').textContent = err.message;
+    // Keep every edit: ask for the key again, then finish this save.
+    forgetToken();
+    state.resumeSave = true;
+    show('login');
+    $('login-error').textContent = `${err.message} Your changes are kept: log in again and they will be saved.`;
     return;
   }
   if (err instanceof ConflictError) {
@@ -361,7 +362,7 @@ function demoRepo() {
   return {
     headSha: async () => 'demo',
     readJson: async (path) => (await fetch(`/${path}`)).json(),
-    commitFiles: async () => new Promise((r) => setTimeout(() => r('demo-2'), 800)),
+    saveFiles: async () => new Promise((r) => setTimeout(() => r('demo-2'), 800)),
     buildStatus: async () => 'success',
   };
 }
@@ -393,10 +394,15 @@ async function load() {
   }
 }
 
-function logout() {
+function forgetToken() {
   try { localStorage.removeItem(TOKEN_KEY); } catch { /* storage unavailable */ }
   state.repo = null;
   $('token').value = '';
+}
+
+function logout() {
+  forgetToken();
+  state.resumeSave = false;
   show('login');
 }
 
@@ -425,7 +431,13 @@ function start() {
     $('login-error').textContent = '';
     try { localStorage.setItem(TOKEN_KEY, token); } catch { /* storage unavailable: works for this visit */ }
     state.repo = new Repo({ token });
-    load();
+    if (state.resumeSave) {
+      state.resumeSave = false;
+      show('editor');
+      save();
+    } else {
+      load();
+    }
   });
   window.addEventListener('beforeunload', (e) => {
     if (state.dirty) e.preventDefault();

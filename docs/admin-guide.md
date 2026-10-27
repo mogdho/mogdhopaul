@@ -52,7 +52,10 @@ Press **Save and publish** at the bottom.
 - After saving, the bar shows **Publishing…** and then **Live**.
 - If it says **Publishing failed**, the site keeps showing the previous version. Use the link to see
   why, or ask for help.
-- If the site was changed somewhere else since you opened the admin, it reloads instead of
+- If it says **Couldn't check publishing**, your changes are saved; use the link to watch them go live.
+- You can keep editing and save again straight away.
+- If your key stops working while you save, your changes are kept: paste a new key and they are saved.
+- If your text or links were changed somewhere else since you opened the admin, it reloads instead of
   overwriting; make your change again.
 
 Every save is kept in GitHub's history, so any earlier version can be brought back.

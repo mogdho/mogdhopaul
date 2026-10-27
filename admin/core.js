@@ -106,14 +106,41 @@ export function newPhotoId(date, taken, rand = Math.random) {
   }
 }
 
-/** Repo paths of image files whose photos were removed. */
-export function photoChanges(before, after) {
-  const kept = new Set(after.map((p) => p.id));
-  const deletePaths = [];
-  for (const p of before) {
-    if (!kept.has(p.id)) deletePaths.push(p.src.replace(/^\//, ''), p.thumb.replace(/^\//, ''));
+/**
+ * The content files a save writes. Images of removed photos are not deleted here: the build
+ * deletes them in the same commit as the new pages, so the live site never links to a missing file.
+ */
+export function filesToSave({ site, projects, photos }) {
+  return [
+    { path: 'content/site.json', text: toJson(site) },
+    { path: 'content/projects.json', text: toJson(projects) },
+    { path: 'content/photos.json', text: toJson(photos) },
+  ];
+}
+
+/**
+ * Wait for the "Build site" run of `sha`. Never throws: the save already succeeded, so a failed
+ * check (key without Actions access, network blip) is reported as 'unchecked'.
+ * Calls onStatus with 'publishing' first, then the outcome: 'success' | 'failure' | 'timeout' | 'unchecked'.
+ */
+export async function watchPublishing(repo, sha, {
+  onStatus, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = Date.now,
+  intervalMs = 5000, timeoutMs = 5 * 60 * 1000,
+}) {
+  onStatus('publishing');
+  const started = now();
+  let outcome = 'timeout';
+  try {
+    while (now() - started < timeoutMs) {
+      await sleep(intervalMs);
+      const status = await repo.buildStatus(sha);
+      if (status === 'success' || status === 'failure') { outcome = status; break; }
+    }
+  } catch {
+    outcome = 'unchecked';
   }
-  return { deletePaths };
+  onStatus(outcome);
+  return outcome;
 }
 
 export function toJson(value) {

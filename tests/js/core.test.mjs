@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   checkText, isAllowedUrl, validateContent, targetSize, isSupportedImage,
-  newPhotoId, photoChanges, toJson,
+  newPhotoId, toJson, filesToSave, watchPublishing,
 } from '../../admin/core.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../content/${name}.json`, import.meta.url), 'utf8'));
@@ -52,9 +52,6 @@ test('newPhotoId is unique', () => {
   const taken = new Set(['2025-05-14-0000']);
   assert.equal(newPhotoId('2025-05-14', taken, seq(0, 0.5)), '2025-05-14-8000');
 });
-test('photoChanges lists files of removed photos', () =>
-  assert.deepEqual(photoChanges([p('a'), p('b')], [p('b')]).deletePaths,
-    ['photos/img/a-1200.webp', 'photos/img/a-600.webp']));
 test('toJson matches the repo format', () => assert.equal(toJson({ a: 1 }), '{\n  "a": 1\n}\n'));
 
 test('identity must contain the owner name', () => {
@@ -69,3 +66,40 @@ test('checkText rejects emoji', () => assert.match(checkText('Hello \u{1F600}'),
 test('checkText rejects AI-Assisted', () => assert.match(checkText('An AI-Assisted tool'), /AI-Assisted/));
 test('checkText flags typed HTML', () => assert.match(checkText('I am <b>bold</b>'), /HTML/));
 test('checkText allows a plain less-than sign', () => assert.equal(checkText('Loads in < 1 second, 3<4.'), null));
+
+test('filesToSave writes the three content files and never deletes images', () => {
+  const c = content();
+  c.photos = [];
+  const files = filesToSave(c);
+  assert.deepEqual(files.map((f) => f.path), ['content/site.json', 'content/projects.json', 'content/photos.json']);
+  assert.ok(files.every((f) => !f.delete && typeof f.text === 'string'));
+  assert.equal(files[2].text, '[]\n');
+});
+
+const clock = () => { let t = 0; return { now: () => t, sleep: async (ms) => { t += ms; } }; };
+const repoWith = (...results) => ({
+  buildStatus: async () => { const r = results.shift(); if (r instanceof Error) throw r; return r; },
+});
+
+test('watchPublishing reports live once the build succeeds', async () => {
+  const seen = [];
+  const out = await watchPublishing(repoWith('none', 'pending', 'success'), 'sha', { ...clock(), onStatus: (s) => seen.push(s) });
+  assert.equal(out, 'success');
+  assert.deepEqual(seen, ['publishing', 'success']);
+});
+
+test('watchPublishing reports failure', async () => {
+  assert.equal(await watchPublishing(repoWith('failure'), 'sha', { ...clock(), onStatus() {} }), 'failure');
+});
+
+test('watchPublishing never throws: a key without Actions access means unchecked, not a failed save', async () => {
+  const seen = [];
+  const out = await watchPublishing(repoWith(new Error('403')), 'sha', { ...clock(), onStatus: (s) => seen.push(s) });
+  assert.equal(out, 'unchecked');
+  assert.deepEqual(seen, ['publishing', 'unchecked']);
+});
+
+test('watchPublishing gives up after five minutes', async () => {
+  const forever = { buildStatus: async () => 'pending' };
+  assert.equal(await watchPublishing(forever, 'sha', { ...clock(), onStatus() {} }), 'timeout');
+});

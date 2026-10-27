@@ -87,3 +87,60 @@ test('buildStatus maps the Build site run', async () => {
     assert.equal(fetch.calls[0].url, `${API}/actions/runs?head_sha=abc`);
   }
 });
+
+test('requests skip the browser cache so a fresh head is always seen', async () => {
+  let seen;
+  const fetch = async (url, opts) => { seen = opts; return { ok: true, status: 200, json: async () => ({ object: { sha: 'a' } }) }; };
+  await new Repo({ token: 'T', fetch }).headSha();
+  assert.equal(seen.cache, 'no-store');
+});
+
+const commitChain = (sha) => [
+  [201, { sha: 'blob1' }], [200, { tree: { sha: 'tree0' } }], [201, { sha: 'tree1' }],
+  [201, { sha }], [200, { object: { sha } }],
+];
+const FILES = [{ path: 'content/site.json', base64: 'e30K' }];
+const route = (calls) => calls.map((c) => `${c.method} ${c.url.replace(API, '')}`);
+
+test('saveFiles commits on the loaded commit when nothing moved', async () => {
+  const fetch = fakeFetch([[200, { object: { sha: 'loaded' } }], ...commitChain('c1')]);
+  assert.equal(await new Repo({ token: 'T', fetch }).saveFiles('loaded', FILES, 'm'), 'c1');
+  assert.deepEqual(fetch.calls[4].body.parents, ['loaded']);
+});
+
+test('saveFiles builds on the bot page rebuild instead of conflicting', async () => {
+  const fetch = fakeFetch([
+    [200, { object: { sha: 'bot' } }],
+    [200, { status: 'ahead', files: [{ filename: 'index.html' }, { filename: 'photos/img/old-600.webp' }] }],
+    ...commitChain('c2'),
+  ]);
+  assert.equal(await new Repo({ token: 'T', fetch }).saveFiles('mine', FILES, 'm'), 'c2');
+  assert.equal(route(fetch.calls)[1], 'GET /compare/mine...bot');
+  assert.deepEqual(fetch.calls[5].body.parents, ['bot']);
+});
+
+test('saveFiles stops when content changed elsewhere', async () => {
+  const fetch = fakeFetch([
+    [200, { object: { sha: 'other' } }],
+    [200, { status: 'ahead', files: [{ filename: 'content/site.json' }] }],
+  ]);
+  await assert.rejects(new Repo({ token: 'T', fetch }).saveFiles('mine', FILES, 'm'), ConflictError);
+  assert.equal(fetch.calls.length, 2);
+});
+
+test('saveFiles stops when history was rewritten', async () => {
+  const fetch = fakeFetch([[200, { object: { sha: 'other' } }], [200, { status: 'diverged', files: [] }]]);
+  await assert.rejects(new Repo({ token: 'T', fetch }).saveFiles('mine', FILES, 'm'), ConflictError);
+});
+
+test('saveFiles retries when the bot lands during the save', async () => {
+  const fetch = fakeFetch([
+    [200, { object: { sha: 'mine' } }],
+    [201, { sha: 'blob1' }], [200, { tree: { sha: 'tree0' } }], [201, { sha: 'tree1' }], [201, { sha: 'lost' }],
+    [422, { message: 'Update is not a fast forward' }],
+    [200, { object: { sha: 'bot' } }],
+    [200, { status: 'ahead', files: [{ filename: 'about/index.html' }] }],
+    ...commitChain('c3'),
+  ]);
+  assert.equal(await new Repo({ token: 'T', fetch }).saveFiles('mine', FILES, 'm'), 'c3');
+});

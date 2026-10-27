@@ -17,6 +17,7 @@ export class Repo {
   async request(method, path, { body, accept = 'application/vnd.github+json', conflictOn422 = false } = {}) {
     const res = await this.fetch(`${this.base}${path}`, {
       method,
+      cache: 'no-store', // GitHub allows caching for 60s; a stale head would look like a conflict
       headers: {
         Authorization: `Bearer ${this.token}`,
         Accept: accept,
@@ -69,6 +70,28 @@ export class Repo {
       body: { sha: commit.sha, force: false }, conflictOn422: true,
     });
     return commit.sha;
+  }
+
+  /**
+   * Save on top of the latest commit. After each save the workflow pushes rebuilt pages, so the
+   * branch moves on its own; that is fine as long as nobody changed content/ since `loadedSha`.
+   */
+  async saveFiles(loadedSha, files, message, attempts = 3) {
+    for (let i = 1; ; i++) {
+      const head = await this.headSha();
+      if (head !== loadedSha) {
+        const cmp = await this.request('GET', `/compare/${loadedSha}...${head}`);
+        const contentChanged = (cmp.files || []).some((f) => f.filename.startsWith('content/'));
+        if (cmp.status !== 'ahead' || contentChanged) {
+          throw new ConflictError('The site changed since you opened the admin. Reloading.');
+        }
+      }
+      try {
+        return await this.commitFiles(head, files, message);
+      } catch (err) {
+        if (!(err instanceof ConflictError) || i >= attempts) throw err;
+      }
+    }
   }
 
   /** 'pending' | 'success' | 'failure' | 'none' for the "Build site" run on this commit. */
