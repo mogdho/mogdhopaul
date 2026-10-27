@@ -647,3 +647,7 @@ html.js .fade.is-visible .photo__label {
 .video h2 {
   margin-top: 0;
 }
+
+.more-link {
+  margin-top: var(--s6);
+}

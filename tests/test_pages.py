@@ -121,5 +121,14 @@ class AboutPage(CommonPageRules, unittest.TestCase):
         self.assertEqual(page["mainEntity"]["name"], "Mogdho Paul")
 
 
+class ProjectsPage(CommonPageRules, unittest.TestCase):
+    page_key = "projects"
+
+    def test_projects_listed(self):
+        for name in ("Hotspot-Auto-Connect", "Copilot2Gemini", "Capslock-CopyPaste", "NN-tab", "leaflet", "video-showcase-paul"):
+            self.assertIn(name, self.p.text)
+            self.assertIn(f"https://github.com/mogdho/{name}", self.p.hrefs)
+
+
 if __name__ == "__main__":
     unittest.main()
