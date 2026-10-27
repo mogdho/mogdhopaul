@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -70,9 +71,8 @@ class Build(unittest.TestCase):
             self.assertEqual((ROOT / rel).read_text(encoding="utf-8"), page, rel)
 
     def test_featured_on_home(self):
-        for name in ("Copilot2Gemini", "Hotspot-Auto-Connect", "leaflet"):
-            self.assertIn(name, self.pages["index.html"])
-        self.assertNotIn("Capslock-CopyPaste", self.pages["index.html"])
+        cards = re.findall(r'<h3><a href="([^"]+)"', self.pages["index.html"])
+        self.assertEqual(cards, [p["url"] for p in self.content["projects"] if p["featured"]])
 
     def test_home_blurb_used_on_home_description_on_projects(self):
         c2g = next(p for p in self.content["projects"] if p["name"] == "Copilot2Gemini")
@@ -88,8 +88,6 @@ class Build(unittest.TestCase):
         person = next(d for d in Page(self.pages["index.html"]).jsonld if d.get("@type") == "Person")
         self.assertEqual(person["sameAs"], urls)
 
-    def test_text_link_rendered(self):
-        self.assertIn('<a href="/photos/">photos page</a>', self.pages["about/index.html"])
 
 
 class Main(unittest.TestCase):
@@ -131,6 +129,12 @@ class Main(unittest.TestCase):
         self.assertEqual(build_site.main([]), 0)
         self.assertEqual(sorted(p.name for p in img.iterdir()), ["keep-1200.webp", "keep-600.webp"])
         self.assertIn("Paris, France", (self.tmp / "photos" / "index.html").read_text(encoding="utf-8"))
+
+    def test_text_link_rendered(self):
+        self.edit("site", lambda s: s["about"]["sections"][0].update(text="See my [photos page](/photos/)."))
+        build_site.main([])
+        about = (self.tmp / "about" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<a href="/photos/">photos page</a>', about)
 
     def test_zero_photos_shows_empty_note(self):
         build_site.main([])

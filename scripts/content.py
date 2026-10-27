@@ -16,6 +16,11 @@ GROUPS = ("windows", "browser")
 FEATURED_COUNT = 3
 LINK = re.compile(r"\[([^\]\n]+)\]\(([^)\s]+)\)")
 IMG_PATH = re.compile(r"^/photos/img/[a-z0-9-]+\.(webp|jpg)$")
+EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
+HTML_TAG = re.compile(r"</?[a-z!]", re.I)
+BANNED_PHRASES = ("ai-assisted",)
+IDENTITY_NAME = "Mogdho Paul"
+IDENTITY_BANNED = re.compile(r"video editor|motion designer|bucharest", re.I)
 
 
 class ContentError(ValueError):
@@ -52,6 +57,12 @@ def _check_text(value, field, required=True):
             raise ContentError(f"{field}: write it in English letters")
     if any(name in value.lower() for name in BANNED_NAMES):
         raise ContentError(f"{field}: contains another spelling of the name; use Mogdho Paul")
+    if EMOJI.search(value):
+        raise ContentError(f"{field}: leave out emoji")
+    if any(phrase in value.lower() for phrase in BANNED_PHRASES):
+        raise ContentError(f'{field}: leave out "AI-Assisted"')
+    if HTML_TAG.search(value):
+        raise ContentError(f"{field}: HTML is not allowed; write plain text and [text](link) links")
     for m in LINK.finditer(value):
         if not is_allowed_url(m.group(2)):
             raise ContentError(f"{field}: link address {m.group(2)!r} must start with https://, mailto: or /")
@@ -73,6 +84,10 @@ def validate(content):
     _check_text(_get(site, "identity", "site.identity"), "site.identity")
     if len(site["identity"]) > 160:
         raise ContentError("site.identity: keep it under 160 characters (Google shows it as the page description)")
+    if IDENTITY_NAME not in site["identity"]:
+        raise ContentError(f"site.identity: must contain {IDENTITY_NAME}")
+    if IDENTITY_BANNED.search(site["identity"]):
+        raise ContentError("site.identity: leave out video editor, motion designer and Bucharest")
     home = _get(site, "home", "site.home")
     for key in ("lead", "text", "video"):
         _check_text(_get(home, key, f"site.home.{key}"), f"site.home.{key}")

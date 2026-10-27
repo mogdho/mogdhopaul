@@ -49,6 +49,30 @@ class Validate(unittest.TestCase):
         self.c["site"]["about"]["sections"][0]["text"] = "প্যারিস"
         self.assertRejects(r"site\.about\.sections\[0\]\.text")
 
+    def test_identity_must_name_owner(self):
+        self.c["site"]["identity"] = "A developer from Bangladesh who builds small web tools."
+        self.assertRejects(r"site\.identity")
+
+    def test_identity_no_video_role(self):
+        self.c["site"]["identity"] = "Mogdho Paul is a video editor from Bangladesh."
+        self.assertRejects(r"site\.identity")
+
+    def test_emoji_rejected(self):
+        self.c["site"]["home"]["lead"] = "Hello \U0001F600"
+        self.assertRejects(r"site\.home\.lead")
+
+    def test_ai_assisted_rejected(self):
+        self.c["projects"][0]["description"] = "An AI-Assisted tool."
+        self.assertRejects(r"projects\[0\]\.description")
+
+    def test_typed_html_rejected(self):
+        self.c["site"]["about"]["lead"] = "I am <b>bold</b>."
+        self.assertRejects(r"site\.about\.lead")
+
+    def test_less_than_sign_allowed(self):
+        self.c["site"]["about"]["lead"] = "Pages load in < 1 second, 3<4."
+        validate(self.c)
+
     def test_featured_must_be_three(self):
         for p in self.c["projects"]:
             p["featured"] = False

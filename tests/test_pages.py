@@ -4,9 +4,13 @@ import unittest
 
 from tests.helpers import PAGES, ROOT, parse
 
+# Expected values come from content/*.json, so edits made in the admin still pass.
+# Checks pinned to today's wording live in test_content_snapshot.py (skipped on GitHub).
 _SITE = json.loads((ROOT / "content" / "site.json").read_text(encoding="utf-8"))
+_PROJECTS = json.loads((ROOT / "content" / "projects.json").read_text(encoding="utf-8"))
 IDENTITY = _SITE["identity"]
 SAME_AS = [p["url"] for p in _SITE["profiles"]]
+CONTACT = [f"mailto:{_SITE['contact']['email']}", _SITE["contact"]["whatsapp"]]
 BANNED = ("Mugdho", "Mogdha", "AI-Assisted")
 URLS = {"home": "/", "about": "/about/", "projects": "/projects/", "photos": "/photos/"}
 MORSE = "-- --- --. -.. .... --- / .--. .- ..- .-.."
@@ -53,7 +57,7 @@ class CommonPageRules:
         self.assertIsNone(re.search(r"[\U0001F300-\U0001FAFF☀-➿]", self.p.html))
 
     def test_footer_links(self):
-        for u in SAME_AS + ["mailto:mogdhapal@gmail.com", "https://wa.me/+8801998955221"]:
+        for u in SAME_AS + CONTACT:
             self.assertIn(u, self.p.hrefs)
 
     def test_nav(self):
@@ -83,7 +87,7 @@ class HomePage(CommonPageRules, unittest.TestCase):
         self.assertNotIn("alternateName", person)
 
     def test_video_section(self):
-        self.assertIn("https://video-showcase.mogdhopaul.com/", self.p.hrefs)
+        self.assertIn('id="video-title"', self.p.html)
         self.assertIn("video editing", self.p.text.lower())
 
     def test_morse_name(self):
@@ -96,16 +100,9 @@ class HomePage(CommonPageRules, unittest.TestCase):
 class AboutPage(CommonPageRules, unittest.TestCase):
     page_key = "about"
 
-    def test_story_facts(self):
-        t = self.p.text.lower()
-        for s in ("Brahmanbaria", "Dhaka", "Bangladesh", "Tagore", "Morse code", "SEO", "video editing"):
-            self.assertIn(s.lower(), t)
-        self.assertGreaterEqual(len(self.p.text.split()), 500)
-
-    def test_no_sensitive(self):
-        t = self.p.text.lower()
-        for s in ("blood group", "religion", "marital", "mental health", "hindu"):
-            self.assertNotIn(s, t)
+    def test_sections_listed(self):
+        for sec in _SITE["about"]["sections"]:
+            self.assertIn(sec["heading"], self.p.text)
 
     def test_jsonld(self):
         page = next(d for d in self.p.jsonld if d.get("@type") in ("AboutPage", "ProfilePage"))
@@ -116,9 +113,9 @@ class ProjectsPage(CommonPageRules, unittest.TestCase):
     page_key = "projects"
 
     def test_projects_listed(self):
-        for name in ("Hotspot-Auto-Connect", "Copilot2Gemini", "Capslock-CopyPaste", "NN-tab", "leaflet", "video-showcase-paul"):
-            self.assertIn(name, self.p.text)
-            self.assertIn(f"https://github.com/mogdho/{name}", self.p.hrefs)
+        for project in _PROJECTS:
+            self.assertIn(project["name"], self.p.text)
+            self.assertIn(project["url"], self.p.hrefs)
 
 
 class PhotosPage(CommonPageRules, unittest.TestCase):

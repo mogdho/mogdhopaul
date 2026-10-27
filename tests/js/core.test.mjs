@@ -56,3 +56,16 @@ test('photoChanges lists files of removed photos', () =>
   assert.deepEqual(photoChanges([p('a'), p('b')], [p('b')]).deletePaths,
     ['photos/img/a-1200.webp', 'photos/img/a-600.webp']));
 test('toJson matches the repo format', () => assert.equal(toJson({ a: 1 }), '{\n  "a": 1\n}\n'));
+
+test('identity must contain the owner name', () => {
+  const c = content(); c.site.identity = 'A developer from Bangladesh who builds small web tools.';
+  assert.ok(validateContent(c).some((e) => e.field === 'site.identity'));
+});
+test('identity must not name a video role', () => {
+  const c = content(); c.site.identity = 'Mogdho Paul is a video editor from Bangladesh.';
+  assert.ok(validateContent(c).some((e) => e.field === 'site.identity'));
+});
+test('checkText rejects emoji', () => assert.match(checkText('Hello \u{1F600}'), /emoji/i));
+test('checkText rejects AI-Assisted', () => assert.match(checkText('An AI-Assisted tool'), /AI-Assisted/));
+test('checkText flags typed HTML', () => assert.match(checkText('I am <b>bold</b>'), /HTML/));
+test('checkText allows a plain less-than sign', () => assert.equal(checkText('Loads in < 1 second, 3<4.'), null));
