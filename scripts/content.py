@@ -71,6 +71,8 @@ def _get(obj, key, field):
 def validate(content):
     site = _get(content, "site", "site")
     _check_text(_get(site, "identity", "site.identity"), "site.identity")
+    if len(site["identity"]) > 160:
+        raise ContentError("site.identity: keep it under 160 characters (Google shows it as the page description)")
     home = _get(site, "home", "site.home")
     for key in ("lead", "text", "video"):
         _check_text(_get(home, key, f"site.home.{key}"), f"site.home.{key}")

@@ -78,6 +78,10 @@ class Validate(unittest.TestCase):
         self.c["projects"][2]["name"] = "Mugdho tool"
         self.assertRejects(r"projects\[2\]\.name")
 
+    def test_identity_fits_google_description(self):
+        self.c["site"]["identity"] = "Mogdho Paul " + "builds things. " * 12
+        self.assertRejects(r"site\.identity.*160")
+
     def test_bad_group(self):
         self.c["projects"][2]["group"] = "linux"
         self.assertRejects(r"projects\[2\]\.group")

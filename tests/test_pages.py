@@ -4,17 +4,9 @@ import unittest
 
 from tests.helpers import PAGES, ROOT, parse
 
-IDENTITY = ("Mogdho Paul is a developer and SEO specialist from Bangladesh "
-            "who builds small web tools and automations.")
-SAME_AS = [
-    "https://www.facebook.com/mogdhopaul",
-    "https://www.instagram.com/mogdhopaul/",
-    "https://www.linkedin.com/in/mogdho-paul/",
-    "https://github.com/mogdho",
-    "https://www.youtube.com/@mogdhoPAUL",
-    "https://t.me/MOGdhA",
-    "https://maggy2minutes.wordpress.com/",
-]
+_SITE = json.loads((ROOT / "content" / "site.json").read_text(encoding="utf-8"))
+IDENTITY = _SITE["identity"]
+SAME_AS = [p["url"] for p in _SITE["profiles"]]
 BANNED = ("Mugdho", "Mogdha", "AI-Assisted")
 URLS = {"home": "/", "about": "/about/", "projects": "/projects/", "photos": "/photos/"}
 MORSE = "-- --- --. -.. .... --- / .--. .- ..- .-.."
@@ -97,9 +89,8 @@ class HomePage(CommonPageRules, unittest.TestCase):
     def test_morse_name(self):
         self.assertIn(MORSE, self.p.text)
 
-    def test_photo_markers(self):
-        self.assertIn("<!-- photos:strip:start -->", self.p.html)
-        self.assertIn("<!-- photos:strip:end -->", self.p.html)
+    def test_photo_strip(self):
+        self.assertIn('class="photo-strip"', self.p.html)
 
 
 class AboutPage(CommonPageRules, unittest.TestCase):
@@ -133,9 +124,8 @@ class ProjectsPage(CommonPageRules, unittest.TestCase):
 class PhotosPage(CommonPageRules, unittest.TestCase):
     page_key = "photos"
 
-    def test_markers(self):
-        self.assertIn("<!-- photos:grid:start -->", self.p.html)
-        self.assertIn("<!-- photos:grid:end -->", self.p.html)
+    def test_photo_grid(self):
+        self.assertIn('class="photo-grid"', self.p.html)
 
     def test_intro_mentions_name(self):
         self.assertIn("Mogdho Paul", self.p.text)
