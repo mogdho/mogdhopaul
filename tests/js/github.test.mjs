@@ -144,3 +144,16 @@ test('saveFiles retries when the bot lands during the save', async () => {
   ]);
   assert.equal(await new Repo({ token: 'T', fetch }).saveFiles('mine', FILES, 'm'), 'c3');
 });
+
+test('default fetch is called the way browsers require (no "Illegal invocation")', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = function browserLikeFetch() {
+    if (this !== undefined && this !== globalThis) throw new TypeError("Failed to execute 'fetch' on 'Window': Illegal invocation");
+    return Promise.resolve({ ok: true, status: 200, json: async () => ({ object: { sha: 'abc' } }) });
+  };
+  try {
+    assert.equal(await new Repo({ token: 'T' }).headSha(), 'abc');
+  } finally {
+    globalThis.fetch = original;
+  }
+});

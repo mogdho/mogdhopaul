@@ -7,7 +7,8 @@ export class GitHubError extends Error {}
 const API = 'https://api.github.com';
 
 export class Repo {
-  constructor({ token, owner = 'mogdho', repo = 'mogdhopaul', branch = 'main', fetch = globalThis.fetch }) {
+  // The default wraps fetch: browsers throw "Illegal invocation" if it is called as this.fetch().
+  constructor({ token, owner = 'mogdho', repo = 'mogdhopaul', branch = 'main', fetch = (...args) => globalThis.fetch(...args) }) {
     this.token = token;
     this.base = `${API}/repos/${owner}/${repo}`;
     this.branch = branch;
