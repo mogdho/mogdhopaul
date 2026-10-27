@@ -1,38 +1,33 @@
-"""Pull Instagram photos into the site.
+"""Add travel photos to the site from photos you pick by hand.
 
-Fetches posts, saves resized WebP images to photos/img/, writes data/photos.json and
+Reads data/photos.csv (columns: file, place, date) and the original images in photo-originals/,
+saves resized WebP copies to photos/img/ (location data stripped), writes data/photos.json and
 rewrites the marked photo regions in index.html (6 newest) and photos/index.html (all).
-Nothing is written unless every step before writing succeeds.
+Nothing is written unless every photo is ready first.
 
-Usage:  IG_TOKEN=... python -m scripts.build_photos
-        python -m scripts.build_photos --fixture media.json   (local JSON instead of the API)
+Usage:  python -m scripts.build_photos
 """
 import argparse
+import csv
 import html
 import io
 import json
-import os
+import re
 import sys
-import urllib.request
-from datetime import date, datetime, timedelta, timezone
+import unicodedata
+from datetime import date
 from pathlib import Path
 
-from PIL import Image
-
-from scripts.instagram import InstagramError, fetch_media, select_posts
+from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 STRIP_COUNT = 6
 SIZES = (1200, 600)
 EMPTY = '<p class="empty-note">Photos from the road are on their way.</p>'
-DHAKA = timezone(timedelta(hours=6))  # Bangladesh has no daylight saving
 MONTHS = ["January", "February", "March", "April", "May", "June", "July",
           "August", "September", "October", "November", "December"]
-
-
-def local_date(timestamp):
-    """Instagram UTC timestamp -> calendar date in Bangladesh, as YYYY-MM-DD."""
-    return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S%z").astimezone(DHAKA).date().isoformat()
+# Other spellings of the owner's name must never appear on the site.
+BANNED_NAMES = ("mugdho", "mogdha")
 
 
 def _date(photo):
@@ -56,15 +51,13 @@ def render_items(photos, limit, eager=0):
     out = []
     for i, p in enumerate(shown):
         d = _date(p)
-        load = 'fetchpriority="high"' if i == 0 and eager else ("" if i < eager else 'loading="lazy" ')
+        load = 'fetchpriority="high" ' if i == 0 and eager else ("" if i < eager else 'loading="lazy" ')
         place = f'<span class="photo__place">{e(p["place"])}</span>' if p.get("place") else ""
         out.append(
             f'<figure class="photo fade">'
-            f'<a href="{e(p["permalink"])}">'
             f'<img src="{e(p["thumb"])}" srcset="{e(p["thumb"])} 600w, {e(p["src"])} 1200w" '
             f'sizes="(min-width: 48rem) 25vw, 50vw" alt="{e(alt_text(p))}" '
             f'width="{p["width"]}" height="{p["height"]}" {load}decoding="async">'
-            f'</a>'
             f'<figcaption class="photo__label">{place}'
             f'<time datetime="{d.isoformat()}">{d.day} {MONTHS[d.month - 1]} {d.year}</time>'
             f'</figcaption></figure>'
@@ -80,81 +73,89 @@ def replace_region(page, name, content):
     return page[:i + len(start)] + "\n" + content + "\n" + page[j:]
 
 
-def _default_download(url):
-    with urllib.request.urlopen(url, timeout=60) as resp:
-        return resp.read()
+def _check_place(place, line):
+    for ch in place:
+        if (ch.isalpha() and not unicodedata.name(ch, "").startswith("LATIN")) or (ch.isdigit() and not ch.isascii()):
+            raise ValueError(f"line {line}: write the place in English letters (got {place!r})")
+    if any(name in place.lower() for name in BANNED_NAMES):
+        raise ValueError(f"line {line}: place {place!r} contains another spelling of your name")
 
 
-def _resized(raw, width):
-    im = Image.open(io.BytesIO(raw)).convert("RGB")
+def read_list(path):
+    """Rows of the photo list, newest first. Raises ValueError naming the line of any mistake."""
+    if not path.exists():
+        return []
+    rows = []
+    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    for line_no, row in enumerate(csv.reader(lines), start=1):
+        if line_no == 1 or not row or not "".join(row).strip() or row[0].lstrip().startswith("#"):
+            continue
+        if len(row) != 3:
+            raise ValueError(f"line {line_no}: expected file,place,date")
+        file, place, when = (cell.strip() for cell in row)
+        try:
+            date.fromisoformat(when)
+        except ValueError:
+            raise ValueError(f"line {line_no}: date must look like 2025-05-14 (got {when!r})") from None
+        if place:
+            _check_place(place, line_no)
+        rows.append({"file": file, "place": place or None, "date": when})
+    return sorted(rows, key=lambda r: r["date"], reverse=True)
+
+
+def _slug(filename):
+    return re.sub(r"[^a-z0-9]+", "-", Path(filename).stem.lower()).strip("-") or "photo"
+
+
+def _resized(original, width):
+    with Image.open(original) as im:
+        im = ImageOps.exif_transpose(im).convert("RGB")
     if im.width > width:
         im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
     buf = io.BytesIO()
-    im.save(buf, "WEBP", quality=80)  # re-encoding drops EXIF/location metadata
+    im.save(buf, "WEBP", quality=80)  # re-encoding drops EXIF, including GPS location
     return buf.getvalue(), im.size
 
 
-def _read_exclude(path):
-    if not path.exists():
-        return set()
-    lines = (ln.split("#", 1)[0].strip() for ln in path.read_text(encoding="utf-8").splitlines())
-    return {ln for ln in lines if ln}
-
-
-def main(argv=None, download=None):
-    parser = argparse.ArgumentParser(description="Pull Instagram photos into the site.")
-    parser.add_argument("--fixture", help="read media JSON from this file instead of the API")
-    args = parser.parse_args(argv)
-    download = download or _default_download
-
+def main(argv=None):
+    argparse.ArgumentParser(description="Add travel photos from data/photos.csv to the site.").parse_args(argv)
     img_dir = ROOT / "photos" / "img"
-    data_path = ROOT / "data" / "photos.json"
+    originals = ROOT / "photo-originals"
 
-    # 1. Fetch (no writes yet)
+    # 1. Read the list and prepare every image in memory (no writes yet)
     try:
-        if args.fixture:
-            media = json.loads(Path(args.fixture).read_text(encoding="utf-8")).get("data", [])
-        else:
-            token = os.environ.get("IG_TOKEN")
-            if not token:
-                print("IG_TOKEN is not set", file=sys.stderr)
-                return 1
-            media = fetch_media(token)
-    except InstagramError as exc:
-        print(f"Instagram fetch failed, nothing changed: {exc}", file=sys.stderr)
+        rows = read_list(ROOT / "data" / "photos.csv")
+    except ValueError as exc:
+        print(f"photos.csv: {exc}. Nothing changed.", file=sys.stderr)
         return 1
 
-    posts = select_posts(media, _read_exclude(ROOT / "data" / "photos-exclude.txt"))
-
-    # 2. Prepare every image in memory (still no writes)
-    pending = {}
-    photos = []
-    for post in posts:
-        big = img_dir / f"{post.id}-1200.webp"
-        small = img_dir / f"{post.id}-600.webp"
+    pending, photos = {}, []
+    for row in rows:
+        pid = _slug(row["file"])
+        big, small = img_dir / f"{pid}-1200.webp", img_dir / f"{pid}-600.webp"
         try:
             if big.exists() and small.exists():
                 with Image.open(big) as im:
                     size = im.size
             else:
-                raw = download(post.image_url)
-                big_bytes, size = _resized(raw, SIZES[0])
-                small_bytes, _ = _resized(raw, SIZES[1])
-                pending[big], pending[small] = big_bytes, small_bytes
-        except (OSError, ValueError) as exc:
-            print(f"Image for post {post.id} failed, nothing changed: {exc}", file=sys.stderr)
+                src = originals / row["file"]
+                if not src.exists():
+                    print(f"Missing photo-originals/{row['file']}. Nothing changed.", file=sys.stderr)
+                    return 1
+                pending[big], size = _resized(src, SIZES[0])
+                pending[small], _ = _resized(src, SIZES[1])
+        except OSError as exc:
+            print(f"Could not read {row['file']}: {exc}. Nothing changed.", file=sys.stderr)
             return 1
-        photos.append({
-            "id": post.id, "permalink": post.permalink, "date": local_date(post.timestamp), "place": post.place,
-            "src": f"/photos/img/{big.name}", "thumb": f"/photos/img/{small.name}",
-            "width": size[0], "height": size[1],
-        })
+        photos.append({"id": pid, "date": row["date"], "place": row["place"],
+                       "src": f"/photos/img/{big.name}", "thumb": f"/photos/img/{small.name}",
+                       "width": size[0], "height": size[1]})
 
     home_path, grid_path = ROOT / "index.html", ROOT / "photos" / "index.html"
     home = replace_region(home_path.read_text(encoding="utf-8"), "strip", render_items(photos, STRIP_COUNT, eager=3))
     grid = replace_region(grid_path.read_text(encoding="utf-8"), "grid", render_items(photos, None))
 
-    # 3. Write
+    # 2. Write
     img_dir.mkdir(parents=True, exist_ok=True)
     for path, data in pending.items():
         path.write_bytes(data)
@@ -162,11 +163,12 @@ def main(argv=None, download=None):
     for old in img_dir.glob("*.webp"):
         if old.name not in keep:
             old.unlink()
+    data_path = ROOT / "data" / "photos.json"
     data_path.parent.mkdir(parents=True, exist_ok=True)
     data_path.write_text(json.dumps(photos, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     home_path.write_text(home, encoding="utf-8")
     grid_path.write_text(grid, encoding="utf-8")
-    print(f"{len(photos)} photos ({len(pending) // 2} new)")
+    print(f"{len(photos)} photos on the site ({len(pending) // 2} new).")
     return 0
 
 

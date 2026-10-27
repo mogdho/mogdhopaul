@@ -1,0 +1,5 @@
+file,place,date
+# One line per photo: the file name in photo-originals/, the place, and the date (YYYY-MM-DD).
+# Put the place in "quotes" if it has a comma. Leave the place empty to show only the date.
+# Example:
+# eiffel.jpg,"Paris, France",2025-05-14

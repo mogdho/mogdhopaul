@@ -1,7 +1,7 @@
 # mogdhopaul.com redesign — design
 
 Date: 2026-10-27
-Status: draft, awaiting owner approval
+Status: approved 2026-10-27. Amended 2026-10-27: owner dropped the Instagram feed; photos are added by hand (docs/adding-photos.md).
 
 ## Intent and why
 

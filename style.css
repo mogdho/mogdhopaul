@@ -418,12 +418,9 @@ a:hover {
 .photo:nth-child(4n + 3) { --tilt: -0.4deg; }
 .photo:nth-child(4n + 4) { --tilt: 1.4deg; }
 
-.photo a {
-  display: block;
-}
-
-.photo a {
+.photo > img {
   flex: 1;
+  min-height: 0;
 }
 
 .photo img {
