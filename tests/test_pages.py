@@ -141,5 +141,20 @@ class PhotosPage(CommonPageRules, unittest.TestCase):
         self.assertIn("Mogdho Paul", self.p.text)
 
 
+
+class Sitemap(unittest.TestCase):
+    def test_all_pages(self):
+        xml = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        for u in URLS.values():
+            self.assertIn(f"<loc>https://mogdhopaul.com{u}</loc>", xml)
+
+
+class Publishing(unittest.TestCase):
+    def test_private_files_not_published(self):
+        cfg = (ROOT / "_config.yml").read_text(encoding="utf-8")
+        for name in ("docs", "tests", "scripts", "PRODUCT.md", "DESIGN.md", "data"):
+            self.assertIn(f"- {name}", cfg)
+
+
 if __name__ == "__main__":
     unittest.main()

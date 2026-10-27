@@ -1,0 +1,9 @@
+# GitHub Pages: publish only the website, not the tooling around it.
+exclude:
+  - docs
+  - tests
+  - scripts
+  - data
+  - PRODUCT.md
+  - DESIGN.md
+  - README.md

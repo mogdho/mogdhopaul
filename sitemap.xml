@@ -2,7 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mogdhopaul.com/</loc>
-    <lastmod>2026-09-06</lastmod>
+    <lastmod>2026-10-27</lastmod>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://mogdhopaul.com/about/</loc>
+    <lastmod>2026-10-27</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mogdhopaul.com/photos/</loc>
+    <lastmod>2026-10-27</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mogdhopaul.com/projects/</loc>
+    <lastmod>2026-10-27</lastmod>
+    <priority>0.7</priority>
   </url>
 </urlset>
