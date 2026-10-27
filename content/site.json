@@ -1,0 +1,63 @@
+{
+  "identity": "Mogdho Paul is a developer and SEO specialist from Bangladesh who builds small web tools and automations.",
+  "home": {
+    "lead": "Hi, I'm Mogdho. I grew up between Brahmanbaria and Dhaka, and I'm quiet by nature, so I'll let this page do the talking.",
+    "text": "Most of my work is small: a script that saves a few clicks every day, a tool that makes a boring task disappear, a page that finally shows up on Google. I like learning a bit of everything, and when I'm not at the computer I'm usually somewhere new with a camera.",
+    "video": "I also edit video: YouTube videos, podcast shorts, colour and sound, and motion graphics, mostly in Premiere Pro and After Effects.\n\nA selection lives on my [video showcase](https://video-showcase.mogdhopaul.com/)."
+  },
+  "about": {
+    "lead": "A quiet person from Bangladesh who would rather learn something new than talk about himself. So here, for once, I'm talking about myself.",
+    "sections": [
+      {
+        "heading": "Where I'm from",
+        "text": "I'm Mogdho Paul, and I'm from Bangladesh. I was born in Brahmanbaria, a small town on the east side of the country, and went to Annada Government High School there before moving to Dhaka. In Dhaka I studied at Government Laboratory High School in Dhanmondi, then at Birshrestha Munshi Abdur Rouf Public College, and later at the University of Chittagong.\n\nGrowing up between a small town and a huge city shaped me more than I expected. Dhaka has almost everything you could want, but it doesn't leave much room to just wander outside and play. I spent a lot of my childhood indoors, and I think that's part of why I grew up an introvert. I'm not good with big gatherings. I'm much happier somewhere quiet, ideally close to trees, water and open sky.\n\nStudying abroad later took me to Europe, and that is where the camera came out. Walking through old towns, standing under the Eiffel Tower, watching snow settle on a winter street: those moments are most of what you'll find on my [photos page](/photos/)."
+      },
+      {
+        "heading": "How I work",
+        "text": "Most of what I do lives on a computer. I build small web tools and automations, the kind of thing that saves a few clicks every day until you forget the task ever existed. A script that connects my laptop to my phone's hotspot when I unlock it. A key that opens Gemini instead of Copilot. An invoice maker that runs entirely in the browser. You can see them on my [projects page](/projects/).\n\nI also work on SEO, helping websites get found on Google. I learned it from Khalid Farhan's lessons and then by doing it: on-page SEO, site audits, guest posts, and writing content that people and search engines can both understand. This website is partly an SEO project too. I want it to be the page that answers the question \"who is Mogdho Paul?\"\n\nAnd I do video editing: YouTube videos, podcast shorts, colour and sound, and motion graphics, mostly in Premiere Pro and After Effects. Some of that work is on my [video showcase](https://video-showcase.mogdhopaul.com/).\n\nI'm building all of this into a freelance career, one small project at a time."
+      },
+      {
+        "heading": "What I'm into",
+        "text": "I love learning. My quiet goal is to be the kind of person who can talk for at least two minutes about any topic in the world. That means a lot of documentaries and a lot of YouTube: Johnny Harris, Enayet Chowdhury and Dhruv Rathee are on repeat. At school and college I read constantly, books and PDFs of anything I could find. These days it's more often films, series and documentaries.\n\nMusic for me is Rabindranath Tagore's songs. I sing them too, though only for an audience of one in the bathroom. I watch anime, play games with friends, and enjoy a good Marvel or DC film, and I'll always watch Shah Rukh Khan.\n\nRight now I'm learning Morse code, which is why my name is written in dots and dashes on the home page. I've also tried my hand at calligraphy. Neither is useful in any practical way, and that's exactly why I like them."
+      },
+      {
+        "heading": "Someday",
+        "text": "I want to do something meaningful for Bangladesh. I'm not sure yet exactly what shape that takes, but technology feels like the right road for it, and I'm learning as much as I can along the way.\n\nAnd one day, far from the noise of the city, I'd like a farmhouse with a hundred acres of land around it, and a slow, simple life to go with it.\n\nIf you'd like to say hello, the links are just below. I also write now and then on my blog, [maggy2minutes](https://maggy2minutes.wordpress.com/)."
+      }
+    ]
+  },
+  "contact": {
+    "whatsapp": "https://wa.me/+8801998955221",
+    "email": "mogdhapal@gmail.com"
+  },
+  "profiles": [
+    {
+      "label": "Facebook",
+      "url": "https://www.facebook.com/mogdhopaul"
+    },
+    {
+      "label": "Instagram",
+      "url": "https://www.instagram.com/mogdhopaul/"
+    },
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/mogdho-paul/"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/mogdho"
+    },
+    {
+      "label": "YouTube",
+      "url": "https://www.youtube.com/@mogdhoPAUL"
+    },
+    {
+      "label": "Telegram",
+      "url": "https://t.me/MOGdhA"
+    },
+    {
+      "label": "Blog",
+      "url": "https://maggy2minutes.wordpress.com/"
+    }
+  ]
+}

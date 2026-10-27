@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Copilot2Gemini",
+    "url": "https://github.com/mogdho/Copilot2Gemini",
+    "description": "Turns the Copilot key on Windows into a Google Gemini key, opening and hiding Gemini as a neat app window instead of a browser tab.",
+    "home_blurb": "Turns the Copilot key on Windows into a Google Gemini key, and keeps its window behaving.",
+    "language": "AutoHotkey",
+    "group": "windows",
+    "featured": true
+  },
+  {
+    "name": "Hotspot-Auto-Connect",
+    "url": "https://github.com/mogdho/Hotspot-Auto-Connect",
+    "description": "Connects my PC to my phone's hotspot, or my usual Wi-Fi, the moment I unlock it. No more clicking through the network menu.",
+    "home_blurb": "Connects my PC to my phone's hotspot or my usual Wi-Fi the moment I unlock it.",
+    "language": "Batch",
+    "group": "windows",
+    "featured": true
+  },
+  {
+    "name": "Capslock-CopyPaste",
+    "url": "https://github.com/mogdho/Capslock-CopyPaste",
+    "description": "Gives the Caps Lock key a real job: press once to copy, twice to paste.",
+    "home_blurb": "",
+    "language": "AutoHotkey",
+    "group": "windows",
+    "featured": false
+  },
+  {
+    "name": "AlwaysNumLock",
+    "url": "https://github.com/mogdho/AlwaysNumLock",
+    "description": "Keeps Num Lock switched on, always, so the number pad never surprises you.",
+    "home_blurb": "",
+    "language": "AutoHotkey",
+    "group": "windows",
+    "featured": false
+  },
+  {
+    "name": "leaflet",
+    "url": "https://github.com/mogdho/leaflet",
+    "description": "An invoice generator that runs entirely in your browser: fill in the items, and it calculates totals and exports a clean A4 PDF. Nothing is uploaded anywhere.",
+    "home_blurb": "Makes A4 PDF invoices right in the browser. Nothing leaves your computer.",
+    "language": "JavaScript",
+    "group": "browser",
+    "featured": true
+  },
+  {
+    "name": "NN-tab",
+    "url": "https://github.com/mogdho/NN-tab",
+    "description": "A very minimal new tab page for Chrome, for people who want a quiet screen when they open a tab.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "browser",
+    "featured": false
+  },
+  {
+    "name": "Highlighter",
+    "url": "https://github.com/mogdho/Highlighter--Chrome-Extension",
+    "description": "A simple, distraction-free text highlighter for Chrome.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "browser",
+    "featured": false
+  },
+  {
+    "name": "remit-bd",
+    "url": "https://github.com/mogdho/remit-bd",
+    "description": "A calculator for sending money home: converts Romanian leu to Bangladeshi taka at current rates and adds Bangladesh's 2.5% government remittance incentive.",
+    "home_blurb": "",
+    "language": "HTML",
+    "group": "browser",
+    "featured": false
+  },
+  {
+    "name": "video-showcase-paul",
+    "url": "https://github.com/mogdho/video-showcase-paul",
+    "description": "The code behind my [video editing showcase](https://video-showcase.mogdhopaul.com/), a single-page portfolio for my edits.",
+    "home_blurb": "",
+    "language": "TypeScript",
+    "group": "browser",
+    "featured": false
+  }
+]
