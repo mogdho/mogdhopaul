@@ -1,0 +1,415 @@
+/* Admin: same passport-notebook tokens as the site (style.css), tuned for filling in forms. */
+
+:root {
+  --error: #8a1f1f;
+  --field-bg: #fbfcf8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --error: #f0a3a3;
+    --field-bg: #1b2621;
+  }
+}
+
+.admin {
+  padding-bottom: 6rem; /* room for the save bar */
+}
+
+.admin-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2) var(--s5);
+  padding-block: var(--s4);
+}
+
+.admin-bar__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+.admin-bar__user {
+  margin: 0;
+  color: var(--on-cover-soft);
+  font-size: 0.95rem;
+}
+
+.demo-banner {
+  margin: 0;
+  padding: var(--s2) var(--gutter);
+  background: var(--paper-deep);
+  color: var(--ink-soft);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.admin-main {
+  padding-block: var(--s6) var(--s8);
+}
+
+.admin h1 {
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  margin-bottom: var(--s4);
+}
+
+.admin h2 {
+  margin-top: var(--s7);
+  font-size: 1.6rem;
+}
+
+.admin h3 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.login {
+  max-width: 30rem;
+}
+
+.login .muted {
+  margin-top: var(--s5);
+}
+
+/* ---------- Buttons ---------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--s5);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 600 1rem/1 var(--sans);
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--cover);
+  border-color: var(--cover);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.button--quiet {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule);
+}
+
+.button--quiet:hover {
+  background: var(--paper-deep);
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
+
+.button--on-cover {
+  background: var(--on-cover);
+  border-color: var(--on-cover);
+  color: var(--cover);
+}
+
+.button--on-cover:hover {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--cover);
+}
+
+.link-button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.danger {
+  color: var(--error);
+}
+
+/* ---------- Tabs (like the site menu) ---------- */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s5);
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: var(--s5);
+}
+
+.tabs [role="tab"] {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: var(--ink-soft);
+  font: 1.05rem var(--sans);
+  cursor: pointer;
+}
+
+.tabs [role="tab"]:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.tabs [role="tab"][aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.panel-intro {
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+/* ---------- Fields ---------- */
+.field-stack {
+  display: grid;
+  gap: var(--s4);
+}
+
+.field {
+  display: grid;
+  gap: var(--s1);
+}
+
+.field__label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.field__hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+}
+
+.field input[type="text"],
+.field input[type="url"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="date"],
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--field-bg);
+  color: var(--ink);
+  font: 1rem/1.5 var(--sans);
+}
+
+.field textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 1px;
+  border-color: var(--stamp);
+}
+
+.field--check {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 44px;
+}
+
+.field--check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--cover);
+}
+
+.field__error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.9rem;
+}
+
+.field__error:empty {
+  display: none;
+}
+
+.has-error input,
+.has-error textarea,
+.has-error select {
+  border-color: var(--error);
+}
+
+/* ---------- Entries (a project, a section, a profile) ---------- */
+.entry-list {
+  display: grid;
+  gap: var(--s5);
+  margin: var(--s4) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  display: grid;
+  gap: var(--s4);
+  padding: var(--s5);
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.entry__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+}
+
+.entry__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+@media (min-width: 48rem) {
+  .entry__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+}
+
+.entry__row {
+  display: grid;
+  gap: var(--s4);
+}
+
+/* ---------- Photos ---------- */
+.photo-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+  margin-bottom: var(--s5);
+}
+
+.file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.file-button:focus-within {
+  outline: 2px solid var(--stamp);
+  outline-offset: 3px;
+}
+
+.admin-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--s5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-photo {
+  display: grid;
+  gap: var(--s3);
+  padding: 0.4rem 0.4rem var(--s4);
+  background: var(--print);
+  box-shadow: var(--shadow);
+  color: #17201c; /* prints stay light paper in both modes */
+}
+
+.admin-photo img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: var(--paper-deep);
+}
+
+.admin-photo .field {
+  padding-inline: var(--s2);
+}
+
+.admin-photo .field input {
+  background: #fbfcf8;
+  color: #17201c;
+  border-color: #c9d1c2;
+}
+
+.admin-photo .field__error {
+  color: #8a1f1f;
+}
+
+.admin-photo .link-button {
+  justify-self: start;
+  margin-inline: var(--s2);
+  color: #8a1f1f;
+}
+
+.new-tag {
+  margin: 0 var(--s2);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5b3e96;
+}
+
+.empty-note--admin {
+  color: var(--ink-soft);
+}
+
+/* ---------- Save bar ---------- */
+.save-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 5;
+  background: var(--cover);
+  color: var(--on-cover);
+  box-shadow: 0 -6px 16px -10px rgb(0 0 0 / 0.5);
+}
+
+.save-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding-block: var(--s3);
+}
+
+.save-bar__status {
+  margin: 0;
+  flex: 1 1 14rem;
+  font-size: 0.95rem;
+}
+
+.save-bar__status a {
+  color: var(--on-cover);
+}
+
+.save-bar :focus-visible {
+  outline-color: var(--on-cover);
+}
