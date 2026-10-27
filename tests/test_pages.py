@@ -102,5 +102,24 @@ class HomePage(CommonPageRules, unittest.TestCase):
         self.assertIn("<!-- photos:strip:end -->", self.p.html)
 
 
+class AboutPage(CommonPageRules, unittest.TestCase):
+    page_key = "about"
+
+    def test_story_facts(self):
+        t = self.p.text.lower()
+        for s in ("Brahmanbaria", "Dhaka", "Bangladesh", "Tagore", "Morse code", "SEO", "video editing"):
+            self.assertIn(s.lower(), t)
+        self.assertGreaterEqual(len(self.p.text.split()), 500)
+
+    def test_no_sensitive(self):
+        t = self.p.text.lower()
+        for s in ("blood group", "religion", "marital", "mental health", "hindu"):
+            self.assertNotIn(s, t)
+
+    def test_jsonld(self):
+        page = next(d for d in self.p.jsonld if d.get("@type") in ("AboutPage", "ProfilePage"))
+        self.assertEqual(page["mainEntity"]["name"], "Mogdho Paul")
+
+
 if __name__ == "__main__":
     unittest.main()
