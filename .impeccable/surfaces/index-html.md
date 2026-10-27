@@ -19,8 +19,8 @@ OWN-WORLD: Bangladeshi passport materials. Cover green (#0F4D3A) owns the header
 
 STORY: Visitor learns the identity line, sees he travels and builds things, reads the story, finds every profile.
 
-FIRST VIEWPORT: Full-width cover-green field, name very large in Young Serif (paper colour), identity line beneath, passport-photo inset of him (small, square-cornered, framed by a thin paper border) at the right on desktop / above on mobile, nav as small paper-coloured links along the top. The bottom edge of the cover gives way to the visa paper where the first photo prints and their violet stamps begin, peeking above the fold.
+FIRST VIEWPORT: Full-width cover-green field, name very large in Young Serif (paper colour), identity line beneath, passport-photo inset of him (small, square-cornered, framed by a thin paper border) at the right on desktop / beside the name on mobile (keeps name, photo and the first prints inside one phone screen), nav as small paper-coloured links along the top. The bottom edge of the cover gives way to the visa paper where the first photo prints and their violet stamps begin, peeking above the fold.
 
-FORM: Owner-pinned direction ("quiet travel notebook"), rendered as passport-notebook. seed: none (unavailable). Signature interaction: as each print scrolls in, its entry stamp lands (slight overshoot of scale and rotation settling to its resting tilt), once. Footer carries a machine-readable-zone line P<BGDPAUL<<MOGDHO<<<< in mono.
+FORM: Owner-pinned direction ("quiet travel notebook"), rendered as passport-notebook. seed: none (owner-pinned direction; the roll does not apply). Signature interaction: prints are always visible and still; as each print scrolls in, only its entry stamp lands (slight overshoot of scale and rotation settling to its resting tilt), once. Stamps carry a raster ink-grain mask (stamp-ink.png, procedural). Footer carries a machine-readable-zone line P<BGDPAUL<<MOGDHO<<<< in mono.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

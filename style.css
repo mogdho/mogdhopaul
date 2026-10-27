@@ -45,6 +45,7 @@
   --ink-soft: #46534d;
   --rule: #c9d1c2;
   --stamp: #5b3e96;
+  --stamp-on-print: #5b3e96; /* prints stay light paper in both modes */
   --shadow: 0 1px 2px rgb(23 32 28 / 0.12), 0 6px 16px -6px rgb(23 32 28 / 0.22);
   --stamp-blend: multiply;
 
@@ -296,13 +297,6 @@ a:hover {
   color: var(--on-cover);
 }
 
-.cover__meta {
-  margin-top: var(--s5);
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  color: var(--on-cover-soft);
-}
-
 .cover--short .cover__body {
   padding-block: var(--s5) var(--s7);
 }
@@ -333,8 +327,7 @@ a:hover {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     "name photo"
-    "lead lead"
-    "meta meta";
+    "lead lead";
   column-gap: var(--s4);
   row-gap: 0;
   align-items: end;
@@ -346,15 +339,13 @@ a:hover {
 
 .cover__body--home .cover__name { grid-area: name; }
 .cover__body--home .cover__lead { grid-area: lead; }
-.cover__body--home .cover__meta { grid-area: meta; }
 .cover__body--home .passport-photo { grid-area: photo; width: clamp(5.5rem, 24vw, 11rem); }
 
 @media (min-width: 48rem) {
   .cover__body--home {
     grid-template-areas:
       "name photo"
-      "lead photo"
-      "meta photo";
+      "lead photo";
     column-gap: var(--s6);
   }
 
@@ -370,7 +361,7 @@ a:hover {
   font-size: clamp(0.95rem, 0.8rem + 0.6vw, 1.2rem);
   letter-spacing: 0.18em;
   color: var(--ink-soft);
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 }
 
 /* ---------- Album prints ---------- */
@@ -389,6 +380,10 @@ a:hover {
   .photo-strip {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .photo-strip .photo img {
+    aspect-ratio: 4 / 3;
+  }
 }
 
 .photo-grid {
@@ -401,20 +396,18 @@ a:hover {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .photo-grid .photo:first-child:not(:last-child) {
+  .photo-grid .photo:first-child:nth-last-child(n + 5) {
     grid-column: span 2;
     grid-row: span 2;
-  }
-
-  .photo-grid .photo:nth-child(7n + 5):not(:last-child) {
-    grid-column: span 2;
   }
 }
 
 .photo {
   position: relative;
+  display: flex;
+  flex-direction: column;
   margin: 0;
-  padding: 0.4rem 0.4rem 3.2rem;
+  padding: 0.4rem 0.4rem 0.7rem;
   background: var(--print);
   box-shadow: var(--shadow);
   transform: rotate(var(--tilt, 0deg));
@@ -429,6 +422,10 @@ a:hover {
   display: block;
 }
 
+.photo a {
+  flex: 1;
+}
+
 .photo img {
   width: 100%;
   height: 100%;
@@ -437,23 +434,15 @@ a:hover {
   background: var(--paper-deep);
 }
 
-.photo-grid .photo:nth-child(7n + 5):not(:last-child) img {
-  aspect-ratio: 8 / 5;
-}
-
-/* entry stamp: place and date */
+/* entry stamp: place and date, inked onto the print's margin */
 .photo__label {
-  position: absolute;
-  right: 0.7rem;
-  bottom: 0.55rem;
-  max-width: calc(100% - 1.4rem);
+  align-self: flex-end;
+  max-width: 100%;
+  margin: 0.6rem 0.2rem 0;
   padding: 0.3rem 0.55rem 0.25rem;
-  border: 2px solid var(--stamp);
-  border-radius: 6px;
-  outline: 1px solid var(--stamp);
-  outline-offset: 2px;
-  color: var(--stamp);
-  background: transparent;
+  border: 4px double var(--stamp-on-print);
+  border-radius: 2px;
+  color: var(--stamp-on-print);
   font-family: var(--mono);
   font-size: 0.72rem;
   line-height: 1.25;
@@ -461,10 +450,15 @@ a:hover {
   text-transform: uppercase;
   transform: rotate(var(--stamp-tilt, -4deg));
   mix-blend-mode: var(--stamp-blend);
+  -webkit-mask-image: url("/stamp-ink.png");
+  mask-image: url("/stamp-ink.png");
+  -webkit-mask-size: 160px 160px;
+  mask-size: 160px 160px;
 }
 
-.photo:nth-child(3n + 2) .photo__label { --stamp-tilt: 3deg; right: auto; left: 0.7rem; }
+.photo:nth-child(3n + 2) .photo__label { --stamp-tilt: 3deg; align-self: flex-start; }
 .photo:nth-child(3n) .photo__label { --stamp-tilt: -2.5deg; }
+.photo:nth-child(4n + 3) .photo__label { mask-position: 40px 70px; -webkit-mask-position: 40px 70px; }
 
 .photo__place {
   display: block;
@@ -606,17 +600,6 @@ main {
 }
 
 /* ---------- Motion: one moment, the stamp landing ---------- */
-html.js .fade {
-  opacity: 0;
-  transform: translateY(14px) rotate(var(--tilt, 0deg));
-  transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
-}
-
-html.js .fade.is-visible {
-  opacity: 1;
-  transform: rotate(var(--tilt, 0deg));
-}
-
 html.js .fade .photo__label {
   opacity: 0;
 }
@@ -642,16 +625,9 @@ html.js .fade.is-visible .photo__label {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.js .fade,
   html.js .fade .photo__label {
     opacity: 1;
-    transform: rotate(var(--tilt, 0deg));
-    transition: none;
     animation: none;
-  }
-
-  html.js .fade .photo__label {
-    transform: rotate(var(--stamp-tilt, -4deg));
   }
 
   a {
