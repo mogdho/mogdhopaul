@@ -130,5 +130,16 @@ class ProjectsPage(CommonPageRules, unittest.TestCase):
             self.assertIn(f"https://github.com/mogdho/{name}", self.p.hrefs)
 
 
+class PhotosPage(CommonPageRules, unittest.TestCase):
+    page_key = "photos"
+
+    def test_markers(self):
+        self.assertIn("<!-- photos:grid:start -->", self.p.html)
+        self.assertIn("<!-- photos:grid:end -->", self.p.html)
+
+    def test_intro_mentions_name(self):
+        self.assertIn("Mogdho Paul", self.p.text)
+
+
 if __name__ == "__main__":
     unittest.main()

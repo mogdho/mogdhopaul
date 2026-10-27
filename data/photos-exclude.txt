@@ -1,0 +1,2 @@
+# Posts to hide from the site: one Instagram post link (or post id) per line.
+# Example: https://www.instagram.com/p/ABC123/
