@@ -1,0 +1,89 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:26.242Z",
+        "reason": "finish reviewer verified against style.css: detector read pages without root-relative /style.css; rows have 1.5rem padding-block, cover text inset by .page gutter"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:26.400Z",
+        "reason": "finish reviewer verified type steps 6/2.6/1.3/1.06rem in style.css"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "about/index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:26.556Z",
+        "reason": "finish reviewer verified against style.css: detector read pages without root-relative /style.css; rows have 1.5rem padding-block, cover text inset by .page gutter"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "about/index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:26.717Z",
+        "reason": "finish reviewer verified type steps 6/2.6/1.3/1.06rem in style.css"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "projects/index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:26.871Z",
+        "reason": "finish reviewer verified against style.css: detector read pages without root-relative /style.css; rows have 1.5rem padding-block, cover text inset by .page gutter"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "projects/index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:27.029Z",
+        "reason": "finish reviewer verified type steps 6/2.6/1.3/1.06rem in style.css"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "photos/index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:27.206Z",
+        "reason": "finish reviewer verified against style.css: detector read pages without root-relative /style.css; rows have 1.5rem padding-block, cover text inset by .page gutter"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "photos/index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:27.376Z",
+        "reason": "finish reviewer verified type steps 6/2.6/1.3/1.06rem in style.css"
+      },
+      {
+        "rule": "wide-tracking",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-27T16:33:27.560Z",
+        "reason": "finish reviewer: 0.18em tracking is on the Morse code line where gaps carry meaning, not body text"
+      }
+    ]
+  }
+}
