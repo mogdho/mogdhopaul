@@ -6,7 +6,11 @@
     "src": "/photos/img/2026-10-29-d06f-1200.webp",
     "thumb": "/photos/img/2026-10-29-d06f-600.webp",
     "width": 1200,
-    "height": 1600
+    "height": 1600,
+    "focus": {
+      "x": 50,
+      "y": 92
+    }
   },
   {
     "id": "2026-10-29-1627",
@@ -15,7 +19,11 @@
     "src": "/photos/img/2026-10-29-1627-1200.webp",
     "thumb": "/photos/img/2026-10-29-1627-600.webp",
     "width": 1084,
-    "height": 1091
+    "height": 1091,
+    "focus": {
+      "x": 50,
+      "y": 8
+    }
   },
   {
     "id": "2026-10-29-77b6",
@@ -24,6 +32,10 @@
     "src": "/photos/img/2026-10-29-77b6-1200.webp",
     "thumb": "/photos/img/2026-10-29-77b6-600.webp",
     "width": 1084,
-    "height": 1118
+    "height": 1118,
+    "focus": {
+      "x": 50,
+      "y": 100
+    }
   }
 ]
