@@ -18,15 +18,6 @@
     "featured": true
   },
   {
-    "name": "NN-tab",
-    "url": "https://github.com/mogdho/NN-tab",
-    "description": "A sleek, ultra-minimalist New Tab dashboard for Google Chrome.",
-    "home_blurb": "",
-    "language": "AutoHotkey",
-    "group": "windows",
-    "featured": false
-  },
-  {
     "name": "AlwaysNumLock",
     "url": "https://github.com/mogdho/AlwaysNumLock",
     "description": "Keeps Num Lock switched on, always, so the number pad never surprises you.",
