@@ -230,6 +230,20 @@ class Main(unittest.TestCase):
         for page in (first, second):
             self.assertEqual(len(re.findall(r'mogdhopaul\.jpeg"', page)), 0, "every photo link is versioned")
 
+    def test_home_shows_three_newest_linked_to_photos_page(self):
+        self.edit("photos", lambda ps: (ps.clear(), ps.extend(
+            photo(pid=f"p{i}", date=f"2025-05-1{i}") for i in range(5))))
+        build_site.main([])
+        home = (self.tmp / "index.html").read_text(encoding="utf-8")
+        photos_page = (self.tmp / "photos" / "index.html").read_text(encoding="utf-8")
+        strip = home[home.index('class="photo-strip"'):home.index("</section>", home.index('class="photo-strip"'))]
+        self.assertEqual(strip.count("<figure"), 3)
+        self.assertEqual(re.findall(r'href="/photos/#photo-(\w+)"', strip), ["p4", "p3", "p2"])  # newest first
+        for pid in ("p4", "p3", "p2"):
+            self.assertIn(f'id="photo-{pid}"', photos_page)
+        self.assertEqual(photos_page.count("<figure"), 5)
+        self.assertNotIn("photo__link", photos_page)
+
     def test_zero_photos_shows_empty_note(self):
         self.edit("photos", lambda ps: ps.clear())
         build_site.main([])

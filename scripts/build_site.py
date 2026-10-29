@@ -21,7 +21,7 @@ SITE = "https://mogdhopaul.com"
 PAGES = {"index.html": "home", "about/index.html": "about",
          "projects/index.html": "projects", "photos/index.html": "photos"}
 NAV = [("/", "Home"), ("/about/", "About"), ("/photos/", "Photos"), ("/projects/", "Projects")]
-STRIP_COUNT = 6
+STRIP_COUNT = 3  # newest photos on the home page; all of them are on the Photos page
 PORTRAIT_FILES = ("mogdhopaul.webp", "mogdhopaul.jpeg")  # replaced by the admin's Profile photo
 e = html.escape
 
@@ -208,7 +208,7 @@ def _main_block(page, content):
     photos = sorted(content["photos"], key=lambda p: p["date"], reverse=True)
     if page == "home":
         return _template("home").substitute(
-            photos=render_items(photos, STRIP_COUNT, eager=3),
+            photos=render_items(photos, STRIP_COUNT, eager=3, link="/photos/"),
             lead=inline(site["home"]["lead"]),
             intro=_indent(render_text(site["home"]["text"]), 8),
             skills=_skills(site["skills"]),

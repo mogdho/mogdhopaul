@@ -113,7 +113,7 @@ function renderPhotos() {
     el('h1', { text: 'Photos' }),
     renderPortrait(),
     el('h2', { text: 'Travel photos' }),
-    el('p', { class: 'panel-intro', text: 'The six newest show on the home page; all of them on the Photos page. Photos are made smaller on this device, and their location data is removed before upload.' }),
+    el('p', { class: 'panel-intro', text: 'The three newest show on the home page; all of them on the Photos page. Photos are made smaller on this device, and their location data is removed before upload.' }),
     el('div', { class: 'photo-tools' },
       el('label', { class: 'button file-button' }, 'Add photos', input),
       el('p', { class: 'field__error', id: 'photo-error', role: 'alert' })),

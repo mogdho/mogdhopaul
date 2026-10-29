@@ -27,8 +27,10 @@ def _focus_style(photo):
     return f'style="object-position: {int(f["x"])}% {int(f["y"])}%" '
 
 
-def render_items(photos, limit, eager=0):
-    """Print markup for photos; the first `eager` images load immediately (they sit in the first screen)."""
+def render_items(photos, limit, eager=0, link=None):
+    """Print markup for photos; the first `eager` images load immediately (they sit in the first screen).
+    With `link` (a page path), each print opens that page at the same photo; without it, each print
+    gets the id that such a link points to."""
     shown = photos[:limit] if limit else photos
     if not shown:
         return EMPTY
@@ -38,8 +40,12 @@ def render_items(photos, limit, eager=0):
         d = _date(p)
         load = 'fetchpriority="high" ' if i == 0 and eager else ("" if i < eager else 'loading="lazy" ')
         place = f'<span class="photo__place">{e(p["place"])}</span>' if p.get("place") else ""
+        anchor = f'photo-{p["id"]}'
+        opener = (f'<a class="photo__link" href="{e(link)}#{e(anchor)}">'
+                  f'<span class="visually-hidden">See this photo on the Photos page</span></a>') if link else ""
         out.append(
-            f'<figure class="photo fade">'
+            (f'<figure class="photo fade">' if link else f'<figure class="photo fade" id="{e(anchor)}">')
+            + opener +
             f'<img src="{e(p["thumb"])}" srcset="{e(p["thumb"])} 600w, {e(p["src"])} 1200w" {_focus_style(p)}'
             f'sizes="(min-width: 48rem) 25vw, 50vw" alt="{e(alt_text(p))}" '
             f'width="{p["width"]}" height="{p["height"]}" {load}decoding="async">'

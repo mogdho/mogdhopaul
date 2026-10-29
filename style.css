@@ -385,6 +385,42 @@ a {
   grid-template-columns: repeat(2, 1fr);
 }
 
+/* phones: the newest print across the top, the other two side by side below */
+@media (max-width: 47.99rem) {
+  .photo-strip .photo:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .photo-strip .photo:first-child img {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* home prints open the same photo on the Photos page; the link covers the whole print */
+.photo__link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.photo__link:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 3px;
+}
+
+.photo:has(.photo__link) {
+  cursor: pointer;
+}
+
+/* arriving from the home page: room above the print and a soft ink ring around it */
+.photo-grid .photo {
+  scroll-margin-top: var(--s6);
+}
+
+.photo-grid .photo:target {
+  box-shadow: var(--shadow), 0 0 0 3px var(--stamp);
+}
+
 @media (min-width: 48rem) {
   .photo-strip {
     grid-template-columns: repeat(3, 1fr);

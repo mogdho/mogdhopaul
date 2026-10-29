@@ -39,7 +39,8 @@ The device remembers you until you press **Log out**.
 - Photos are shown in a fixed frame, so some of each photo is cut off. **Drag the photo** inside its
   frame to choose which part stays; the small frame shows how it looks on the home page.
   **Centre** puts it back in the middle. The whole photo is uploaded, so you can change this any time.
-- The six newest photos appear on the home page; all of them on the Photos page.
+- The three newest photos appear on the home page (tapping one opens it on the Photos page); all of
+  them are on the Photos page.
 
 **Projects**
 - Edit any field, add or delete projects, and move them up or down.
