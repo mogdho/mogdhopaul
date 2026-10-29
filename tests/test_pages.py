@@ -139,7 +139,7 @@ class Sitemap(unittest.TestCase):
 class Publishing(unittest.TestCase):
     def test_tooling_not_published(self):
         cfg = (ROOT / "_config.yml").read_text(encoding="utf-8")
-        for name in ("content", "templates", "scripts", "tests", "docs", "PRODUCT.md", "DESIGN.md"):
+        for name in ("content", "templates", "scripts", "tests", "docs"):
             self.assertIn(f"- {name}", cfg)
 
     def test_build_starts_from_latest_main(self):

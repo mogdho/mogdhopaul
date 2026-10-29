@@ -5,6 +5,4 @@ exclude:
   - scripts
   - tests
   - docs
-  - PRODUCT.md
-  - DESIGN.md
   - README.md
