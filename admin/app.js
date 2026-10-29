@@ -1,6 +1,7 @@
 // Admin page: log in with a GitHub key, edit content/*.json and photos, save as one commit, watch publishing.
 import {
-  FEATURED_COUNT, dragFocus, filesToSave, isSupportedImage, newPhotoId, validateContent, watchPublishing,
+  DEFAULT_SKILL_ICONS, FEATURED_COUNT, ICON_SETS, dragFocus, filesToSave, iconQueries, isSupportedImage, newPhotoId,
+  rankIcons, skillIconPath, validateContent, watchPublishing,
 } from './core.js';
 import { AuthError, ConflictError, Repo } from './github.js';
 import { PORTRAIT_SIZE, cropImage, resizeImage } from './images.js';
@@ -61,8 +62,6 @@ function fitTextarea(area) {
   area.style.height = 'auto';
   area.style.height = `${area.scrollHeight + 2}px`;
 }
-
-const splitList = (text) => text.split(',').map((t) => t.trim()).filter(Boolean);
 
 const TEXT_HINT ='Blank line = new paragraph. Link: [text](https://…)';
 
@@ -331,6 +330,155 @@ function removePhoto(photo) {
   markDirty();
 }
 
+// ---------- skills ----------
+// Each skill has a name and an icon from Iconify (a free icon library; single-colour sets only).
+// The chosen icon's SVG is saved into skill-icons/ with the next save, so the site never loads it from Iconify.
+const ICONIFY = 'https://api.iconify.design';
+const SKILL_GROUP_LABELS = [['stack', 'Tech stack'], ['tools', 'Tools']];
+const skillUi = {
+  previews: new Map(), // icon id -> object URL, for icons picked since the page opened
+  manual: new WeakSet(), // skills whose icon was chosen by hand: renaming keeps it
+  added: new WeakSet(), // skills added since the page opened: their icon follows the name
+  stamps: new WeakMap(), // skill -> its preview element, updated in place while typing
+  timers: new WeakMap(),
+  picker: null, // the skill whose icon picker is open
+};
+
+const iconFileUrl = (id) => { const [p, n] = id.split(':'); return `${ICONIFY}/${p}/${n}.svg`; };
+const iconSrc = (id) => skillUi.previews.get(id) || `/${skillIconPath(id)}`;
+
+async function searchIcons(query) {
+  const res = await fetch(`${ICONIFY}/search?query=${encodeURIComponent(query)}&limit=64&prefixes=${ICON_SETS.join(',')}`);
+  if (!res.ok) throw new Error(`icon search failed (${res.status})`);
+  return rankIcons((await res.json()).icons || []);
+}
+
+async function findIcon(name) {
+  for (const q of iconQueries(name)) {
+    const found = await searchIcons(q);
+    if (found.length) return found[0];
+  }
+  return null;
+}
+
+/** Download the icon so it is saved with the site, then use it. null = the group's default icon. */
+async function useIcon(item, id) {
+  if (id) {
+    const res = await fetch(iconFileUrl(id));
+    const svg = res.ok ? await res.text() : '';
+    if (!svg.trim().startsWith('<svg')) throw new Error('icon download failed');
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    state.newImages.set(skillIconPath(id), blob);
+    if (!skillUi.previews.has(id)) skillUi.previews.set(id, URL.createObjectURL(blob));
+  }
+  item.icon = id;
+  markDirty();
+}
+
+function skillStamp(item, group) {
+  const id = item.icon || DEFAULT_SKILL_ICONS[group];
+  return el('span', { class: 'skill__stamp skill-entry__stamp', 'aria-hidden': 'true' },
+    el('span', { class: 'skill__icon', style: `--icon: url("${iconSrc(id)}")` }));
+}
+
+function refreshStamp(item, group) {
+  const old = skillUi.stamps.get(item);
+  if (!old) return;
+  const fresh = skillStamp(item, group);
+  old.replaceWith(fresh);
+  skillUi.stamps.set(item, fresh);
+}
+
+/** New skills (and ones without an icon) get the best matching icon a moment after you stop typing. */
+function autoIcon(item, group) {
+  if (skillUi.manual.has(item) || !(skillUi.added.has(item) || item.icon == null)) return;
+  clearTimeout(skillUi.timers.get(item));
+  skillUi.timers.set(item, setTimeout(async () => {
+    const name = item.name;
+    try {
+      const id = name.trim() ? await findIcon(name) : null;
+      if (item.name !== name || skillUi.manual.has(item)) return; // typed on, or chosen by hand meanwhile
+      await useIcon(item, id);
+      refreshStamp(item, group);
+    } catch { /* offline or the library is down: the default icon stays */ }
+  }, 700));
+}
+
+function iconPicker(item, group) {
+  const results = el('ul', { class: 'icon-picker__results' });
+  const status = el('p', { class: 'field__hint', role: 'status' });
+  const query = el('input', { type: 'search', id: 'icon-search', autocomplete: 'off', 'aria-label': 'Search icons' });
+  query.value = item.name;
+  const choose = async (id) => {
+    status.textContent = 'Saving this icon…';
+    try {
+      await useIcon(item, id);
+      skillUi.manual.add(item);
+      skillUi.picker = null;
+      renderSkills();
+    } catch {
+      status.textContent = 'Couldn’t download that icon. Check your connection and try again.';
+    }
+  };
+  const run = async () => {
+    results.replaceChildren();
+    if (!query.value.trim()) return;
+    status.textContent = 'Searching…';
+    try {
+      const found = await searchIcons(query.value.trim());
+      status.textContent = found.length ? 'Pick the icon you like.' : 'No icons found. Try another word, for example the company name.';
+      results.replaceChildren(...found.slice(0, 24).map((id) => el('li', {},
+        el('button', { type: 'button', class: 'icon-picker__choice', title: id, 'aria-label': `Use icon ${id}`, onclick: () => choose(id) },
+          el('span', { class: 'skill__icon', style: `--icon: url("${iconFileUrl(id)}")` })))));
+    } catch {
+      status.textContent = 'Couldn’t reach the icon library. Check your connection and try again.';
+    }
+  };
+  const form = el('form', { class: 'icon-picker__search', onsubmit: (e) => { e.preventDefault(); run(); } },
+    query, el('button', { type: 'submit', class: 'button button--quiet' }, 'Search'));
+  requestAnimationFrame(() => { query.focus(); run(); });
+  return el('div', { class: 'icon-picker' }, form, status, results,
+    el('div', { class: 'entry__actions' },
+      el('button', { type: 'button', class: 'link-button', onclick: () => choose(null) }, 'Use the plain default icon'),
+      el('button', { type: 'button', class: 'link-button', onclick: () => { skillUi.picker = null; renderSkills(); } }, 'Close')));
+}
+
+function renderSkills() {
+  const box = $('skills-editor');
+  if (!box) return;
+  const skills = state.site.skills;
+  box.replaceChildren(...SKILL_GROUP_LABELS.map(([group, label]) => {
+    const list = skills[group];
+    return el('div', { class: 'skill-group' },
+      el('h3', { text: label }),
+      list.length ? null : el('p', { class: 'field__hint', text: 'Empty: this row is hidden on the site.' }),
+      el('ol', { class: 'skill-list' }, list.map((item, i) => {
+        const stamp = skillStamp(item, group);
+        skillUi.stamps.set(item, stamp);
+        return el('li', { class: 'skill-entry' },
+          el('div', { class: 'skill-entry__main' },
+            stamp,
+            field({ label: 'Skill', value: item.name, field: `site.skills.${group}[${i}].name`,
+              onInput: (v) => { item.name = v; autoIcon(item, group); } }),
+            el('div', { class: 'entry__actions' },
+              el('button', { type: 'button', class: 'button button--quiet', onclick: () => { skillUi.picker = skillUi.picker === item ? null : item; renderSkills(); } }, 'Change icon'),
+              el('button', { type: 'button', class: 'button button--quiet', disabled: i === 0, onclick: () => moveItem(list, i, -1, renderSkills) }, 'Move up'),
+              el('button', { type: 'button', class: 'button button--quiet', disabled: i === list.length - 1, onclick: () => moveItem(list, i, 1, renderSkills) }, 'Move down'),
+              el('button', { type: 'button', class: 'button button--quiet danger', onclick: () => { list.splice(i, 1); markDirty(); renderSkills(); } }, 'Delete'))),
+          el('p', { class: 'field__error', 'data-error-for': `site.skills.${group}[${i}].icon`, role: 'alert' }),
+          skillUi.picker === item ? iconPicker(item, group) : null);
+      })),
+      el('button', { type: 'button', class: 'button', onclick: () => {
+        const item = { name: '', icon: null };
+        list.push(item);
+        skillUi.added.add(item);
+        markDirty();
+        renderSkills();
+        box.querySelectorAll(`[data-field="site.skills.${group}[${list.length - 1}].name"]`).forEach((n) => n.focus());
+      } }, `Add to ${label.toLowerCase()}`));
+  }));
+}
+
 // ---------- projects ----------
 function renderProjects() {
   const panel = $('panel-projects');
@@ -389,10 +537,8 @@ function renderText() {
       field({ label: 'Home: intro', value: s.home.text, field: 'site.home.text', multiline: true, hint: TEXT_HINT, onInput: (v) => { s.home.text = v; } }),
       field({ label: 'Home: video editing', value: s.home.video, field: 'site.home.video', multiline: true, hint: TEXT_HINT, onInput: (v) => { s.home.video = v; } })),
     el('h2', { text: 'Skills' }),
-    el('p', { class: 'panel-intro', text: 'Shown on the home page above “Things I’ve built”. Separate items with commas; leave a line empty to hide it.' }),
-    el('div', { class: 'field-stack' },
-      field({ label: 'Tech stack', value: s.skills.stack.join(', '), field: 'site.skills.stack', required: false, hint: 'For example: JavaScript, Python', onInput: (v) => { s.skills.stack = splitList(v); } }),
-      field({ label: 'Tools', value: s.skills.tools.join(', '), field: 'site.skills.tools', required: false, hint: 'For example: Premiere Pro, After Effects', onInput: (v) => { s.skills.tools = splitList(v); } })),
+    el('p', { class: 'panel-intro', text: 'Shown on the home page above “Things I’ve built”. Each skill gets a matching icon automatically; use “Change icon” to pick another.' }),
+    el('div', { id: 'skills-editor' }),
     el('h2', { text: 'About page' }),
     field({ label: 'Opening line', value: s.about.lead, field: 'site.about.lead', multiline: true, onInput: (v) => { s.about.lead = v; } }),
     el('ol', { class: 'entry-list' }, s.about.sections.map((sec, i) => el('li', { class: 'entry' },
@@ -422,6 +568,7 @@ function renderText() {
         el('button', { type: 'button', class: 'button button--quiet danger', onclick: () => { s.profiles.splice(i, 1); markDirty(); renderText(); } }, 'Delete'))))),
     el('button', { type: 'button', class: 'button', onclick: () => { s.profiles.push({ label: '', url: 'https://' }); markDirty(); renderText(); } }, 'Add link'),
   );
+  renderSkills();
 }
 
 // ---------- errors ----------

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import {
   checkText, isAllowedUrl, validateContent, targetSize, isSupportedImage,
   newPhotoId, toJson, filesToSave, watchPublishing, isFocus, dragFocus, cropRect,
+  isIconId, skillIconPath, iconQueries, rankIcons, DEFAULT_SKILL_ICONS,
 } from '../../admin/core.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../content/${name}.json`, import.meta.url), 'utf8'));
@@ -43,8 +44,21 @@ test('validateContent checks photo date and place', () => {
   assert.deepEqual(validateContent(c).map((e) => e.field), ['photos[0].date', 'photos[1].place']);
 });
 test('validateContent checks skills', () => {
-  const c = content(); c.site.skills.tools = ['Premiere Pro', 'Mugdho editor'];
-  assert.deepEqual(validateContent(c).map((e) => e.field), ['site.skills.tools']);
+  const c = content();
+  c.site.skills.tools = [{ name: 'Premiere Pro', icon: null }, { name: 'Mugdho editor', icon: null }, { name: 'Ok', icon: '../x' }];
+  assert.deepEqual(validateContent(c).map((e) => e.field), ['site.skills.tools[1].name', 'site.skills.tools[2].icon']);
+});
+test('skill icon helpers', () => {
+  assert.equal(isIconId('simple-icons:python'), true);
+  assert.equal(isIconId('a:b/c'), false);
+  assert.equal(skillIconPath('cib:adobe-after-effects'), 'skill-icons/cib--adobe-after-effects.svg');
+  assert.deepEqual(iconQueries(' HTML &  CSS '), ['html css', 'html']);
+  assert.deepEqual(rankIcons(['tabler:brand-python', 'ri:x', 'unknown:y', 'simple-icons:python', 'cib:python']),
+    ['simple-icons:python', 'cib:python', 'tabler:brand-python', 'ri:x']);
+});
+test('skill icon defaults match the build', () => {
+  const py = readFileSync(new URL('../../scripts/build_site.py', import.meta.url), 'utf8');
+  for (const [group, id] of Object.entries(DEFAULT_SKILL_ICONS)) assert.match(py, new RegExp(`"${group}": "${id}"`));
 });
 test('isFocus accepts whole percentages only', () => {
   assert.equal(isFocus({ x: 0, y: 100 }), true);

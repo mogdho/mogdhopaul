@@ -6,6 +6,7 @@ on:
     paths:
       - "content/**"
       - "photos/img/**"
+      - "skill-icons/**"
       - "mogdhopaul.webp"
       - "mogdhopaul.jpeg"
       - "style.css"
@@ -58,7 +59,7 @@ jobs:
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A index.html about projects photos admin/index.html
+            git add -A index.html about projects photos admin/index.html skill-icons
             git commit -m "chore: rebuild pages"
             git pull --rebase
             git push

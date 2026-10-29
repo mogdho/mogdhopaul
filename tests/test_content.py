@@ -95,12 +95,21 @@ class Validate(unittest.TestCase):
         self.assertRejects(r"photos\[0\]\.src")
 
     def test_skills_checked_like_text(self):
-        self.c["site"]["skills"]["tools"] = ["Premiere Pro", "<b>x</b>"]
-        self.assertRejects(r"site\.skills\.tools\[1\]")
+        self.c["site"]["skills"]["tools"] = [{"name": "Premiere Pro", "icon": None}, {"name": "<b>x</b>", "icon": None}]
+        self.assertRejects(r"site\.skills\.tools\[1\]\.name")
 
     def test_skills_must_be_lists(self):
         self.c["site"]["skills"]["stack"] = "JavaScript, Python"
         self.assertRejects(r"site\.skills\.stack")
+
+    def test_skill_needs_name_and_icon(self):
+        self.c["site"]["skills"]["stack"] = ["JavaScript"]
+        self.assertRejects(r"site\.skills\.stack\[0\]")
+
+    def test_skill_icon_id_shape(self):
+        for bad in ("python", "../x:y", "a:b/c", "A:b"):
+            self.c["site"]["skills"]["stack"] = [{"name": "X", "icon": bad}]
+            self.assertRejects(r"site\.skills\.stack\[0\]\.icon")
 
     def _photo(self, **extra):
         return {"id": "a", "place": None, "date": "2025-05-14", "src": "/photos/img/a-1200.webp",

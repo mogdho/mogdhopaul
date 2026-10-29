@@ -14,6 +14,7 @@ from pathlib import Path
 BANNED_NAMES = ("mugdho", "mogdha")
 GROUPS = ("windows", "browser")
 SKILL_GROUPS = ("stack", "tools")
+ICON_ID = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*:[a-z0-9]+(-[a-z0-9]+)*$")  # an Iconify icon, saved in skill-icons/
 FEATURED_COUNT = 3
 LINK = re.compile(r"\[([^\]\n]+)\]\(([^)\s]+)\)")
 IMG_PATH = re.compile(r"^/photos/img/[a-z0-9-]+\.(webp|jpg)$")
@@ -98,7 +99,12 @@ def validate(content):
         if not isinstance(items, list):
             raise ContentError(f"site.skills.{key}: must be a list")
         for i, item in enumerate(items):
-            _check_text(item, f"site.skills.{key}[{i}]")
+            f = f"site.skills.{key}[{i}]"
+            if not isinstance(item, dict) or set(item) != {"name", "icon"}:
+                raise ContentError(f"{f}: must have a name and an icon")
+            _check_text(item["name"], f"{f}.name")
+            if item["icon"] is not None and not ICON_ID.match(str(item["icon"])):
+                raise ContentError(f"{f}.icon: must look like set:name, for example simple-icons:python")
     about = _get(site, "about", "site.about")
     _check_text(_get(about, "lead", "site.about.lead"), "site.about.lead")
     for i, sec in enumerate(_get(about, "sections", "site.about.sections")):

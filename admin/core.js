@@ -5,6 +5,34 @@ export const BANNED_NAMES = ['mugdho', 'mogdha'];
 export const FEATURED_COUNT = 3;
 export const GROUPS = ['windows', 'browser'];
 export const SKILL_GROUPS = ['stack', 'tools'];
+
+// ---------- skill icons (Iconify: free icon library; single-colour sets only, in order of preference) ----------
+export const ICON_SETS = ['simple-icons', 'cib', 'devicon-plain', 'fa6-brands', 'tabler', 'ri', 'mdi', 'bi'];
+export const DEFAULT_SKILL_ICONS = { stack: 'tabler:code', tools: 'tabler:tools' }; // mirrors scripts/build_site.py
+const ICON_ID = /^[a-z0-9]+(-[a-z0-9]+)*:[a-z0-9]+(-[a-z0-9]+)*$/;
+
+export function isIconId(id) {
+  return typeof id === 'string' && ICON_ID.test(id);
+}
+
+/** Where an icon is saved in the site, e.g. skill-icons/simple-icons--python.svg */
+export function skillIconPath(id) {
+  const [prefix, name] = id.split(':');
+  return `skill-icons/${prefix}--${name}.svg`;
+}
+
+/** Search words to try for a skill name: the whole name, then its first word ("HTML & CSS" -> "html css", "html"). */
+export function iconQueries(name) {
+  const clean = String(name).toLowerCase().replace(/&/g, ' ').replace(/\s+/g, ' ').trim();
+  return clean ? [...new Set([clean, clean.split(' ')[0]])] : [];
+}
+
+/** Search results ("set:name"), best first: single-colour brand sets before general icon sets. */
+export function rankIcons(results) {
+  const rank = (id) => ICON_SETS.indexOf(id.split(':')[0]);
+  return results.filter((id) => isIconId(id) && rank(id) >= 0)
+    .map((id, i) => ({ id, i })).sort((a, b) => rank(a.id) - rank(b.id) || a.i - b.i).map((r) => r.id);
+}
 const LINK = /\[([^\]\n]+)\]\(([^)\s]+)\)/g;
 const IMG_PATH = /^\/photos\/img\/[a-z0-9-]+\.(webp|jpg)$/;
 const SUPPORTED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -58,8 +86,14 @@ export function validateContent({ site, projects, photos }) {
   for (const key of ['lead', 'text', 'video']) text(`site.home.${key}`, site.home[key]);
   for (const key of SKILL_GROUPS) {
     const items = site.skills?.[key];
-    if (!Array.isArray(items)) add(`site.skills.${key}`, 'This list is missing.');
-    else add(`site.skills.${key}`, items.map((t) => checkText(t)).find(Boolean) || null);
+    if (!Array.isArray(items)) {
+      add(`site.skills.${key}`, 'This list is missing.');
+      continue;
+    }
+    items.forEach((it, i) => {
+      text(`site.skills.${key}[${i}].name`, it?.name);
+      if (it?.icon != null && !isIconId(it.icon)) add(`site.skills.${key}[${i}].icon`, 'This icon is broken. Choose another.');
+    });
   }
   text('site.about.lead', site.about.lead);
   site.about.sections.forEach((s, i) => {

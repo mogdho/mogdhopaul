@@ -50,8 +50,10 @@ The device remembers you until you press **Log out**.
 - Your identity line, home intro, video-editing text, About page sections, WhatsApp, email and
   profile links.
 - A blank line starts a new paragraph.
-- **Skills**: your tech stack and tools, shown on the home page above your projects. Separate items
-  with commas (JavaScript, Python). Leave a line empty to hide that row.
+- **Skills**: your tech stack and tools, shown on the home page above your projects as round stamps.
+  **Add to tech stack / Add to tools** adds one; type its name and a matching single-colour icon is
+  found for it. **Change icon** lets you search for another (try the company name if nothing comes
+  up). **Move up / Move down** set the order, **Delete** removes it. An empty group is hidden.
 - To add a link, write `[link text](https://example.com)`. Links to your own pages work too:
   `[photos page](/photos/)`.
 

@@ -93,32 +93,33 @@ def _project_items(projects, indent, home):
 
 
 SKILL_LABELS = (("stack", "Tech stack"), ("tools", "Tools"))
-# Short marks for the skill stamps; anything else gets its initials.
-SKILL_MARKS = {
-    "javascript": "JS", "typescript": "TS", "python": "Py", "html": "</>", "html & css": "</>",
-    "css": "{ }", "autohotkey": "AHK", "premiere pro": "Pr", "after effects": "Ae",
-    "photoshop": "Ps", "illustrator": "Ai", "figma": "Fg", "react": "Re", "node.js": "No",
-    "git": "Git", "seo": "SEO", "wordpress": "WP", "batch": "BAT", "davinci resolve": "DR",
-}
+# Skill icons: single-colour icons from the Iconify library, saved by the admin into skill-icons/.
+SKILL_ICON_DIR = "skill-icons"
+DEFAULT_SKILL_ICONS = {"stack": "tabler:code", "tools": "tabler:tools"}  # for skills without their own icon
+
+
+def skill_icon_path(icon_id):
+    prefix, name = icon_id.split(":")
+    return f"{SKILL_ICON_DIR}/{prefix}--{name}.svg"
 
 
 def skill_mark(name):
-    """Two or three characters that stand for a skill inside its stamp."""
-    key = " ".join(name.lower().split())
-    if key in SKILL_MARKS:
-        return SKILL_MARKS[key]
-    words = [w for w in key.replace("&", " ").split() if w[0].isalnum()]
+    """Initials, shown only when no icon file can be found."""
+    words = [w for w in name.replace("&", " ").split() if w[0].isalnum()]
     if len(words) > 1:
         return "".join(w[0] for w in words[:3]).upper()
-    word = words[0] if words else key
-    return word[:2].capitalize()
+    return (words[0] if words else name)[:2].capitalize()
 
 
-def _skill_item(name):
-    mark = skill_mark(name)
-    cls = "skill__stamp skill__stamp--long" if len(mark) > 2 else "skill__stamp"
-    return (f'<li class="skill"><span class="{cls}" aria-hidden="true">{e(mark)}</span>'
-            f'<span class="skill__name">{e(name)}</span></li>')
+def _skill_item(item, group):
+    for icon_id in (item["icon"], DEFAULT_SKILL_ICONS[group]):
+        if icon_id and (ROOT / skill_icon_path(icon_id)).exists():
+            inner = f'<span class="skill__icon" style="--icon: url(/{skill_icon_path(icon_id)})"></span>'
+            break
+    else:
+        inner = e(skill_mark(item["name"]))
+    return (f'<li class="skill"><span class="skill__stamp" aria-hidden="true">{inner}</span>'
+            f'<span class="skill__name">{e(item["name"])}</span></li>')
 
 
 def _skills(skills):
@@ -126,7 +127,7 @@ def _skills(skills):
     rows = []
     for key, label in SKILL_LABELS:
         if skills[key]:
-            items = "".join(_skill_item(item) for item in skills[key])
+            items = "".join(_skill_item(item, key) for item in skills[key])
             rows.append(f'  <div class="skills__row">\n    <dt>{label}</dt>\n'
                         f'    <dd><ul class="skills__items">{items}</ul></dd>\n  </div>')
     if not rows:
@@ -257,6 +258,14 @@ def build(root=None):
     return pages
 
 
+def unused_skill_icons(root, site):
+    """Icon files no skill uses any more (the default icons are always kept)."""
+    keep = {Path(skill_icon_path(i)).name for i in DEFAULT_SKILL_ICONS.values()}
+    keep |= {Path(skill_icon_path(it["icon"])).name for g in site["skills"].values() for it in g if it["icon"]}
+    folder = Path(root) / SKILL_ICON_DIR
+    return sorted(p for p in folder.glob("*") if p.is_file() and p.name not in keep) if folder.exists() else []
+
+
 def unused_images(root, photos):
     keep = {Path(p[k]).name for p in photos for k in ("src", "thumb")}
     img = Path(root) / "photos" / "img"
@@ -267,7 +276,8 @@ def main(argv=None):
     argparse.ArgumentParser(description="Build the site pages from content/.").parse_args(argv)
     try:
         pages = build(ROOT)
-        photos = load_content(ROOT)["photos"]
+        content = load_content(ROOT)
+        photos = content["photos"]
         admin = _admin_page()
     except ContentError as exc:
         print(f"Content problem, nothing changed: {exc}", file=sys.stderr)
@@ -278,7 +288,7 @@ def main(argv=None):
         out = ROOT / rel
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(page, encoding="utf-8")
-    removed = unused_images(ROOT, photos)
+    removed = unused_images(ROOT, photos) + unused_skill_icons(ROOT, content["site"])
     for path in removed:
         path.unlink()
     print(f"Built {len(pages)} pages, {len(photos)} photos, removed {len(removed)} unused image(s).")

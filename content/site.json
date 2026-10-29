@@ -7,15 +7,36 @@
   },
   "skills": {
     "stack": [
-      "JavaScript",
-      "Python",
-      "HTML & CSS",
-      "AutoHotkey"
+      {
+        "name": "JavaScript",
+        "icon": "simple-icons:javascript"
+      },
+      {
+        "name": "Python",
+        "icon": "simple-icons:python"
+      },
+      {
+        "name": "HTML & CSS",
+        "icon": "simple-icons:html5"
+      },
+      {
+        "name": "AutoHotkey",
+        "icon": "simple-icons:autohotkey"
+      }
     ],
     "tools": [
-      "Premiere Pro",
-      "After Effects",
-      "Capcut"
+      {
+        "name": "Premiere Pro",
+        "icon": "devicon-plain:premierepro"
+      },
+      {
+        "name": "After Effects",
+        "icon": "cib:adobe-after-effects"
+      },
+      {
+        "name": "Capcut",
+        "icon": "tabler:movie"
+      }
     ]
   },
   "about": {

@@ -548,8 +548,13 @@ main {
   text-align: center;
 }
 
-.skill__stamp--long {
-  font-size: 0.85rem;
+/* the skill's icon, inked in the stamp colour (the SVG is only used as a shape) */
+.skill__icon {
+  width: 1.9rem;
+  height: 1.9rem;
+  background: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
 }
 
 .skill__stamp {

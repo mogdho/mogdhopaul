@@ -164,8 +164,17 @@ class Main(unittest.TestCase):
         about = (self.tmp / "about" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<a href="/photos/">photos page</a>', about)
 
+    def skill(self, name, icon=None):
+        return {"name": name, "icon": icon}
+
+    def icon_file(self, icon_id):
+        path = self.tmp / build_site.skill_icon_path(icon_id)
+        path.parent.mkdir(exist_ok=True)
+        path.write_text("<svg/>", encoding="utf-8")
+        return path
+
     def test_skills_before_projects(self):
-        self.edit("site", lambda s: s.update(skills={"stack": ["JavaScript", "C & C++"], "tools": []}))
+        self.edit("site", lambda s: s.update(skills={"stack": [self.skill("JavaScript"), self.skill("C & C++")], "tools": []}))
         build_site.main([])
         home = (self.tmp / "index.html").read_text(encoding="utf-8")
         self.assertLess(home.index('id="skills-title"'), home.index('id="projects-title"'))
@@ -173,11 +182,34 @@ class Main(unittest.TestCase):
         self.assertIn("Tech stack", home)
         self.assertNotIn("<dt>Tools</dt>", home)  # empty group hidden
 
-    def test_skill_marks(self):
-        self.assertEqual(build_site.skill_mark("JavaScript"), "JS")
-        self.assertEqual(build_site.skill_mark("after  effects"), "Ae")
-        self.assertEqual(build_site.skill_mark("Blender"), "Bl")
+    def test_skill_icon_from_its_file(self):
+        self.icon_file("simple-icons:python")
+        self.edit("site", lambda s: s.update(skills={"stack": [self.skill("Python", "simple-icons:python")], "tools": []}))
+        build_site.main([])
+        home = (self.tmp / "index.html").read_text(encoding="utf-8")
+        self.assertIn("--icon: url(/skill-icons/simple-icons--python.svg)", home)
+
+    def test_skill_without_icon_gets_group_default(self):
+        self.icon_file("tabler:tools")
+        self.edit("site", lambda s: s.update(skills={"stack": [], "tools": [self.skill("CapCut"), self.skill("Gone", "x:missing")]}))
+        build_site.main([])
+        home = (self.tmp / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(home.count("url(/skill-icons/tabler--tools.svg)"), 2)
+
+    def test_skill_initials_when_no_icon_files(self):
         self.assertEqual(build_site.skill_mark("Final Cut Pro"), "FCP")
+        self.assertEqual(build_site.skill_mark("Blender"), "Bl")
+        self.edit("site", lambda s: s.update(skills={"stack": [self.skill("Blender")], "tools": []}))
+        build_site.main([])
+        self.assertIn('aria-hidden="true">Bl</span>', (self.tmp / "index.html").read_text(encoding="utf-8"))
+
+    def test_unused_skill_icons_deleted(self):
+        keep, gone, default = self.icon_file("cib:figma"), self.icon_file("cib:old"), self.icon_file("tabler:code")
+        self.edit("site", lambda s: s.update(skills={"stack": [self.skill("Figma", "cib:figma")], "tools": []}))
+        self.assertEqual(build_site.main([]), 0)
+        self.assertTrue(keep.exists())
+        self.assertTrue(default.exists())
+        self.assertFalse(gone.exists())
 
     def test_no_skills_no_section(self):
         self.edit("site", lambda s: s.update(skills={"stack": [], "tools": []}))
