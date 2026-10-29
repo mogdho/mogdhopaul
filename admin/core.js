@@ -4,6 +4,7 @@
 export const BANNED_NAMES = ['mugdho', 'mogdha'];
 export const FEATURED_COUNT = 3;
 export const GROUPS = ['windows', 'browser'];
+export const SKILL_GROUPS = ['stack', 'tools'];
 const LINK = /\[([^\]\n]+)\]\(([^)\s]+)\)/g;
 const IMG_PATH = /^\/photos\/img\/[a-z0-9-]+\.(webp|jpg)$/;
 const SUPPORTED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -55,6 +56,11 @@ export function validateContent({ site, projects, photos }) {
   else if (!(site.identity || '').includes(IDENTITY_NAME)) add('site.identity', `Include your name, “${IDENTITY_NAME}”, so Google connects this line to you.`);
   else if (IDENTITY_BANNED.test(site.identity)) add('site.identity', 'Leave out “video editor”, “motion designer” and “Bucharest” here; video editing has its own section.');
   for (const key of ['lead', 'text', 'video']) text(`site.home.${key}`, site.home[key]);
+  for (const key of SKILL_GROUPS) {
+    const items = site.skills?.[key];
+    if (!Array.isArray(items)) add(`site.skills.${key}`, 'This list is missing.');
+    else add(`site.skills.${key}`, items.map((t) => checkText(t)).find(Boolean) || null);
+  }
   text('site.about.lead', site.about.lead);
   site.about.sections.forEach((s, i) => {
     text(`site.about.sections[${i}].heading`, s.heading);

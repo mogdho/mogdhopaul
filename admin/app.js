@@ -62,7 +62,9 @@ function fitTextarea(area) {
   area.style.height = `${area.scrollHeight + 2}px`;
 }
 
-const TEXT_HINT = 'Blank line = new paragraph. Link: [text](https://…)';
+const splitList = (text) => text.split(',').map((t) => t.trim()).filter(Boolean);
+
+const TEXT_HINT ='Blank line = new paragraph. Link: [text](https://…)';
 
 function markDirty() {
   state.dirty = true;
@@ -386,6 +388,11 @@ function renderText() {
       field({ label: 'Home: first line', value: s.home.lead, field: 'site.home.lead', multiline: true, onInput: (v) => { s.home.lead = v; } }),
       field({ label: 'Home: intro', value: s.home.text, field: 'site.home.text', multiline: true, hint: TEXT_HINT, onInput: (v) => { s.home.text = v; } }),
       field({ label: 'Home: video editing', value: s.home.video, field: 'site.home.video', multiline: true, hint: TEXT_HINT, onInput: (v) => { s.home.video = v; } })),
+    el('h2', { text: 'Skills' }),
+    el('p', { class: 'panel-intro', text: 'Shown on the home page above “Things I’ve built”. Separate items with commas; leave a line empty to hide it.' }),
+    el('div', { class: 'field-stack' },
+      field({ label: 'Tech stack', value: s.skills.stack.join(', '), field: 'site.skills.stack', required: false, hint: 'For example: JavaScript, Python', onInput: (v) => { s.skills.stack = splitList(v); } }),
+      field({ label: 'Tools', value: s.skills.tools.join(', '), field: 'site.skills.tools', required: false, hint: 'For example: Premiere Pro, After Effects', onInput: (v) => { s.skills.tools = splitList(v); } })),
     el('h2', { text: 'About page' }),
     field({ label: 'Opening line', value: s.about.lead, field: 'site.about.lead', multiline: true, onInput: (v) => { s.about.lead = v; } }),
     el('ol', { class: 'entry-list' }, s.about.sections.map((sec, i) => el('li', { class: 'entry' },

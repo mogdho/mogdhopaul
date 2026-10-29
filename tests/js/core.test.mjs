@@ -42,6 +42,10 @@ test('validateContent checks photo date and place', () => {
   const c = content(); c.photos = [{ ...p('a'), date: '14/05/2025' }, { ...p('b'), place: 'Mugdho house' }];
   assert.deepEqual(validateContent(c).map((e) => e.field), ['photos[0].date', 'photos[1].place']);
 });
+test('validateContent checks skills', () => {
+  const c = content(); c.site.skills.tools = ['Premiere Pro', 'Mugdho editor'];
+  assert.deepEqual(validateContent(c).map((e) => e.field), ['site.skills.tools']);
+});
 test('isFocus accepts whole percentages only', () => {
   assert.equal(isFocus({ x: 0, y: 100 }), true);
   for (const bad of [null, { x: 101, y: 0 }, { x: 1.5, y: 0 }, { x: 50 }, { x: 1, y: 2, z: 3 }, '50% 50%']) {

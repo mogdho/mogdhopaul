@@ -63,6 +63,26 @@ def _project_items(projects, indent, home):
     return _indent("\n".join(items), indent)
 
 
+SKILL_LABELS = (("stack", "Tech stack"), ("tools", "Tools"))
+
+
+def _skills(skills):
+    """Home page skills: one row per group, items as stamps. Empty groups are left out."""
+    rows = []
+    for key, label in SKILL_LABELS:
+        if skills[key]:
+            items = "".join(f"<li>{e(item)}</li>" for item in skills[key])
+            rows.append(f'  <div class="skills__row">\n    <dt>{label}</dt>\n'
+                        f'    <dd><ul class="skills__items">{items}</ul></dd>\n  </div>')
+    if not rows:
+        return ""
+    return _indent(
+        '<section aria-labelledby="skills-title">\n'
+        '  <h2 id="skills-title">Skills</h2>\n'
+        '  <dl class="skills">\n' + "\n".join(_indent(r, 2) for r in rows) + '\n  </dl>\n'
+        '</section>', 4) + "\n"
+
+
 def _cover(page, site, v=""):
     if page == "home":
         return _indent(
@@ -135,6 +155,7 @@ def _main_block(page, content):
             photos=render_items(photos, STRIP_COUNT, eager=3),
             lead=inline(site["home"]["lead"]),
             intro=_indent(render_text(site["home"]["text"]), 8),
+            skills=_skills(site["skills"]),
             projects=_project_items([p for p in projects if p["featured"]], 8, home=True),
             video=_indent(render_text(site["home"]["video"]), 8),
         )

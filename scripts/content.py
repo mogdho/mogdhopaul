@@ -13,6 +13,7 @@ from pathlib import Path
 
 BANNED_NAMES = ("mugdho", "mogdha")
 GROUPS = ("windows", "browser")
+SKILL_GROUPS = ("stack", "tools")
 FEATURED_COUNT = 3
 LINK = re.compile(r"\[([^\]\n]+)\]\(([^)\s]+)\)")
 IMG_PATH = re.compile(r"^/photos/img/[a-z0-9-]+\.(webp|jpg)$")
@@ -91,6 +92,13 @@ def validate(content):
     home = _get(site, "home", "site.home")
     for key in ("lead", "text", "video"):
         _check_text(_get(home, key, f"site.home.{key}"), f"site.home.{key}")
+    skills = _get(site, "skills", "site.skills")
+    for key in SKILL_GROUPS:
+        items = _get(skills, key, f"site.skills.{key}")
+        if not isinstance(items, list):
+            raise ContentError(f"site.skills.{key}: must be a list")
+        for i, item in enumerate(items):
+            _check_text(item, f"site.skills.{key}[{i}]")
     about = _get(site, "about", "site.about")
     _check_text(_get(about, "lead", "site.about.lead"), "site.about.lead")
     for i, sec in enumerate(_get(about, "sections", "site.about.sections")):

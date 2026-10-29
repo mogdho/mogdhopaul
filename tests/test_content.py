@@ -94,6 +94,14 @@ class Validate(unittest.TestCase):
                              "thumb": "/photos/img/a-600.webp", "width": 1200, "height": 900}]
         self.assertRejects(r"photos\[0\]\.src")
 
+    def test_skills_checked_like_text(self):
+        self.c["site"]["skills"]["tools"] = ["Premiere Pro", "<b>x</b>"]
+        self.assertRejects(r"site\.skills\.tools\[1\]")
+
+    def test_skills_must_be_lists(self):
+        self.c["site"]["skills"]["stack"] = "JavaScript, Python"
+        self.assertRejects(r"site\.skills\.stack")
+
     def _photo(self, **extra):
         return {"id": "a", "place": None, "date": "2025-05-14", "src": "/photos/img/a-1200.webp",
                 "thumb": "/photos/img/a-600.webp", "width": 1200, "height": 900, **extra}

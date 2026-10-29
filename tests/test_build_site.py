@@ -148,6 +148,20 @@ class Main(unittest.TestCase):
         about = (self.tmp / "about" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<a href="/photos/">photos page</a>', about)
 
+    def test_skills_before_projects(self):
+        self.edit("site", lambda s: s.update(skills={"stack": ["JavaScript", "C & C++"], "tools": []}))
+        build_site.main([])
+        home = (self.tmp / "index.html").read_text(encoding="utf-8")
+        self.assertLess(home.index('id="skills-title"'), home.index('id="projects-title"'))
+        self.assertIn("<li>C &amp; C++</li>", home)
+        self.assertIn("Tech stack", home)
+        self.assertNotIn("<dt>Tools</dt>", home)  # empty group hidden
+
+    def test_no_skills_no_section(self):
+        self.edit("site", lambda s: s.update(skills={"stack": [], "tools": []}))
+        build_site.main([])
+        self.assertNotIn("skills-title", (self.tmp / "index.html").read_text(encoding="utf-8"))
+
     def test_new_profile_photo_gets_new_address(self):
         # Browsers and link previews cache the photo, so its address changes with its contents.
         (self.tmp / "mogdhopaul.jpeg").write_bytes(b"one")

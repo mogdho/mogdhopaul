@@ -508,6 +508,55 @@ main {
   }
 }
 
+/* ---------- Skills: rows like the visa page, items as small ink stamps ---------- */
+.skills {
+  margin: var(--s5) 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.skills__row {
+  display: grid;
+  gap: var(--s3) var(--s5);
+  padding-block: var(--s5);
+  border-bottom: 1px solid var(--rule);
+}
+
+.skills dt {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+}
+
+.skills dd {
+  margin: 0;
+}
+
+.skills__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skills__items li {
+  padding: 0.2rem 0.6rem;
+  border: 1.5px solid var(--stamp);
+  border-radius: 3px;
+  color: var(--stamp);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 48rem) {
+  .skills__row {
+    grid-template-columns: 17rem minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
 /* ---------- Projects: entries on a visa page ---------- */
 .project-list {
   margin: var(--s5) 0 0;
