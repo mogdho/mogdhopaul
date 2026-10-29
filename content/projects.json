@@ -18,10 +18,10 @@
     "featured": true
   },
   {
-    "name": "Hotspot-Auto-Connect",
-    "url": "https://github.com/mogdho/Hotspot-Auto-Connect",
-    "description": "Connects my PC to my phone's hotspot, or my usual Wi-Fi, the moment I unlock it. No more clicking through the network menu.",
-    "home_blurb": "Connects my PC to my phone's hotspot or my usual Wi-Fi the moment I unlock it.",
+    "name": "HMT(How Many Time)",
+    "url": "https://github.com/mogdho/how-many-time",
+    "description": "Smoking, drinking, junk food, doom-scrolling: whatever it is, tap one button each time it happens and see honestly how you're doing.\n\n",
+    "home_blurb": "A private, one-tap tracker for the habit you're trying to cut down on.",
     "language": "Batch",
     "group": "windows",
     "featured": false
