@@ -1,5 +1,14 @@
 [
   {
+    "name": "NN-tab",
+    "url": "https://github.com/mogdho/NN-tab",
+    "description": "A very minimal new tab page for Chrome, for people who want a quiet screen when they open a tab.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "browser",
+    "featured": false
+  },
+  {
     "name": "Copilot2Gemini",
     "url": "https://github.com/mogdho/Copilot2Gemini",
     "description": "Turns the Copilot key on Windows into a Google Gemini key, opening and hiding Gemini as a neat app window instead of a browser tab.",
@@ -34,15 +43,6 @@
     "language": "JavaScript",
     "group": "browser",
     "featured": true
-  },
-  {
-    "name": "NN-tab",
-    "url": "https://github.com/mogdho/NN-tab",
-    "description": "A very minimal new tab page for Chrome, for people who want a quiet screen when they open a tab.",
-    "home_blurb": "",
-    "language": "JavaScript",
-    "group": "browser",
-    "featured": false
   },
   {
     "name": "Highlighter",
