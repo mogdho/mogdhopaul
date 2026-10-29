@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   checkText, isAllowedUrl, validateContent, targetSize, isSupportedImage,
-  newPhotoId, toJson, filesToSave, watchPublishing,
+  newPhotoId, toJson, filesToSave, watchPublishing, isFocus, dragFocus,
 } from '../../admin/core.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../content/${name}.json`, import.meta.url), 'utf8'));
@@ -42,7 +42,24 @@ test('validateContent checks photo date and place', () => {
   const c = content(); c.photos = [{ ...p('a'), date: '14/05/2025' }, { ...p('b'), place: 'Mugdho house' }];
   assert.deepEqual(validateContent(c).map((e) => e.field), ['photos[0].date', 'photos[1].place']);
 });
-test('targetSize scales down', () => assert.deepEqual(targetSize(6000, 4000, 1200), { width: 1200, height: 800 }));
+test('isFocus accepts whole percentages only', () => {
+  assert.equal(isFocus({ x: 0, y: 100 }), true);
+  for (const bad of [null, { x: 101, y: 0 }, { x: 1.5, y: 0 }, { x: 50 }, { x: 1, y: 2, z: 3 }, '50% 50%']) {
+    assert.equal(isFocus(bad), false, JSON.stringify(bad));
+  }
+});
+test('validateContent flags a broken crop position', () => {
+  const c = content(); c.photos = [{ ...p('a'), focus: { x: 120, y: 50 } }, { ...p('b'), focus: { x: 20, y: 70 } }];
+  assert.deepEqual(validateContent(c).map((e) => e.field), ['photos[0].focus']);
+});
+test('dragFocus moves only the side that overflows', () => {
+  // Landscape photo in a tall frame: it overflows left/right only.
+  const box = { frameW: 400, frameH: 500, imageW: 1200, imageH: 900 };
+  // Scaled to 500 high -> 667 wide, 267px to spare. Dragging right 133px shows more of the left.
+  assert.deepEqual(dragFocus({ x: 50, y: 50 }, 133.5, 40, box), { x: 0, y: 50 });
+  assert.deepEqual(dragFocus({ x: 50, y: 50 }, -1000, 0, box), { x: 100, y: 50 });
+});
+test('targetSize scales down',() => assert.deepEqual(targetSize(6000, 4000, 1200), { width: 1200, height: 800 }));
 test('targetSize never upscales', () => assert.deepEqual(targetSize(800, 600, 1200), { width: 800, height: 600 }));
 test('isSupportedImage refuses HEIC', () => {
   assert.equal(isSupportedImage({ type: 'image/heic' }), false);

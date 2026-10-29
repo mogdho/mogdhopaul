@@ -19,6 +19,14 @@ def alt_text(photo):
     return f"Travel photo by Mogdho Paul, {when}"
 
 
+def _focus_style(photo):
+    """Crop position chosen in the admin; nothing for the default centre."""
+    f = photo.get("focus")
+    if not f or (f["x"], f["y"]) == (50, 50):
+        return ""
+    return f'style="object-position: {int(f["x"])}% {int(f["y"])}%" '
+
+
 def render_items(photos, limit, eager=0):
     """Print markup for photos; the first `eager` images load immediately (they sit in the first screen)."""
     shown = photos[:limit] if limit else photos
@@ -32,7 +40,7 @@ def render_items(photos, limit, eager=0):
         place = f'<span class="photo__place">{e(p["place"])}</span>' if p.get("place") else ""
         out.append(
             f'<figure class="photo fade">'
-            f'<img src="{e(p["thumb"])}" srcset="{e(p["thumb"])} 600w, {e(p["src"])} 1200w" '
+            f'<img src="{e(p["thumb"])}" srcset="{e(p["thumb"])} 600w, {e(p["src"])} 1200w" {_focus_style(p)}'
             f'sizes="(min-width: 48rem) 25vw, 50vw" alt="{e(alt_text(p))}" '
             f'width="{p["width"]}" height="{p["height"]}" {load}decoding="async">'
             f'<figcaption class="photo__label">{place}'

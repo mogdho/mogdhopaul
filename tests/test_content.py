@@ -94,6 +94,19 @@ class Validate(unittest.TestCase):
                              "thumb": "/photos/img/a-600.webp", "width": 1200, "height": 900}]
         self.assertRejects(r"photos\[0\]\.src")
 
+    def _photo(self, **extra):
+        return {"id": "a", "place": None, "date": "2025-05-14", "src": "/photos/img/a-1200.webp",
+                "thumb": "/photos/img/a-600.webp", "width": 1200, "height": 900, **extra}
+
+    def test_photo_focus_accepted(self):
+        self.c["photos"] = [self._photo(focus={"x": 0, "y": 100})]
+        validate(self.c)
+
+    def test_photo_focus_out_of_range(self):
+        for bad in ({"x": 101, "y": 50}, {"x": "50", "y": 50}, {"x": 50}, {"x": 50, "y": 50, "z": 1}, "50% 50%"):
+            self.c["photos"] = [self._photo(focus=bad)]
+            self.assertRejects(r"photos\[0\]\.focus")
+
     def test_missing_field(self):
         del self.c["projects"][0]["url"]
         self.assertRejects(r"projects\[0\]\.url")

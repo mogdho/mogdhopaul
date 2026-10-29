@@ -1,6 +1,6 @@
 // Admin page: log in with a GitHub key, edit content/*.json and photos, save as one commit, watch publishing.
 import {
-  FEATURED_COUNT, filesToSave, isSupportedImage, newPhotoId, validateContent, watchPublishing,
+  FEATURED_COUNT, dragFocus, filesToSave, isSupportedImage, newPhotoId, validateContent, watchPublishing,
 } from './core.js';
 import { AuthError, ConflictError, Repo } from './github.js';
 import { resizeImage } from './images.js';
@@ -122,7 +122,7 @@ function renderPhotos() {
   panel.append(el('ul', { class: 'admin-photos' }, sorted.map((photo) => {
     const index = state.photos.indexOf(photo);
     return el('li', { class: 'admin-photo' },
-      el('img', { src: imgSrc(photo), alt: photo.place ? `Photo from ${photo.place}` : 'Travel photo', loading: 'lazy' }),
+      cropControls(photo),
       state.newImages.has(photo.src.slice(1)) ? el('p', { class: 'new-tag', text: 'New · not saved yet' }) : null,
       field({ label: 'Place', value: photo.place, field: `photos[${index}].place`, required: false,
         onInput: (v) => { photo.place = v.trim() ? v : null; } }),
@@ -130,6 +130,72 @@ function renderPhotos() {
         onInput: (v) => { photo.date = v; } }),
       el('button', { type: 'button', class: 'link-button', onclick: () => removePhoto(photo) }, 'Delete photo'));
   })));
+}
+
+const CENTRE = { x: 50, y: 50 };
+
+/**
+ * The photo in the two frame shapes the site uses (Photos page 4:5, home page 4:3).
+ * Drag either one, or use the arrow keys, to choose which part stays in the frame.
+ */
+function cropControls(photo) {
+  const alt = photo.place ? `Photo from ${photo.place}` : 'Travel photo';
+  const frames = [];
+  const apply = () => {
+    const f = photo.focus || CENTRE;
+    for (const { img } of frames) img.style.objectPosition = `${f.x}% ${f.y}%`;
+  };
+  const setFocus = (f) => {
+    const cur = photo.focus || CENTRE;
+    if (f.x === cur.x && f.y === cur.y) return;
+    if (f.x === 50 && f.y === 50) delete photo.focus;
+    else photo.focus = { x: f.x, y: f.y };
+    apply();
+    markDirty();
+  };
+
+  const makeFrame = (shape, label) => {
+    const img = el('img', { src: imgSrc(photo), alt, draggable: 'false', loading: 'lazy' });
+    const frame = el('div', { class: `crop crop--${shape}`, tabindex: '0', 'aria-label': `${label}. Drag the photo or use the arrow keys to move it.` }, img);
+    let drag = null;
+    frame.addEventListener('pointerdown', (e) => {
+      frame.setPointerCapture(e.pointerId);
+      drag = { x: e.clientX, y: e.clientY, focus: { ...(photo.focus || CENTRE) } };
+      frame.classList.add('is-dragging');
+    });
+    frame.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      setFocus(dragFocus(drag.focus, e.clientX - drag.x, e.clientY - drag.y, {
+        frameW: frame.clientWidth, frameH: frame.clientHeight,
+        imageW: img.naturalWidth || photo.width, imageH: img.naturalHeight || photo.height,
+      }));
+    });
+    const stop = () => { drag = null; frame.classList.remove('is-dragging'); };
+    frame.addEventListener('pointerup', stop);
+    frame.addEventListener('pointercancel', stop);
+    frame.addEventListener('keydown', (e) => {
+      const step = e.shiftKey ? 1 : 5;
+      const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+      if (!move) return;
+      e.preventDefault();
+      const f = photo.focus || CENTRE;
+      const clamp = (n) => Math.min(100, Math.max(0, n));
+      setFocus({ x: clamp(f.x + move[0]), y: clamp(f.y + move[1]) });
+    });
+    frames.push({ img });
+    return frame;
+  };
+
+  const card = makeFrame('card', 'Crop on the Photos page');
+  const home = makeFrame('home', 'Crop on the home page');
+  apply();
+  return el('div', { class: 'crop-controls' },
+    card,
+    el('div', { class: 'crop-row' },
+      home,
+      el('div', { class: 'crop-help' },
+        el('p', { class: 'field__hint', text: 'Drag the photo to choose what stays in the frame. The small frame shows the home page.' }),
+        el('button', { type: 'button', class: 'link-button', onclick: () => setFocus(CENTRE) }, 'Centre'))));
 }
 
 async function addPhotos(files) {

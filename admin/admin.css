@@ -342,11 +342,72 @@
   color: #17201c; /* prints stay light paper in both modes */
 }
 
-.admin-photo img {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+/* Crop frames: the same shapes as the site's photo cards. Drag the photo inside to move it. */
+.crop-controls {
+  display: grid;
+  gap: var(--s3);
+}
+
+.crop {
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
   background: var(--paper-deep);
+}
+
+.crop.is-dragging {
+  cursor: grabbing;
+}
+
+.crop:focus-visible {
+  outline: 2px solid #5b3e96;
+  outline-offset: 2px;
+}
+
+.crop img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.crop--card {
+  aspect-ratio: 4 / 5;
+}
+
+.crop--home {
+  aspect-ratio: 4 / 3;
+  width: 6.5rem;
+  flex: none;
+  box-shadow: 0 0 0 1px #c9d1c2;
+}
+
+.crop-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding-inline: var(--s2);
+}
+
+.crop-help {
+  display: grid;
+  gap: var(--s1);
+  min-width: 0;
+}
+
+.crop-help .field__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #46534d;
+}
+
+.admin-photo .crop-help .link-button {
+  justify-self: start;
+  margin: 0;
+  color: #5b3e96;
 }
 
 .admin-photo .field {

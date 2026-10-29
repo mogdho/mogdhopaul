@@ -135,6 +135,14 @@ def validate(content):
         for key in ("width", "height"):
             if not isinstance(_get(ph, key, f"{f}.{key}"), int) or ph[key] <= 0:
                 raise ContentError(f"{f}.{key}: must be a positive number")
+        if "focus" in ph and not _is_focus(ph["focus"]):
+            raise ContentError(f"{f}.focus: must be x and y from 0 to 100")
+
+
+def _is_focus(focus):
+    """Crop position: which part of the photo stays in the frame, as x/y percentages."""
+    return (isinstance(focus, dict) and set(focus) == {"x", "y"}
+            and all(type(focus[k]) is int and 0 <= focus[k] <= 100 for k in ("x", "y")))
 
 
 def load_content(root):

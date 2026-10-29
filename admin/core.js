@@ -83,8 +83,31 @@ export function validateContent({ site, projects, photos }) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(ph.date || '') || Number.isNaN(Date.parse(ph.date))) add(`${f}.date`, 'Pick a date.');
     if (ph.place != null && ph.place !== '') text(`${f}.place`, ph.place);
     for (const key of ['src', 'thumb']) if (!IMG_PATH.test(ph[key] || '')) add(`${f}.${key}`, 'Image path is broken.');
+    if (ph.focus !== undefined && !isFocus(ph.focus)) add(`${f}.focus`, 'Crop position is broken. Press “Centre” to reset it.');
   });
   return errors;
+}
+
+/** Crop position: {x, y} whole percentages from 0 to 100. */
+export function isFocus(focus) {
+  return focus !== null && typeof focus === 'object'
+    && Object.keys(focus).sort().join() === 'x,y'
+    && [focus.x, focus.y].every((n) => Number.isInteger(n) && n >= 0 && n <= 100);
+}
+
+/**
+ * New crop position after dragging the photo by (dx, dy) pixels inside a frame.
+ * The photo covers the frame, so only the overflowing side can move; dragging right shows more of the left.
+ */
+export function dragFocus(start, dx, dy, { frameW, frameH, imageW, imageH }) {
+  const scale = Math.max(frameW / imageW, frameH / imageH);
+  const overX = imageW * scale - frameW;
+  const overY = imageH * scale - frameH;
+  const clamp = (n) => Math.min(100, Math.max(0, Math.round(n)));
+  return {
+    x: overX > 0.5 ? clamp(start.x - (dx / overX) * 100) : start.x,
+    y: overY > 0.5 ? clamp(start.y - (dy / overY) * 100) : start.y,
+  };
 }
 
 /** Size that fits within `max` pixels wide, never enlarging. */

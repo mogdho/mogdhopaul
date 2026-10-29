@@ -39,6 +39,14 @@ class RenderPhotos(unittest.TestCase):
     def test_limit(self):
         self.assertEqual(render_items([photo(pid=str(i)) for i in range(8)], 6).count("<figure"), 6)
 
+    def test_crop_position(self):
+        out = render_items([{**photo(), "focus": {"x": 30, "y": 80}}], None)
+        self.assertIn('style="object-position: 30% 80%"', out)
+
+    def test_centre_crop_adds_nothing(self):
+        for p in (photo(), {**photo(), "focus": {"x": 50, "y": 50}}):
+            self.assertNotIn("object-position", render_items([p], None))
+
     def test_label_date_only(self):
         out = render_items([photo(place=None)], None)
         self.assertIn(">14 May 2025<", out)
