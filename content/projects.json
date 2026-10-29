@@ -6,7 +6,7 @@
     "home_blurb": "",
     "language": "JavaScript",
     "group": "browser",
-    "featured": false
+    "featured": true
   },
   {
     "name": "Copilot2Gemini",
@@ -24,7 +24,7 @@
     "home_blurb": "Connects my PC to my phone's hotspot or my usual Wi-Fi the moment I unlock it.",
     "language": "Batch",
     "group": "windows",
-    "featured": true
+    "featured": false
   },
   {
     "name": "AlwaysNumLock",
@@ -42,7 +42,7 @@
     "home_blurb": "Makes A4 PDF invoices right in the browser. Nothing leaves your computer.",
     "language": "JavaScript",
     "group": "browser",
-    "featured": true
+    "featured": false
   },
   {
     "name": "Highlighter",
@@ -60,7 +60,7 @@
     "home_blurb": "",
     "language": "HTML",
     "group": "browser",
-    "featured": false
+    "featured": true
   },
   {
     "name": "video-showcase-paul",
