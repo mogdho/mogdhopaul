@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import {
   checkText, isAllowedUrl, validateContent, targetSize, isSupportedImage,
   newPhotoId, toJson, filesToSave, watchPublishing, isFocus, dragFocus, cropRect,
-  isIconId, skillIconPath, iconQueries, rankIcons, DEFAULT_SKILL_ICONS,
+  isIconId, skillIconPath, iconQueries, rankIcons, DEFAULT_SKILL_ICONS, newestFirst,
 } from '../../admin/core.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../content/${name}.json`, import.meta.url), 'utf8'));
@@ -47,6 +47,11 @@ test('validateContent checks skills', () => {
   const c = content();
   c.site.skills.tools = [{ name: 'Premiere Pro', icon: null }, { name: 'Mugdho editor', icon: null }, { name: 'Ok', icon: '../x' }];
   assert.deepEqual(validateContent(c).map((e) => e.field), ['site.skills.tools[1].name', 'site.skills.tools[2].icon']);
+});
+test('newestFirst: newest date, then the last upload of the same day', () => {
+  const list = [{ ...p('old'), date: '2025-05-01' }, { ...p('a'), date: '2025-06-01' }, { ...p('b'), date: '2025-06-01' }];
+  assert.deepEqual(newestFirst(list).map((x) => x.id), ['b', 'a', 'old']);
+  assert.deepEqual(list.map((x) => x.id), ['old', 'a', 'b'], 'does not reorder the saved list');
 });
 test('skill icon helpers', () => {
   assert.equal(isIconId('simple-icons:python'), true);

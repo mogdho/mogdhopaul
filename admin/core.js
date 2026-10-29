@@ -166,6 +166,12 @@ export function cropRect(srcW, srcH, outW, outH, focus) {
   return { sx, sy, sw, sh, outW: w, outH: Math.round(w / ratio) };
 }
 
+/** Newest date first; same date: the one uploaded last first (uploads are added at the end). Mirrors the build. */
+export function newestFirst(photos) {
+  return photos.map((p, i) => ({ p, i }))
+    .sort((a, b) => b.p.date.localeCompare(a.p.date) || b.i - a.i).map(({ p }) => p);
+}
+
 /** Size that fits within `max` pixels wide, never enlarging. */
 export function targetSize(width, height, max) {
   if (width <= max) return { width, height };

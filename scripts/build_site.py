@@ -139,6 +139,11 @@ def _skills(skills):
         '</section>', 4) + "\n"
 
 
+def newest_first(photos):
+    """Newest date first; photos with the same date: the one uploaded last first (uploads are added at the end)."""
+    return [p for _, p in sorted(enumerate(photos), key=lambda ip: (ip[1]["date"], ip[0]), reverse=True)]
+
+
 def _cover(page, site, v=""):
     if page == "home":
         return _indent(
@@ -205,7 +210,7 @@ def _meta(page, site, v=""):
 
 def _main_block(page, content):
     site, projects = content["site"], content["projects"]
-    photos = sorted(content["photos"], key=lambda p: p["date"], reverse=True)
+    photos = newest_first(content["photos"])
     if page == "home":
         return _template("home").substitute(
             photos=render_items(photos, STRIP_COUNT, eager=3, link="/photos/"),

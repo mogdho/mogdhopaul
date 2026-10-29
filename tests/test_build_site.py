@@ -244,6 +244,17 @@ class Main(unittest.TestCase):
         self.assertEqual(photos_page.count("<figure"), 5)
         self.assertNotIn("photo__link", photos_page)
 
+    def test_same_day_uploads_newest_first(self):
+        # Uploads are added at the end of the list; on the same date the last upload is the newest.
+        self.edit("photos", lambda ps: (ps.clear(), ps.extend([
+            photo(pid="old", date="2025-05-01"), photo(pid="a", date="2025-06-01"),
+            photo(pid="b", date="2025-06-01"), photo(pid="c", date="2025-06-01"), photo(pid="d", date="2025-06-01")])))
+        build_site.main([])
+        home = (self.tmp / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r'href="/photos/#photo-(\w+)"', home), ["d", "c", "b"])
+        photos_page = (self.tmp / "photos" / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r'id="photo-(\w+)"', photos_page), ["d", "c", "b", "a", "old"])
+
     def test_zero_photos_shows_empty_note(self):
         self.edit("photos", lambda ps: ps.clear())
         build_site.main([])

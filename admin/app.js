@@ -1,6 +1,6 @@
 // Admin page: log in with a GitHub key, edit content/*.json and photos, save as one commit, watch publishing.
 import {
-  DEFAULT_SKILL_ICONS, FEATURED_COUNT, ICON_SETS, dragFocus, filesToSave, iconQueries, isSupportedImage, newPhotoId,
+  DEFAULT_SKILL_ICONS, FEATURED_COUNT, ICON_SETS, dragFocus, filesToSave, iconQueries, isSupportedImage, newPhotoId, newestFirst,
   rankIcons, skillIconPath, validateContent, watchPublishing,
 } from './core.js';
 import { AuthError, ConflictError, Repo } from './github.js';
@@ -118,7 +118,7 @@ function renderPhotos() {
       el('label', { class: 'button file-button' }, 'Add photos', input),
       el('p', { class: 'field__error', id: 'photo-error', role: 'alert' })),
   );
-  const sorted = [...state.photos].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = newestFirst(state.photos);
   if (!sorted.length) {
     panel.append(el('p', { class: 'empty-note empty-note--admin', text: 'No photos yet. Add some to get started.' }));
     return;
