@@ -137,6 +137,7 @@ class Main(unittest.TestCase):
         self.assertIn('<a href="/photos/">photos page</a>', about)
 
     def test_zero_photos_shows_empty_note(self):
+        self.edit("photos", lambda ps: ps.clear())
         build_site.main([])
         self.assertIn("empty-note", (self.tmp / "photos" / "index.html").read_text(encoding="utf-8"))
         self.assertIn("empty-note", (self.tmp / "index.html").read_text(encoding="utf-8"))
