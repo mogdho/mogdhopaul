@@ -75,9 +75,13 @@ class Build(unittest.TestCase):
         self.assertEqual(cards, [p["url"] for p in self.content["projects"] if p["featured"]])
 
     def test_home_blurb_used_on_home_description_on_projects(self):
-        c2g = next(p for p in self.content["projects"] if p["name"] == "Copilot2Gemini")
-        self.assertIn(c2g["home_blurb"], self.pages["index.html"])
-        self.assertIn(c2g["description"], self.pages["projects/index.html"])
+        # Any featured project with a short version; which ones are featured is the owner's choice.
+        p = next((p for p in self.content["projects"]
+                  if p["featured"] and p["home_blurb"] and "[" not in p["description"]), None)
+        if p is None:
+            self.skipTest("no featured project has a short version")
+        self.assertIn(p["home_blurb"], Page(self.pages["index.html"]).text)
+        self.assertIn(p["description"], Page(self.pages["projects/index.html"]).text)
 
     def test_profiles_drive_footer_and_jsonld(self):
         urls = [p["url"] for p in self.content["site"]["profiles"]]

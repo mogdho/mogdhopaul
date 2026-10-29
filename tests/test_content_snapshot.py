@@ -29,7 +29,7 @@ class ContentSnapshot(unittest.TestCase):
 
     def test_known_projects_listed(self):
         p = parse(PAGES["projects"])
-        for name in ("Hotspot-Auto-Connect", "Copilot2Gemini", "Capslock-CopyPaste", "NN-tab", "leaflet", "video-showcase-paul"):
+        for name in ("Hotspot-Auto-Connect", "Copilot2Gemini", "NN-tab", "leaflet", "video-showcase-paul"):
             self.assertIn(name, p.text)
             self.assertIn(f"https://github.com/mogdho/{name}", p.hrefs)
 

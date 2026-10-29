@@ -28,7 +28,9 @@ class OwnerEditsPublish(unittest.TestCase):
             site["about"]["sections"] = [{"heading": "Now", "text": "A short about page."}]
             (content / "site.json").write_text(json.dumps(site, indent=2) + "\n", encoding="utf-8")
             projects = json.loads((content / "projects.json").read_text(encoding="utf-8"))
-            projects = [p for p in projects if p["name"] != "NN-tab"]
+            # Delete a project that isn't on the home page, whichever the owner has picked.
+            gone = next(p for p in projects if not p["featured"])
+            projects = [p for p in projects if p is not gone]
             (content / "projects.json").write_text(json.dumps(projects, indent=2) + "\n", encoding="utf-8")
 
             env = {**os.environ, NESTED: "1", "GITHUB_ACTIONS": "true"}
