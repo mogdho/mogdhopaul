@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import html
 import json
+import re
 import sys
 from pathlib import Path
 from string import Template
@@ -34,14 +35,42 @@ def _template(name):
     return Template((ROOT / "templates" / f"{name}.html").read_text(encoding="utf-8"))
 
 
-def _portrait_version():
-    """Version tag from the profile photo's bytes, so a new photo shows at once instead of a cached one."""
+def _version(*names):
+    """Version tag from the files' bytes. The site sits behind a cache that keeps files for hours,
+    so every link to a file that changes carries this tag: new contents, new address."""
     h, found = hashlib.sha256(), False
-    for name in PORTRAIT_FILES:
+    for name in names:
         if (ROOT / name).exists():
             h.update((ROOT / name).read_bytes())
             found = True
     return f"?v={h.hexdigest()[:10]}" if found else ""
+
+
+def _portrait_version():
+    return _version(*PORTRAIT_FILES)
+
+
+ADMIN_MODULES = ("core.js", "github.js", "images.js")
+ADMIN_ASSETS = re.compile(r"(  <!-- assets: written by scripts/build_site.py -->\n).*?(  <!-- /assets -->)", re.S)
+
+
+def _admin_page():
+    """admin/index.html with versioned links. The import map makes app.js load versioned copies of the
+    modules it imports, so a cached old module is never mixed with a new one."""
+    path = ROOT / "admin" / "index.html"
+    if not path.exists():
+        return None
+    imports = {f"/admin/{m}": f"/admin/{m}{_version(f'admin/{m}')}" for m in ADMIN_MODULES}
+    assets = (
+        f'  <link rel="stylesheet" href="/style.css{_version("style.css")}">\n'
+        f'  <link rel="stylesheet" href="/admin/admin.css{_version("admin/admin.css")}">\n'
+        f'  <script type="importmap">{json.dumps({"imports": imports})}</script>\n'
+        f'  <script type="module" src="/admin/app.js{_version("admin/app.js")}"></script>\n'
+    )
+    page = path.read_text(encoding="utf-8")
+    if not ADMIN_ASSETS.search(page):
+        raise ContentError("admin/index.html: the assets markers are missing")
+    return ADMIN_ASSETS.sub(lambda m: m.group(1) + assets + m.group(2), page)
 
 
 def _jsonld(data):
@@ -211,6 +240,7 @@ def build(root=None):
     profiles = _indent("\n".join(f'<li><a href="{e(p["url"])}" rel="me">{e(p["label"])}</a></li>'
                                  for p in site["profiles"]), 8)
     v = _portrait_version()
+    css_v, js_v = _version("style.css"), _version("script.js")
     pages = {}
     for rel, page in PAGES.items():
         title, description, og_type, jsonld = _meta(page, site, v)
@@ -221,7 +251,7 @@ def build(root=None):
         pages[rel] = _template("base").substitute(
             title=e(title), description=e(description), canonical=f"{SITE}{path}", og_type=og_type,
             jsonld=jsonld, cover_class="" if page == "home" else " cover--short", nav=nav,
-            cover=_cover(page, site, v), image=f"{SITE}/mogdhopaul.jpeg{v}", main=_main_block(page, content).rstrip("\n"),
+            css_v=css_v, js_v=js_v, cover=_cover(page, site, v), image=f"{SITE}/mogdhopaul.jpeg{v}", main=_main_block(page, content).rstrip("\n"),
             whatsapp=e(site["contact"]["whatsapp"]), email=e(site["contact"]["email"]), profiles=profiles,
         )
     return pages
@@ -238,9 +268,12 @@ def main(argv=None):
     try:
         pages = build(ROOT)
         photos = load_content(ROOT)["photos"]
+        admin = _admin_page()
     except ContentError as exc:
         print(f"Content problem, nothing changed: {exc}", file=sys.stderr)
         return 1
+    if admin is not None:
+        (ROOT / "admin" / "index.html").write_text(admin, encoding="utf-8")
     for rel, page in pages.items():
         out = ROOT / rel
         out.parent.mkdir(parents=True, exist_ok=True)

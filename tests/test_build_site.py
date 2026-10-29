@@ -78,6 +78,22 @@ class Build(unittest.TestCase):
         for rel, page in self.pages.items():
             self.assertEqual((ROOT / rel).read_text(encoding="utf-8"), page, rel)
 
+    def test_committed_admin_page_is_fresh(self):
+        self.assertEqual((ROOT / "admin" / "index.html").read_text(encoding="utf-8"), build_site._admin_page())
+
+    def test_changed_files_get_new_addresses(self):
+        # The site sits behind a cache that keeps files for hours: every changing file is linked with a version.
+        home = self.pages["index.html"]
+        self.assertRegex(home, r'href="/style\.css\?v=\w+"')
+        self.assertRegex(home, r'src="/script\.js\?v=\w+"')
+        admin = build_site._admin_page()
+        for name in ("/style.css", "/admin/admin.css", "/admin/app.js"):
+            self.assertRegex(admin, re.escape(name) + r'\?v=\w+"')
+        imports = json.loads(re.search(r'<script type="importmap">(.*?)</script>', admin).group(1))["imports"]
+        found = {Path(m.group(1)).name for f in (ROOT / "admin").glob("*.js")
+                 for m in re.finditer(r"from '\./([\w.]+)'", f.read_text(encoding="utf-8"))}
+        self.assertEqual({k.rsplit("/", 1)[1] for k in imports}, found, "every imported admin module is versioned")
+
     def test_featured_on_home(self):
         cards = re.findall(r'<h3><a href="([^"]+)"', self.pages["index.html"])
         self.assertEqual(cards, [p["url"] for p in self.content["projects"] if p["featured"]])
