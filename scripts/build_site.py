@@ -5,6 +5,7 @@ Writes index.html, about/index.html, projects/index.html, photos/index.html and 
 photos/img/ that no photo uses. If the content breaks a site rule, nothing is written.
 """
 import argparse
+import hashlib
 import html
 import json
 import sys
@@ -20,6 +21,7 @@ PAGES = {"index.html": "home", "about/index.html": "about",
          "projects/index.html": "projects", "photos/index.html": "photos"}
 NAV = [("/", "Home"), ("/about/", "About"), ("/photos/", "Photos"), ("/projects/", "Projects")]
 STRIP_COUNT = 6
+PORTRAIT_FILES = ("mogdhopaul.webp", "mogdhopaul.jpeg")  # replaced by the admin's Profile photo
 e = html.escape
 
 
@@ -30,6 +32,16 @@ def _indent(block, spaces):
 
 def _template(name):
     return Template((ROOT / "templates" / f"{name}.html").read_text(encoding="utf-8"))
+
+
+def _portrait_version():
+    """Version tag from the profile photo's bytes, so a new photo shows at once instead of a cached one."""
+    h, found = hashlib.sha256(), False
+    for name in PORTRAIT_FILES:
+        if (ROOT / name).exists():
+            h.update((ROOT / name).read_bytes())
+            found = True
+    return f"?v={h.hexdigest()[:10]}" if found else ""
 
 
 def _jsonld(data):
@@ -51,7 +63,7 @@ def _project_items(projects, indent, home):
     return _indent("\n".join(items), indent)
 
 
-def _cover(page, site):
+def _cover(page, site, v=""):
     if page == "home":
         return _indent(
             '<div class="cover__body cover__body--home">\n'
@@ -61,9 +73,9 @@ def _cover(page, site):
             '  </div>\n'
             '  <figure class="passport-photo">\n'
             '    <picture>\n'
-            '      <source srcset="/mogdhopaul.webp" type="image/webp">\n'
-            '      <img src="/mogdhopaul.jpeg" alt="Mogdho Paul standing in a stone arcade on his travels" '
-            'width="480" height="424" fetchpriority="high">\n'
+            f'      <source srcset="/mogdhopaul.webp{v}" type="image/webp">\n'
+            f'      <img src="/mogdhopaul.jpeg{v}" alt="Portrait of Mogdho Paul" '
+            'width="480" height="600" fetchpriority="high">\n'
             '    </picture>\n'
             '  </figure>\n'
             '</div>', 6)
@@ -84,12 +96,12 @@ def _cover(page, site):
         '</div>', 6)
 
 
-def _meta(page, site):
+def _meta(page, site, v=""):
     profiles = [p["url"] for p in site["profiles"]]
     if page == "home":
         person = {
             "@context": "https://schema.org", "@type": "Person", "name": "Mogdho Paul",
-            "url": f"{SITE}/", "image": f"{SITE}/mogdhopaul.jpeg",
+            "url": f"{SITE}/", "image": f"{SITE}/mogdhopaul.jpeg{v}",
             "jobTitle": "Developer & SEO Specialist", "description": site["identity"],
             "nationality": {"@type": "Country", "name": "Bangladesh"},
             "homeLocation": {"@type": "Country", "name": "Bangladesh"},
@@ -151,9 +163,10 @@ def build(root=None):
     site = content["site"]
     profiles = _indent("\n".join(f'<li><a href="{e(p["url"])}" rel="me">{e(p["label"])}</a></li>'
                                  for p in site["profiles"]), 8)
+    v = _portrait_version()
     pages = {}
     for rel, page in PAGES.items():
-        title, description, og_type, jsonld = _meta(page, site)
+        title, description, og_type, jsonld = _meta(page, site, v)
         path = "/" if page == "home" else f"/{page}/"
         nav = _indent("\n".join(
             f'<li><a href="{href}"{" aria-current=" + chr(34) + "page" + chr(34) if href == path else ""}>{label}</a></li>'
@@ -161,7 +174,7 @@ def build(root=None):
         pages[rel] = _template("base").substitute(
             title=e(title), description=e(description), canonical=f"{SITE}{path}", og_type=og_type,
             jsonld=jsonld, cover_class="" if page == "home" else " cover--short", nav=nav,
-            cover=_cover(page, site), main=_main_block(page, content).rstrip("\n"),
+            cover=_cover(page, site, v), image=f"{SITE}/mogdhopaul.jpeg{v}", main=_main_block(page, content).rstrip("\n"),
             whatsapp=e(site["contact"]["whatsapp"]), email=e(site["contact"]["email"]), profiles=profiles,
         )
     return pages

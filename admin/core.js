@@ -110,6 +110,22 @@ export function dragFocus(start, dx, dy, { frameW, frameH, imageW, imageH }) {
   };
 }
 
+/**
+ * Part of a srcW x srcH image to cut for an outW x outH frame, placed by `focus` ({x, y} percentages),
+ * like object-fit: cover with object-position. The output never enlarges the source.
+ */
+export function cropRect(srcW, srcH, outW, outH, focus) {
+  const ratio = outW / outH;
+  let sw = srcW;
+  let sh = srcH;
+  if (srcW / srcH > ratio) sw = Math.round(srcH * ratio);
+  else sh = Math.round(srcW / ratio);
+  const sx = Math.round(((srcW - sw) * focus.x) / 100);
+  const sy = Math.round(((srcH - sh) * focus.y) / 100);
+  const w = Math.min(outW, sw);
+  return { sx, sy, sw, sh, outW: w, outH: Math.round(w / ratio) };
+}
+
 /** Size that fits within `max` pixels wide, never enlarging. */
 export function targetSize(width, height, max) {
   if (width <= max) return { width, height };

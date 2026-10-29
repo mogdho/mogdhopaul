@@ -378,6 +378,57 @@
   aspect-ratio: 4 / 5;
 }
 
+.crop--portrait {
+  aspect-ratio: 4 / 5;
+}
+
+.crop--still {
+  cursor: default;
+}
+
+/* Profile photo: the passport-style print beside the name on the home page. */
+.portrait-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s4) var(--s5);
+  margin-bottom: var(--s7);
+  padding-bottom: var(--s6);
+  border-bottom: 1px solid var(--rule);
+}
+
+.portrait-editor__photo {
+  width: 11rem;
+  flex: none;
+  padding: 0.35rem;
+  background: var(--print);
+  box-shadow: var(--shadow);
+}
+
+.portrait-editor__text {
+  display: grid;
+  gap: var(--s3);
+  flex: 1 1 16rem;
+  min-width: 0;
+  max-width: 34rem;
+}
+
+.portrait-editor__text h2 {
+  margin: 0;
+}
+
+.portrait-editor__text .field__hint,
+.portrait-editor__text .new-tag {
+  margin: 0;
+}
+
+.portrait-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+}
+
 .crop--home {
   aspect-ratio: 4 / 3;
   width: 6.5rem;

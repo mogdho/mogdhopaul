@@ -148,6 +148,20 @@ class Main(unittest.TestCase):
         about = (self.tmp / "about" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<a href="/photos/">photos page</a>', about)
 
+    def test_new_profile_photo_gets_new_address(self):
+        # Browsers and link previews cache the photo, so its address changes with its contents.
+        (self.tmp / "mogdhopaul.jpeg").write_bytes(b"one")
+        build_site.main([])
+        first = (self.tmp / "index.html").read_text(encoding="utf-8")
+        (self.tmp / "mogdhopaul.jpeg").write_bytes(b"two")
+        build_site.main([])
+        second = (self.tmp / "index.html").read_text(encoding="utf-8")
+        v1 = re.search(r'/mogdhopaul\.jpeg\?v=(\w+)"', first).group(1)
+        v2 = re.search(r'/mogdhopaul\.jpeg\?v=(\w+)"', second).group(1)
+        self.assertNotEqual(v1, v2)
+        for page in (first, second):
+            self.assertEqual(len(re.findall(r'mogdhopaul\.jpeg"', page)), 0, "every photo link is versioned")
+
     def test_zero_photos_shows_empty_note(self):
         self.edit("photos", lambda ps: ps.clear())
         build_site.main([])

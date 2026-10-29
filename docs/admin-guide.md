@@ -26,6 +26,11 @@ The device remembers you until you press **Log out**.
 
 ## 3. Make changes
 
+**Profile photo**
+- At the top of **Photos**, press **Change profile photo** and pick a photo. Drag it inside the frame
+  to choose what shows, then save. It replaces the photo beside your name on the home page and the
+  picture shown when someone shares a link to your site. **Keep the current photo** cancels.
+
 **Photos**
 - **Add photos** lets you pick one or several at once (JPG or PNG; iPhone HEIC photos need to be
   saved as JPG first). They are made smaller on your device and their location data is removed,

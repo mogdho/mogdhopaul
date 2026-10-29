@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   checkText, isAllowedUrl, validateContent, targetSize, isSupportedImage,
-  newPhotoId, toJson, filesToSave, watchPublishing, isFocus, dragFocus,
+  newPhotoId, toJson, filesToSave, watchPublishing, isFocus, dragFocus, cropRect,
 } from '../../admin/core.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../content/${name}.json`, import.meta.url), 'utf8'));
@@ -59,7 +59,16 @@ test('dragFocus moves only the side that overflows', () => {
   assert.deepEqual(dragFocus({ x: 50, y: 50 }, 133.5, 40, box), { x: 0, y: 50 });
   assert.deepEqual(dragFocus({ x: 50, y: 50 }, -1000, 0, box), { x: 100, y: 50 });
 });
-test('targetSize scales down',() => assert.deepEqual(targetSize(6000, 4000, 1200), { width: 1200, height: 800 }));
+test('cropRect cuts a wide photo to 4:5 at the chosen spot', () => {
+  // 2000x1000 -> 800 wide slice; 1200px spare across, none down.
+  assert.deepEqual(cropRect(2000, 1000, 480, 600, { x: 0, y: 50 }), { sx: 0, sy: 0, sw: 800, sh: 1000, outW: 480, outH: 600 });
+  assert.equal(cropRect(2000, 1000, 480, 600, { x: 100, y: 50 }).sx, 1200);
+});
+test('cropRect cuts a tall photo and never enlarges', () => {
+  // 600x1500 -> 600x750 slice, centred: 375px from the top. Output stays 600 wide, not 960.
+  assert.deepEqual(cropRect(600, 1500, 960, 1200, { x: 50, y: 50 }), { sx: 0, sy: 375, sw: 600, sh: 750, outW: 600, outH: 750 });
+});
+test('targetSize scales down', () => assert.deepEqual(targetSize(6000, 4000, 1200), { width: 1200, height: 800 }));
 test('targetSize never upscales', () => assert.deepEqual(targetSize(800, 600, 1200), { width: 800, height: 600 }));
 test('isSupportedImage refuses HEIC', () => {
   assert.equal(isSupportedImage({ type: 'image/heic' }), false);

@@ -6,6 +6,8 @@ on:
     paths:
       - "content/**"
       - "photos/img/**"
+      - "mogdhopaul.webp"
+      - "mogdhopaul.jpeg"
       - "templates/**"
       - "scripts/**"
       - "admin/**"

@@ -3,7 +3,7 @@ import {
   FEATURED_COUNT, dragFocus, filesToSave, isSupportedImage, newPhotoId, validateContent, watchPublishing,
 } from './core.js';
 import { AuthError, ConflictError, Repo } from './github.js';
-import { resizeImage } from './images.js';
+import { PORTRAIT_SIZE, cropImage, resizeImage } from './images.js';
 
 const TOKEN_KEY = 'mp-admin-token';
 const ACTIONS_URL = 'https://github.com/mogdho/mogdhopaul/actions';
@@ -15,6 +15,7 @@ const state = {
   site: null, projects: [], photos: [],
   newImages: new Map(), // repo path -> Blob, for photos added since the last save
   previews: new Map(), // photo id -> object URL
+  portrait: null, // a newly chosen profile photo, until it is saved
   dirty: false, saving: false,
   resumeSave: false, // a save stopped by a bad key: log in again and it continues, edits kept
 };
@@ -109,6 +110,8 @@ function renderPhotos() {
   const input = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif', multiple: true, onchange: (e) => addPhotos(e.target.files) });
   panel.append(
     el('h1', { text: 'Photos' }),
+    renderPortrait(),
+    el('h2', { text: 'Travel photos' }),
     el('p', { class: 'panel-intro', text: 'The six newest show on the home page; all of them on the Photos page. Photos are made smaller on this device, and their location data is removed before upload.' }),
     el('div', { class: 'photo-tools' },
       el('label', { class: 'button file-button' }, 'Add photos', input),
@@ -135,67 +138,156 @@ function renderPhotos() {
 const CENTRE = { x: 50, y: 50 };
 
 /**
+ * A frame the photo fills; drag it (or use the arrow keys) to choose which part stays in view.
+ * getFocus/setFocus read and store the position as {x, y} percentages.
+ */
+function cropFrame({ shape, label, src, alt, getFocus, setFocus, size }) {
+  const img = el('img', { src, alt, draggable: 'false', loading: 'lazy' });
+  const frame = el('div', { class: `crop crop--${shape}`, tabindex: '0', 'aria-label': `${label}. Drag the photo or use the arrow keys to move it.` }, img);
+  let drag = null;
+  frame.addEventListener('pointerdown', (e) => {
+    frame.setPointerCapture(e.pointerId);
+    drag = { x: e.clientX, y: e.clientY, focus: { ...getFocus() } };
+    frame.classList.add('is-dragging');
+  });
+  frame.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    setFocus(dragFocus(drag.focus, e.clientX - drag.x, e.clientY - drag.y, {
+      frameW: frame.clientWidth, frameH: frame.clientHeight,
+      imageW: img.naturalWidth || size.width, imageH: img.naturalHeight || size.height,
+    }));
+  });
+  const stop = () => { drag = null; frame.classList.remove('is-dragging'); };
+  frame.addEventListener('pointerup', stop);
+  frame.addEventListener('pointercancel', stop);
+  frame.addEventListener('keydown', (e) => {
+    const step = e.shiftKey ? 1 : 5;
+    const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+    if (!move) return;
+    e.preventDefault();
+    const f = getFocus();
+    const clamp = (n) => Math.min(100, Math.max(0, n));
+    setFocus({ x: clamp(f.x + move[0]), y: clamp(f.y + move[1]) });
+  });
+  return { frame, img };
+}
+
+/**
  * The photo in the two frame shapes the site uses (Photos page 4:5, home page 4:3).
  * Drag either one, or use the arrow keys, to choose which part stays in the frame.
  */
 function cropControls(photo) {
-  const alt = photo.place ? `Photo from ${photo.place}` : 'Travel photo';
   const frames = [];
+  const getFocus = () => photo.focus || CENTRE;
   const apply = () => {
-    const f = photo.focus || CENTRE;
+    const f = getFocus();
     for (const { img } of frames) img.style.objectPosition = `${f.x}% ${f.y}%`;
   };
   const setFocus = (f) => {
-    const cur = photo.focus || CENTRE;
+    const cur = getFocus();
     if (f.x === cur.x && f.y === cur.y) return;
     if (f.x === 50 && f.y === 50) delete photo.focus;
     else photo.focus = { x: f.x, y: f.y };
     apply();
     markDirty();
   };
-
-  const makeFrame = (shape, label) => {
-    const img = el('img', { src: imgSrc(photo), alt, draggable: 'false', loading: 'lazy' });
-    const frame = el('div', { class: `crop crop--${shape}`, tabindex: '0', 'aria-label': `${label}. Drag the photo or use the arrow keys to move it.` }, img);
-    let drag = null;
-    frame.addEventListener('pointerdown', (e) => {
-      frame.setPointerCapture(e.pointerId);
-      drag = { x: e.clientX, y: e.clientY, focus: { ...(photo.focus || CENTRE) } };
-      frame.classList.add('is-dragging');
-    });
-    frame.addEventListener('pointermove', (e) => {
-      if (!drag) return;
-      setFocus(dragFocus(drag.focus, e.clientX - drag.x, e.clientY - drag.y, {
-        frameW: frame.clientWidth, frameH: frame.clientHeight,
-        imageW: img.naturalWidth || photo.width, imageH: img.naturalHeight || photo.height,
-      }));
-    });
-    const stop = () => { drag = null; frame.classList.remove('is-dragging'); };
-    frame.addEventListener('pointerup', stop);
-    frame.addEventListener('pointercancel', stop);
-    frame.addEventListener('keydown', (e) => {
-      const step = e.shiftKey ? 1 : 5;
-      const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
-      if (!move) return;
-      e.preventDefault();
-      const f = photo.focus || CENTRE;
-      const clamp = (n) => Math.min(100, Math.max(0, n));
-      setFocus({ x: clamp(f.x + move[0]), y: clamp(f.y + move[1]) });
-    });
-    frames.push({ img });
-    return frame;
+  const common = {
+    src: imgSrc(photo), alt: photo.place ? `Photo from ${photo.place}` : 'Travel photo',
+    getFocus, setFocus, size: photo,
   };
-
-  const card = makeFrame('card', 'Crop on the Photos page');
-  const home = makeFrame('home', 'Crop on the home page');
+  const card = cropFrame({ ...common, shape: 'card', label: 'Crop on the Photos page' });
+  const home = cropFrame({ ...common, shape: 'home', label: 'Crop on the home page' });
+  frames.push(card, home);
   apply();
   return el('div', { class: 'crop-controls' },
-    card,
+    card.frame,
     el('div', { class: 'crop-row' },
-      home,
+      home.frame,
       el('div', { class: 'crop-help' },
         el('p', { class: 'field__hint', text: 'Drag the photo to choose what stays in the frame. The small frame shows the home page.' }),
         el('button', { type: 'button', class: 'link-button', onclick: () => setFocus(CENTRE) }, 'Centre'))));
+}
+
+// ---------- profile photo ----------
+// The photo beside your name on the home page. A new one is cropped to the frame on this device
+// when you save, and replaces /mogdhopaul.webp and /mogdhopaul.jpeg.
+function renderPortrait() {
+  const p = state.portrait; // null, or { file, url, width, height, focus } for a newly chosen photo
+  const input = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp', onchange: (e) => choosePortrait(e.target.files[0]) });
+  let frame;
+  if (p) {
+    frame = cropFrame({
+      shape: 'portrait', label: 'Profile photo crop', src: p.url, alt: 'New profile photo', size: p,
+      getFocus: () => p.focus,
+      setFocus: (f) => {
+        if (f.x === p.focus.x && f.y === p.focus.y) return;
+        p.focus = f;
+        frame.img.style.objectPosition = `${f.x}% ${f.y}%`;
+        markDirty();
+      },
+    });
+    frame.img.style.objectPosition = `${p.focus.x}% ${p.focus.y}%`;
+  } else {
+    // The live file; the commit id in the address skips a cached older photo after a save.
+    const img = el('img', { src: `/mogdhopaul.jpeg?v=${state.sha || ''}`, alt: 'Current profile photo' });
+    frame = { frame: el('div', { class: 'crop crop--portrait crop--still' }, img), img };
+  }
+  return el('section', { class: 'portrait-editor' },
+    el('div', { class: 'portrait-editor__photo' }, frame.frame),
+    el('div', { class: 'portrait-editor__text' },
+      el('h2', { text: 'Profile photo' }),
+      el('p', {
+        class: 'field__hint',
+        text: p
+          ? 'Drag the photo to choose what shows in the frame, then save. It replaces the photo beside your name on the home page.'
+          : 'The photo beside your name on the home page. It also shows when someone shares a link to your site.',
+      }),
+      p ? el('p', { class: 'new-tag', text: 'New · not saved yet' }) : null,
+      el('div', { class: 'portrait-editor__actions' },
+        el('label', { class: 'button file-button' }, p ? 'Choose another' : 'Change profile photo', input),
+        p ? el('button', { type: 'button', class: 'link-button', onclick: () => setPortraitFocus(CENTRE) }, 'Centre') : null,
+        p ? el('button', { type: 'button', class: 'link-button', onclick: cancelPortrait }, 'Keep the current photo') : null),
+      el('p', { class: 'field__error', id: 'portrait-error', role: 'alert' })));
+}
+
+function setPortraitFocus(f) {
+  state.portrait.focus = { ...f };
+  renderPhotos();
+  markDirty();
+}
+
+async function choosePortrait(file) {
+  if (!file) return;
+  if (!isSupportedImage(file)) {
+    $('portrait-error').textContent = `${file.name}: this kind of file can't be used. Please use JPG or PNG.`;
+    return;
+  }
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const { width, height } = bitmap;
+    bitmap.close();
+    if (state.portrait) URL.revokeObjectURL(state.portrait.url);
+    state.portrait = { file, url: URL.createObjectURL(file), width, height, focus: { ...CENTRE } };
+  } catch {
+    $('portrait-error').textContent = `${file.name}: couldn't open this photo.`;
+    return;
+  }
+  renderPhotos();
+  markDirty();
+}
+
+function cancelPortrait() {
+  URL.revokeObjectURL(state.portrait.url);
+  state.portrait = null;
+  renderPhotos();
+}
+
+/** The two cropped files for a newly chosen profile photo, as [repo path, Blob]. */
+async function portraitFiles() {
+  const p = state.portrait;
+  const small = await cropImage(p.file, p.focus, PORTRAIT_SIZE.small);
+  const large = await cropImage(p.file, p.focus, PORTRAIT_SIZE.large, { jpeg: true });
+  return [['mogdhopaul.webp', small], ['mogdhopaul.jpeg', large]];
 }
 
 async function addPhotos(files) {
@@ -370,13 +462,17 @@ async function save() {
   let sha = null;
   try {
     const files = filesToSave(content).map(({ path, text }) => ({ path, base64: base64FromText(text) }));
-    for (const [path, blob] of state.newImages) {
+    const images = [...state.newImages];
+    if (state.portrait) images.push(...await portraitFiles());
+    for (const [path, blob] of images) {
       files.push({ path, base64: base64FromBytes(new Uint8Array(await blob.arrayBuffer())) });
     }
     sha = await state.repo.saveFiles(state.sha, files, 'admin: update site');
     state.sha = sha;
     state.original = structuredClone(content);
     state.newImages.clear();
+    if (state.portrait) URL.revokeObjectURL(state.portrait.url);
+    state.portrait = null;
     state.dirty = false;
     renderPhotos();
   } catch (err) {
@@ -442,6 +538,7 @@ async function load() {
     Object.assign(state, { site, projects, photos, dirty: false });
     state.original = structuredClone({ site, projects, photos });
     state.newImages.clear();
+    state.portrait = null;
     renderAll();
     show('editor');
     const tab = new URLSearchParams(location.search).get('tab');
