@@ -46,7 +46,6 @@
   --rule: #c9d1c2;
   --stamp: #5b3e96;
   --stamp-on-print: #5b3e96; /* prints stay light paper in both modes */
-  --mark: #c9b6f2; /* logo underline, always on the green cover */
   --shadow: 0 1px 2px rgb(23 32 28 / 0.12), 0 6px 16px -6px rgb(23 32 28 / 0.22);
   --stamp-blend: multiply;
 
@@ -254,30 +253,9 @@ a {
 }
 
 .site-header__name {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s2);
   font-family: var(--serif);
   font-size: 1.15rem;
   text-decoration: none;
-}
-
-/* MP logo: passport code-line initials with a lilac underline. */
-.site-header__mark {
-  width: 2.6rem;
-  height: 2.6rem;
-  margin-block: -0.5rem; /* keep the header height unchanged */
-  flex: none;
-}
-
-.site-header__mark text {
-  font-family: var(--mono);
-  font-size: 32px;
-  fill: currentColor;
-}
-
-.site-header__mark rect {
-  fill: var(--mark);
 }
 
 .site-nav ul {
