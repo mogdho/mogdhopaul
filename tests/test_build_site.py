@@ -153,9 +153,15 @@ class Main(unittest.TestCase):
         build_site.main([])
         home = (self.tmp / "index.html").read_text(encoding="utf-8")
         self.assertLess(home.index('id="skills-title"'), home.index('id="projects-title"'))
-        self.assertIn("<li>C &amp; C++</li>", home)
+        self.assertIn('<span class="skill__name">C &amp; C++</span>', home)
         self.assertIn("Tech stack", home)
         self.assertNotIn("<dt>Tools</dt>", home)  # empty group hidden
+
+    def test_skill_marks(self):
+        self.assertEqual(build_site.skill_mark("JavaScript"), "JS")
+        self.assertEqual(build_site.skill_mark("after  effects"), "Ae")
+        self.assertEqual(build_site.skill_mark("Blender"), "Bl")
+        self.assertEqual(build_site.skill_mark("Final Cut Pro"), "FCP")
 
     def test_no_skills_no_section(self):
         self.edit("site", lambda s: s.update(skills={"stack": [], "tools": []}))

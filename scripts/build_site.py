@@ -64,14 +64,40 @@ def _project_items(projects, indent, home):
 
 
 SKILL_LABELS = (("stack", "Tech stack"), ("tools", "Tools"))
+# Short marks for the skill stamps; anything else gets its initials.
+SKILL_MARKS = {
+    "javascript": "JS", "typescript": "TS", "python": "Py", "html": "</>", "html & css": "</>",
+    "css": "{ }", "autohotkey": "AHK", "premiere pro": "Pr", "after effects": "Ae",
+    "photoshop": "Ps", "illustrator": "Ai", "figma": "Fg", "react": "Re", "node.js": "No",
+    "git": "Git", "seo": "SEO", "wordpress": "WP", "batch": "BAT", "davinci resolve": "DR",
+}
+
+
+def skill_mark(name):
+    """Two or three characters that stand for a skill inside its stamp."""
+    key = " ".join(name.lower().split())
+    if key in SKILL_MARKS:
+        return SKILL_MARKS[key]
+    words = [w for w in key.replace("&", " ").split() if w[0].isalnum()]
+    if len(words) > 1:
+        return "".join(w[0] for w in words[:3]).upper()
+    word = words[0] if words else key
+    return word[:2].capitalize()
+
+
+def _skill_item(name):
+    mark = skill_mark(name)
+    cls = "skill__stamp skill__stamp--long" if len(mark) > 2 else "skill__stamp"
+    return (f'<li class="skill"><span class="{cls}" aria-hidden="true">{e(mark)}</span>'
+            f'<span class="skill__name">{e(name)}</span></li>')
 
 
 def _skills(skills):
-    """Home page skills: one row per group, items as stamps. Empty groups are left out."""
+    """Home page skills: one row per group, each skill as an ink stamp. Empty groups are left out."""
     rows = []
     for key, label in SKILL_LABELS:
         if skills[key]:
-            items = "".join(f"<li>{e(item)}</li>" for item in skills[key])
+            items = "".join(_skill_item(item) for item in skills[key])
             rows.append(f'  <div class="skills__row">\n    <dt>{label}</dt>\n'
                         f'    <dd><ul class="skills__items">{items}</ul></dd>\n  </div>')
     if not rows:

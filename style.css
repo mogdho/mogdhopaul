@@ -533,21 +533,52 @@ main {
 .skills__items {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s2) var(--s3);
+  gap: var(--s4) var(--s5);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.skills__items li {
-  padding: 0.2rem 0.6rem;
-  border: 1.5px solid var(--stamp);
-  border-radius: 3px;
+/* each skill: a round entry stamp, pressed slightly crooked, with its name below */
+.skill {
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+  min-width: 5.5rem;
+  text-align: center;
+}
+
+.skill__stamp--long {
+  font-size: 0.85rem;
+}
+
+.skill__stamp {
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border: 2px solid var(--stamp);
+  border-radius: 50%;
+  outline: 1px solid var(--stamp);
+  outline-offset: -6px;
   color: var(--stamp);
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1;
+  transform: rotate(var(--tilt, -6deg));
+  mix-blend-mode: var(--stamp-blend);
+}
+
+.skill:nth-child(3n + 2) .skill__stamp { --tilt: 5deg; }
+.skill:nth-child(3n + 3) .skill__stamp { --tilt: -2deg; }
+
+.skill__name {
   font-family: var(--mono);
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink-soft);
 }
 
 @media (min-width: 48rem) {
