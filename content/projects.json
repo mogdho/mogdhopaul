@@ -18,9 +18,9 @@
     "featured": true
   },
   {
-    "name": "Capslock-CopyPaste",
-    "url": "https://github.com/mogdho/Capslock-CopyPaste",
-    "description": "Gives the Caps Lock key a real job: press once to copy, twice to paste.",
+    "name": "NN-tab",
+    "url": "https://github.com/mogdho/NN-tab",
+    "description": "A sleek, ultra-minimalist New Tab dashboard for Google Chrome.",
     "home_blurb": "",
     "language": "AutoHotkey",
     "group": "windows",
