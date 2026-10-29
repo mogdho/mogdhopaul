@@ -37,5 +37,18 @@
       "x": 50,
       "y": 100
     }
+  },
+  {
+    "id": "2026-10-29-be9f",
+    "place": "Bucharest",
+    "date": "2026-10-29",
+    "src": "/photos/img/2026-10-29-be9f-1200.webp",
+    "thumb": "/photos/img/2026-10-29-be9f-600.webp",
+    "width": 1084,
+    "height": 1242,
+    "focus": {
+      "x": 50,
+      "y": 0
+    }
   }
 ]
