@@ -509,7 +509,7 @@ function renderProjects() {
       field({ label: 'Short version for the home page (optional)', value: p.home_blurb, field: `${f}.home_blurb`, required: false, onInput: (v) => { p.home_blurb = v; } }),
       el('div', { class: 'entry__row' },
         field({ label: 'Language', value: p.language, field: `${f}.language`, onInput: (v) => { p.language = v; } }),
-        field({ label: 'Section', value: p.group, field: `${f}.group`, options: [['windows', 'Windows, made calmer'], ['browser', 'In the browser']], onInput: (v) => { p.group = v; } })),
+        field({ label: 'Section', value: p.group, field: `${f}.group`, options: [['windows', 'Windows, made calmer'], ['extensions', 'Chrome extensions'], ['browser', 'In the browser']], onInput: (v) => { p.group = v; } })),
       el('label', { class: 'field--check', for: `feat${i}` }, box, 'Show on home page'));
   })));
   panel.append(el('button', { type: 'button', class: 'button', onclick: () => {

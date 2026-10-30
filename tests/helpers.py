@@ -9,6 +9,13 @@ PAGES = {
     "about": ROOT / "about" / "index.html",
     "projects": ROOT / "projects" / "index.html",
     "photos": ROOT / "photos" / "index.html",
+    "alwaysnumlock": ROOT / "alwaysnumlock" / "index.html",
+    "capslock-copypaste": ROOT / "capslock-copypaste" / "index.html",
+    "copilot2gemini": ROOT / "copilot2gemini" / "index.html",
+    "nn-tab": ROOT / "nn-tab" / "index.html",
+    "yt-mini-pip": ROOT / "yt-mini-pip" / "index.html",
+    "ytmodify": ROOT / "ytmodify" / "index.html",
+    "how-many-time": ROOT / "how-many-time" / "index.html",
 }
 
 

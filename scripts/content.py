@@ -12,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 BANNED_NAMES = ("mugdho", "mogdha")
-GROUPS = ("windows", "browser")
+GROUPS = ("windows", "extensions", "browser")
 SKILL_GROUPS = ("stack", "tools")
 ICON_ID = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*:[a-z0-9]+(-[a-z0-9]+)*$")  # an Iconify icon, saved in skill-icons/
 FEATURED_COUNT = 3

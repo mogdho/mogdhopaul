@@ -59,7 +59,7 @@ jobs:
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A index.html about projects photos admin/index.html skill-icons
+            git add -A index.html about projects photos admin/index.html skill-icons alwaysnumlock capslock-copypaste copilot2gemini nn-tab yt-mini-pip ytmodify how-many-time
             git commit -m "chore: rebuild pages"
             git pull --rebase
             git push

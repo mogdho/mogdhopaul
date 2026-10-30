@@ -1,8 +1,9 @@
-"""Build the four public pages from content/*.json and templates/.
+"""Build the public pages from content/*.json and templates/.
 
 Usage:  python -m scripts.build_site
-Writes index.html, about/index.html, projects/index.html, photos/index.html and removes images in
-photos/img/ that no photo uses. If the content breaks a site rule, nothing is written.
+Writes index.html, about/index.html, projects/index.html, photos/index.html, one page per Windows
+tool (alwaysnumlock/index.html and so on, from templates/tools/) and removes images in photos/img/
+that no photo uses. If the content breaks a site rule, nothing is written.
 """
 import argparse
 import hashlib
@@ -24,6 +25,111 @@ NAV = [("/", "Home"), ("/about/", "About"), ("/photos/", "Photos"), ("/projects/
 STRIP_COUNT = 3  # newest photos on the home page; all of them are on the Photos page
 PORTRAIT_FILES = ("mogdhopaul.webp", "mogdhopaul.jpeg")  # replaced by the admin's Profile photo
 e = html.escape
+
+# Windows apps and Chrome extensions with their own download page at /<slug>/. The page body is templates/tools/<slug>.html.
+# The download button points at the newest GitHub release, so a new release needs no site change.
+TOOLS = {
+    "alwaysnumlock": {
+        "name": "AlwaysNumLock",
+        "repo": "https://github.com/mogdho/AlwaysNumLock",
+        "lead": "Keeps Num Lock on, always. Your number pad types numbers, every time, even after sleep.",
+        "title": "AlwaysNumLock — Keep Num Lock On in Windows, by Mogdho Paul",
+        "description": "Free Windows app by Mogdho Paul that keeps Num Lock switched on, even after sleep or "
+                       "the lock screen. Download, double-click, done.",
+    },
+    "capslock-copypaste": {
+        "name": "Capslock-CopyPaste",
+        "repo": "https://github.com/mogdho/Capslock-CopyPaste",
+        "lead": "Turns the Caps Lock key into copy and paste. Tap once to copy, tap twice to paste.",
+        "title": "Capslock-CopyPaste — Copy and Paste with Caps Lock, by Mogdho Paul",
+        "description": "Free Windows app by Mogdho Paul: tap Caps Lock once to copy and twice to paste. "
+                       "Works with text, pictures and files.",
+    },
+    "copilot2gemini": {
+        "name": "Copilot2Gemini",
+        "repo": "https://github.com/mogdho/Copilot2Gemini",
+        "lead": "Makes the Copilot key open Google Gemini instead. Or ChatGPT, Claude, any assistant you like.",
+        "title": "Copilot2Gemini — Open Gemini with the Copilot Key, by Mogdho Paul",
+        "description": "Free Windows app by Mogdho Paul that makes the Copilot key open Google Gemini, "
+                       "ChatGPT or Claude in its own window.",
+    },
+    "nn-tab": {
+        "kind": "chrome",
+        "name": "NN-tab",
+        "repo": "https://github.com/mogdho/NN-tab",
+        "file": "NN-tab.zip",
+        "lead": "A calm new tab page for Chrome: a clock, your bookmarks, a few notes and a quote. Nothing else.",
+        "title": "NN-tab — A Minimal New Tab Page for Chrome, by Mogdho Paul",
+        "description": "Free Chrome extension by Mogdho Paul: a quiet new tab page with a clock, bookmarks, "
+                       "notes and a quote. Everything stays on your computer.",
+    },
+    "yt-mini-pip": {
+        "kind": "chrome",
+        "name": "yt-mini-PIP",
+        "repo": "https://github.com/mogdho/yt-mini-PIP",
+        # The release file name carries its version; rename it here when a new version comes out.
+        "file": "yt-mini-pip-v1.1.zip",
+        "lead": "Your YouTube video keeps playing in a small floating window when you switch tabs, "
+                "and slides back when you return.",
+        "title": "yt-mini-PIP — Auto Picture-in-Picture for YouTube, by Mogdho Paul",
+        "description": "Free Chrome extension by Mogdho Paul that pops a playing YouTube video into a small "
+                       "floating window when you switch tabs or apps.",
+    },
+    "ytmodify": {
+        "kind": "chrome",
+        "name": "ytModify",
+        "repo": "https://github.com/mogdho/ytModify-extension",
+        "file": "ytModify.zip",
+        "lead": "Makes YouTube nicer to watch: a soft glow around the video, auto pop-out, "
+                "the quality you want and a bigger player.",
+        "title": "ytModify — A Nicer YouTube in Chrome, by Mogdho Paul",
+        "description": "Free Chrome extension by Mogdho Paul: ambient glow, auto pop-out, fixed video quality "
+                       "and a bigger player for YouTube.",
+    },
+    "how-many-time": {
+        "kind": "web",
+        "name": "How Many Times",
+        "repo": "https://github.com/mogdho/how-many-time",
+        "app": "https://mogdho.github.io/how-many-time/",
+        "lead": "A private, one-tap counter for the habit you’re trying to cut down on. "
+                "Tap once each time it happens, and see honestly how you’re doing.",
+        "title": "How Many Times — A Private Habit Tracker, by Mogdho Paul",
+        "description": "Free app by Mogdho Paul: tap one button each time you slip on a habit you're cutting "
+                       "down on. Private, works offline, no sign-up.",
+    },
+}
+for _slug, _tool in TOOLS.items():
+    _tool.setdefault("kind", "windows")
+    if _tool["kind"] != "web":
+        _tool.setdefault("file", f"{_tool['name']}.exe")
+    PAGES[f"{_slug}/index.html"] = f"tool:{_slug}"
+
+# What changes between a Windows app, a Chrome extension and a web app page.
+KINDS = {
+    "windows": {"kicker": "Free for Windows", "note": "Free · Windows 10 and 11 · Nothing to install",
+                "os": "Windows 10, Windows 11", "category": "UtilitiesApplication"},
+    "chrome": {"kicker": "Free for Chrome", "note": "Free · Chrome, Edge and Brave · No account",
+               "os": "Google Chrome", "category": "BrowserApplication"},
+    "web": {"kicker": "Free app", "note": "Free · Any phone or computer · No sign-up",
+            "os": "Any", "category": "LifestyleApplication"},
+}
+
+
+def download_url(tool):
+    """Where the button goes. Downloads link straight to the file in the newest release, so the browser
+    downloads it without opening GitHub; a web app links to the app itself."""
+    if tool["kind"] == "web":
+        return tool["app"]
+    return f"{tool['repo']}/releases/latest/download/{tool['file']}"
+
+
+def project_href(project):
+    """A project with its own download page links there; the others link to GitHub."""
+    url = project["url"].rstrip("/").lower()
+    for slug, tool in TOOLS.items():
+        if url in (tool["repo"].lower(), tool.get("app", "").rstrip("/").lower()):
+            return f"/{slug}/"
+    return project["url"]
 
 
 def _indent(block, spaces):
@@ -84,7 +190,7 @@ def _project_items(projects, indent, home):
         text = (p["home_blurb"] or p["description"]) if home else p["description"]
         items.append(
             '<li class="project">\n'
-            f'  <h3><a href="{e(p["url"])}">{e(p["name"])}</a></h3>\n'
+            f'  <h3><a href="{e(project_href(p))}">{e(p["name"])}</a></h3>\n'
             f'  <p>{inline(text)}</p>\n'
             f'  <span class="project__lang">{e(p["language"])}</span>\n'
             '</li>'
@@ -144,7 +250,46 @@ def newest_first(photos):
     return [p for _, p in sorted(enumerate(photos), key=lambda ip: (ip[1]["date"], ip[0]), reverse=True)]
 
 
+DOWNLOAD_ICON = ('<svg class="button__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" '
+                 'focusable="false"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" '
+                 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+
+OPEN_ICON = ('<svg class="button__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" '
+             'focusable="false"><path d="M8 16 17 7m0 0H9.5M17 7v7.5" fill="none" stroke="currentColor" '
+             'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+
+def download_button(tool, extra_class=""):
+    if tool["kind"] == "web":
+        return f'<a class="button{extra_class}" href="{e(download_url(tool))}">{OPEN_ICON}Open the app</a>'
+    return (f'<a class="button{extra_class}" href="{e(download_url(tool))}" download>'
+            f'{DOWNLOAD_ICON}Download {e(tool["name"])}</a>')
+
+
 def _cover(page, site, v=""):
+    if page.startswith("tool:"):
+        slug = page[5:]
+        tool = TOOLS[slug]
+        logo = f"{slug}/img/logo.webp"  # square app icon, shown on a paper tile beside the name
+        logo_html = ("  <figure class=\"app-logo\">\n"
+                     f'    <img src="/{logo}{_version(logo)}" alt="{e(tool["name"])} logo" '
+                     'width="256" height="256" fetchpriority="high">\n'
+                     "  </figure>\n") if (ROOT / logo).exists() else ""
+        return _indent(
+            '<div class="cover__body cover__body--tool">\n'
+            + logo_html +
+            '  <div>\n'
+            '    <p class="cover__kicker"><a href="/projects/">Projects</a>'
+            f'<span aria-hidden="true"> / </span>{KINDS[tool["kind"]]["kicker"]}</p>\n'
+            f'    <h1 class="cover__name">{e(tool["name"])}</h1>\n'
+            f'    <p class="cover__lead">{e(tool["lead"])}</p>\n'
+            '    <div class="download">\n'
+            f'      {download_button(tool, " button--cover")}\n'
+            f'      <p class="download__note">{KINDS[tool["kind"]]["note"]}</p>\n'
+            '    </div>\n'
+            '  </div>\n'
+            '</div>', 6)
     if page == "home":
         return _indent(
             '<div class="cover__body cover__body--home">\n'
@@ -179,6 +324,19 @@ def _cover(page, site, v=""):
 
 def _meta(page, site, v=""):
     profiles = [p["url"] for p in site["profiles"]]
+    if page.startswith("tool:"):
+        slug = page[5:]
+        tool = TOOLS[slug]
+        app = {
+            "@context": "https://schema.org", "@type": "SoftwareApplication", "name": tool["name"],
+            "url": f"{SITE}/{slug}/", "description": tool["description"],
+            "operatingSystem": KINDS[tool["kind"]]["os"], "applicationCategory": KINDS[tool["kind"]]["category"],
+            ("installUrl" if tool["kind"] == "web" else "downloadUrl"): download_url(tool),
+            "isAccessibleForFree": True,
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+            "author": {"@type": "Person", "name": "Mogdho Paul", "url": f"{SITE}/"},
+        }
+        return tool["title"], tool["description"], "website", _jsonld(app)
     if page == "home":
         person = {
             "@context": "https://schema.org", "@type": "Person", "name": "Mogdho Paul",
@@ -210,6 +368,16 @@ def _meta(page, site, v=""):
 
 def _main_block(page, content):
     site, projects = content["site"], content["projects"]
+    if page.startswith("tool:"):
+        slug = page[5:]
+        tool = TOOLS[slug]
+        fields = {"button": download_button(tool), "repo": e(tool["repo"]), "name": e(tool["name"]),
+                  "file": e(tool.get("file", "")), "folder": e(tool.get("file", "").removesuffix(".zip"))}
+        # Chrome extensions share the same "add it to Chrome" and "update or remove" sections.
+        for key in ("install", "remove"):
+            fields[key] = (_template(f"tools/_chrome-{key}").substitute(fields).strip()
+                           if tool["kind"] == "chrome" else "")
+        return _template(f"tools/{slug}").substitute(fields)
     photos = newest_first(content["photos"])
     if page == "home":
         return _template("home").substitute(
@@ -227,13 +395,14 @@ def _main_block(page, content):
     if page == "projects":
         return _template("projects").substitute(
             windows=_project_items([p for p in projects if p["group"] == "windows"], 6, home=False),
+            extensions=_project_items([p for p in projects if p["group"] == "extensions"], 6, home=False),
             browser=_project_items([p for p in projects if p["group"] == "browser"], 6, home=False),
         )
     return _template("photos").substitute(photos=render_items(photos, None))
 
 
 def build(root=None):
-    """All four pages as {relative path: html}. Raises ContentError if the content breaks a rule."""
+    """All pages as {relative path: html}. Raises ContentError if the content breaks a rule."""
     global ROOT
     if root is not None and Path(root) != ROOT:
         saved, ROOT = ROOT, Path(root)
@@ -250,7 +419,7 @@ def build(root=None):
     pages = {}
     for rel, page in PAGES.items():
         title, description, og_type, jsonld = _meta(page, site, v)
-        path = "/" if page == "home" else f"/{page}/"
+        path = "/" if page == "home" else f"/{page.removeprefix('tool:')}/"
         nav = _indent("\n".join(
             f'<li><a href="{href}"{" aria-current=" + chr(34) + "page" + chr(34) if href == path else ""}>{label}</a></li>'
             for href, label in NAV), 12)

@@ -46,6 +46,9 @@
   --rule: #c9d1c2;
   --stamp: #5b3e96;
   --stamp-on-print: #5b3e96; /* prints stay light paper in both modes */
+  --ink-on-print: #17201c;
+  --soft-on-print: #46534d;
+  --rule-on-print: #c9d1c2;
   --shadow: 0 1px 2px rgb(23 32 28 / 0.12), 0 6px 16px -6px rgb(23 32 28 / 0.22);
   --stamp-blend: multiply;
 
@@ -785,4 +788,498 @@ html.js .fade.is-visible .photo__label {
 
 .lately h2 {
   margin-top: var(--s6);
+}
+
+/* ---------- Tool pages: download button, steps, keys, the menu by the clock ---------- */
+.cover__kicker {
+  margin: 0 0 var(--s4);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-cover-soft);
+}
+
+.cover .cover__kicker a {
+  color: var(--on-cover-soft);
+  text-decoration: none;
+}
+
+.cover .cover__kicker a:hover {
+  color: var(--on-cover);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.download {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+  margin-top: var(--s6);
+}
+
+.download__note {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--on-cover-soft);
+}
+
+/* the download button: a solid stamp-violet block; on the cover it turns cream on green */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 3rem;
+  padding: var(--s3) var(--s5);
+  border-radius: 4px;
+  background: var(--stamp);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+
+.button:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button__icon {
+  flex: none;
+}
+
+.cover a.button--cover {
+  background: var(--on-cover);
+  color: var(--cover);
+}
+
+/* before / after rows, the "after" inked as an entry stamp */
+.ledger {
+  margin: var(--s5) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.ledger li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "when when"
+    "before after";
+  align-items: center;
+  gap: var(--s2) var(--s5);
+  padding-block: var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.ledger .ledger__head {
+  display: none;
+}
+
+.ledger__when { grid-area: when; }
+.ledger__before { grid-area: before; }
+.ledger__after { grid-area: after; justify-self: start; }
+
+.ledger__before,
+.ledger__head span {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.ledger__after {
+  padding: 0.2rem 0.55rem 0.15rem;
+  border: 4px double var(--stamp);
+  border-radius: 2px;
+  color: var(--stamp);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: rotate(-2.5deg);
+  mix-blend-mode: var(--stamp-blend);
+  -webkit-mask-image: url("/stamp-ink.png");
+  mask-image: url("/stamp-ink.png");
+  -webkit-mask-size: 160px 160px;
+  mask-size: 160px 160px;
+}
+
+.ledger li:nth-child(odd) .ledger__after { transform: rotate(1.5deg); }
+
+.ledger__foot {
+  margin-top: var(--s4);
+  max-width: var(--measure);
+}
+
+@media (min-width: 48rem) {
+  .ledger li,
+  .ledger .ledger__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 12rem 15rem;
+    grid-template-areas: "when before after";
+  }
+
+  .ledger .ledger__head {
+    padding-block: var(--s3);
+  }
+}
+
+/* keys and what they do */
+.keys {
+  margin: var(--s5) 0 var(--s5);
+  border-top: 1px solid var(--rule);
+}
+
+.keys > div {
+  display: grid;
+  gap: var(--s2) var(--s5);
+  padding-block: var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.keys dd {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+.keys__how {
+  display: block;
+  margin-top: var(--s2);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 48rem) {
+  .keys > div {
+    grid-template-columns: 20rem minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-bottom: 3px solid var(--ink-soft);
+  border-radius: 4px;
+  background: var(--paper-deep);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* the little notes that pop up next to the mouse */
+.pop {
+  padding: 0.05em 0.45em;
+  border-radius: 3px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+/* numbered set-up steps, each number pressed as a round stamp */
+.steps {
+  display: grid;
+  gap: var(--s6);
+  max-width: 46rem;
+  margin: var(--s5) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps > li {
+  position: relative;
+  min-height: 3rem;
+  padding-left: 4.25rem;
+  counter-increment: step;
+}
+
+.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid var(--stamp);
+  border-radius: 50%;
+  outline: 1px solid var(--stamp);
+  outline-offset: -5px;
+  color: var(--stamp);
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  line-height: 1;
+  transform: rotate(-6deg);
+  mix-blend-mode: var(--stamp-blend);
+}
+
+.steps > li:nth-child(even)::before {
+  transform: rotate(5deg);
+}
+
+.steps h3 {
+  margin: 0.55rem 0 var(--s2);
+}
+
+.steps p {
+  margin: 0 0 var(--s3);
+}
+
+.note {
+  padding: var(--s3) var(--s4);
+  border-left: 3px solid var(--stamp);
+  background: var(--paper-deep);
+  font-size: 0.95rem;
+}
+
+.plain-steps {
+  max-width: var(--measure);
+  margin: var(--s5) 0 0;
+  padding-left: 1.4rem;
+}
+
+.plain-steps li {
+  margin-bottom: var(--s3);
+  padding-left: var(--s2);
+}
+
+.plain-steps li::marker {
+  font-family: var(--mono);
+  color: var(--stamp);
+}
+
+/* the menu by the clock, drawn as a paper print */
+.menu-section {
+  align-items: start;
+}
+
+.tray {
+  width: min(100%, 20rem);
+  margin-top: var(--s5);
+  padding: var(--s2);
+  background: var(--print);
+  box-shadow: var(--shadow);
+  color: var(--ink-on-print);
+  transform: rotate(-1deg);
+}
+
+.tray p {
+  margin: 0;
+}
+
+.tray__title {
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--rule-on-print);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--soft-on-print);
+}
+
+.tray__item {
+  position: relative;
+  padding: var(--s2) var(--s3) var(--s2) 2.25rem;
+  border-radius: 3px;
+  font-size: 0.95rem;
+}
+
+.tray__title + .tray__item {
+  margin-top: var(--s1);
+  background: var(--rule-on-print);
+}
+
+.tray__item.is-checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0.95rem;
+  width: 0.35rem;
+  height: 0.7rem;
+  border: solid var(--stamp-on-print);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-65%) rotate(45deg);
+}
+
+.tray__item--more::after {
+  content: "\203A";
+  position: absolute;
+  right: var(--s3);
+}
+
+.tray__item--split {
+  margin-top: var(--s1);
+  border-top: 1px solid var(--rule-on-print);
+  border-radius: 0;
+}
+
+.options {
+  max-width: var(--measure);
+  margin: var(--s5) 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.options > div {
+  padding-block: var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.options dt {
+  font-weight: 700;
+}
+
+.options dd {
+  margin: var(--s1) 0 0;
+}
+
+.options--wide {
+  max-width: none;
+}
+
+@media (min-width: 48rem) {
+  .menu-section .options {
+    margin-top: var(--s8);
+  }
+
+  .options--wide > div {
+    display: grid;
+    grid-template-columns: 20rem minmax(0, 1fr);
+    gap: var(--s5);
+    align-items: baseline;
+  }
+
+  .options--wide dd {
+    margin: 0;
+    max-width: var(--measure);
+  }
+}
+
+.get-it {
+  margin-top: var(--s8);
+  padding-top: var(--s6);
+  border-top: 1px solid var(--rule);
+}
+
+.get-it h2 {
+  margin-top: 0;
+}
+
+.get-it .button {
+  margin-top: var(--s2);
+}
+
+/* screenshots of an extension, printed like the travel photos */
+.shot {
+  max-width: 48rem;
+  margin: var(--s6) 0;
+  padding: 0.4rem 0.4rem 0.7rem;
+  background: var(--print);
+  box-shadow: var(--shadow);
+  transform: rotate(-0.6deg);
+}
+
+.shot img {
+  width: 100%;
+  background: var(--paper-deep);
+}
+
+.shot figcaption {
+  margin: 0.6rem 0.2rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--soft-on-print);
+}
+
+.shot--narrow {
+  width: min(100%, 15rem);
+  margin-top: var(--s5);
+  transform: rotate(-1deg);
+}
+
+.shot--wide {
+  max-width: none;
+  transform: rotate(0.4deg);
+}
+
+/* two columns: when, and what happens */
+@media (max-width: 47.99rem) {
+  .ledger--two li {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "when"
+      "after";
+  }
+}
+
+@media (min-width: 48rem) {
+  .ledger--two li,
+  .ledger--two .ledger__head {
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    grid-template-areas: "when after";
+  }
+}
+.shot--chart {
+  max-width: 24rem;
+  transform: rotate(0.8deg);
+}
+
+/* tool pages: the app's logo on a small paper tile, pressed on the cover like the passport photo */
+.cover__body--tool {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--s5);
+}
+
+.app-logo {
+  order: -1;
+  width: 4.5rem;
+  margin: 0;
+  padding: 0.6rem;
+  background: var(--print);
+  box-shadow: var(--shadow);
+  transform: rotate(-3deg);
+}
+
+.app-logo img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+@media (min-width: 48rem) {
+  .cover__body--tool {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--s7);
+    align-items: center;
+  }
+
+  .app-logo {
+    order: 1;
+    width: clamp(8rem, 13vw, 10.5rem);
+    padding: 0.9rem;
+    margin-right: var(--s5);
+  }
 }

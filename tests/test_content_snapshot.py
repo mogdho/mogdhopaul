@@ -7,6 +7,7 @@ what the SEO groundwork relied on.
 import os
 import unittest
 
+from scripts.build_site import project_href
 from tests.helpers import PAGES, parse
 
 
@@ -29,9 +30,9 @@ class ContentSnapshot(unittest.TestCase):
 
     def test_known_projects_listed(self):
         p = parse(PAGES["projects"])
-        for name in ("Hotspot-Auto-Connect", "Copilot2Gemini", "NN-tab", "leaflet", "video-showcase-paul"):
+        for name in ("Copilot2Gemini", "NN-tab", "leaflet", "video-showcase-paul"):
             self.assertIn(name, p.text)
-            self.assertIn(f"https://github.com/mogdho/{name}", p.hrefs)
+            self.assertIn(project_href({"url": f"https://github.com/mogdho/{name}"}), p.hrefs)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 
 export const BANNED_NAMES = ['mugdho', 'mogdha'];
 export const FEATURED_COUNT = 3;
-export const GROUPS = ['windows', 'browser'];
+export const GROUPS = ['windows', 'extensions', 'browser'];
 export const SKILL_GROUPS = ['stack', 'tools'];
 
 // ---------- skill icons (Iconify: free icon library; single-colour sets only, in order of preference) ----------
@@ -112,7 +112,7 @@ export function validateContent({ site, projects, photos }) {
     for (const key of ['name', 'description', 'language']) text(`${f}.${key}`, p[key]);
     text(`${f}.home_blurb`, p.home_blurb, { required: false });
     add(`${f}.url`, urlProblem(p.url));
-    if (!GROUPS.includes(p.group)) add(`${f}.group`, 'Choose Windows or Browser.');
+    if (!GROUPS.includes(p.group)) add(`${f}.group`, 'Choose a section.');
   });
   if (projects.filter((p) => p.featured).length !== FEATURED_COUNT) {
     add('projects', `Choose exactly ${FEATURED_COUNT} projects for the home page.`);

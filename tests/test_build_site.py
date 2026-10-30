@@ -96,7 +96,7 @@ class Build(unittest.TestCase):
 
     def test_featured_on_home(self):
         cards = re.findall(r'<h3><a href="([^"]+)"', self.pages["index.html"])
-        self.assertEqual(cards, [p["url"] for p in self.content["projects"] if p["featured"]])
+        self.assertEqual(cards, [build_site.project_href(p) for p in self.content["projects"] if p["featured"]])
 
     def test_home_blurb_used_on_home_description_on_projects(self):
         # Any featured project with a short version; which ones are featured is the owner's choice.

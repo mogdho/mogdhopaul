@@ -5,7 +5,7 @@
     "description": "A very minimal new tab page for Chrome, for people who want a quiet screen when they open a tab.",
     "home_blurb": "",
     "language": "JavaScript",
-    "group": "browser",
+    "group": "extensions",
     "featured": true
   },
   {
@@ -36,6 +36,15 @@
     "featured": false
   },
   {
+    "name": "Capslock-CopyPaste",
+    "url": "https://github.com/mogdho/Capslock-CopyPaste",
+    "description": "Turns the Caps Lock key into copy and paste: tap it once to copy, twice to paste.",
+    "home_blurb": "",
+    "language": "AutoHotkey",
+    "group": "windows",
+    "featured": false
+  },
+  {
     "name": "leaflet",
     "url": "https://github.com/mogdho/leaflet",
     "description": "An invoice generator that runs entirely in your browser: fill in the items, and it calculates totals and exports a clean A4 PDF. Nothing is uploaded anywhere.",
@@ -50,7 +59,25 @@
     "description": "A simple, distraction-free text highlighter for Chrome.",
     "home_blurb": "",
     "language": "JavaScript",
-    "group": "browser",
+    "group": "extensions",
+    "featured": false
+  },
+  {
+    "name": "ytModify",
+    "url": "https://github.com/mogdho/ytModify-extension",
+    "description": "Makes YouTube nicer to watch: a soft glow around the video, auto pop-out when you switch tabs, the quality you want for each view and a bigger player.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "extensions",
+    "featured": false
+  },
+  {
+    "name": "yt-mini-PIP",
+    "url": "https://github.com/mogdho/yt-mini-PIP",
+    "description": "Keeps a YouTube video playing in a small floating window when you switch tabs, and puts it back when you return.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "extensions",
     "featured": false
   },
   {

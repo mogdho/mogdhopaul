@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NN-tab — A Minimal New Tab Page for Chrome, by Mogdho Paul</title>
+  <meta name="description" content="Free Chrome extension by Mogdho Paul: a quiet new tab page with a clock, bookmarks, notes and a quote. Everything stays on your computer.">
+  <meta name="author" content="Mogdho Paul">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://mogdhopaul.com/nn-tab/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mogdhopaul.com/nn-tab/">
+  <meta property="og:title" content="NN-tab — A Minimal New Tab Page for Chrome, by Mogdho Paul">
+  <meta property="og:description" content="Free Chrome extension by Mogdho Paul: a quiet new tab page with a clock, bookmarks, notes and a quote. Everything stays on your computer.">
+  <meta property="og:image" content="https://mogdhopaul.com/mogdhopaul.jpeg?v=e9051e9209">
+  <meta property="og:site_name" content="Mogdho Paul">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NN-tab — A Minimal New Tab Page for Chrome, by Mogdho Paul">
+  <meta name="twitter:description" content="Free Chrome extension by Mogdho Paul: a quiet new tab page with a clock, bookmarks, notes and a quote. Everything stays on your computer.">
+  <meta name="twitter:image" content="https://mogdhopaul.com/mogdhopaul.jpeg?v=e9051e9209">
+  <meta name="theme-color" content="#0f4d3a">
+
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="preload" href="/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/style.css?v=1cf4960df9">
+  <script src="/script.js?v=34d6b1b87a"></script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDY4Z5D7MW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LDY4Z5D7MW');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "NN-tab",
+    "url": "https://mogdhopaul.com/nn-tab/",
+    "description": "Free Chrome extension by Mogdho Paul: a quiet new tab page with a clock, bookmarks, notes and a quote. Everything stays on your computer.",
+    "operatingSystem": "Google Chrome",
+    "applicationCategory": "BrowserApplication",
+    "downloadUrl": "https://github.com/mogdho/NN-tab/releases/latest/download/NN-tab.zip",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Mogdho Paul",
+      "url": "https://mogdhopaul.com/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="cover cover--short">
+    <div class="page">
+      <header class="site-header">
+        <a class="site-header__name" href="/">Mogdho Paul</a>
+        <nav class="site-nav" aria-label="Main">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about/">About</a></li>
+            <li><a href="/photos/">Photos</a></li>
+            <li><a href="/projects/">Projects</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <div class="cover__body cover__body--tool">
+        <figure class="app-logo">
+          <img src="/nn-tab/img/logo.webp?v=363361656b" alt="NN-tab logo" width="256" height="256" fetchpriority="high">
+        </figure>
+        <div>
+          <p class="cover__kicker"><a href="/projects/">Projects</a><span aria-hidden="true"> / </span>Free for Chrome</p>
+          <h1 class="cover__name">NN-tab</h1>
+          <p class="cover__lead">A calm new tab page for Chrome: a clock, your bookmarks, a few notes and a quote. Nothing else.</p>
+          <div class="download">
+            <a class="button button--cover" href="https://github.com/mogdho/NN-tab/releases/latest/download/NN-tab.zip" download><svg class="button__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download NN-tab</a>
+            <p class="download__note">Free · Chrome, Edge and Brave · No account</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main id="main" class="page">
+    <section aria-labelledby="what-title">
+      <h2 id="what-title">What it does</h2>
+      <div class="prose">
+        <p class="lead">Every new tab opens to the same quiet page: the time, your favourite sites, a short to-do list and a quote you like. No news, no ads, no clutter.</p>
+      </div>
+      <figure class="shot">
+        <picture>
+          <source srcset="/nn-tab/img/dashboard-dark.webp" media="(prefers-color-scheme: dark)">
+          <img src="/nn-tab/img/dashboard-light.webp" alt="The NN-tab new tab page: a large clock and date, a quote, a to-do list and a grid of website bookmarks" width="1280" height="720" loading="lazy">
+        </picture>
+        <figcaption>A new tab with NN-tab</figcaption>
+      </figure>
+      <dl class="options options--wide">
+        <div><dt>Clock and date</dt><dd>A big, clear clock with the full date.</dd></div>
+        <div><dt>Your bookmarks</dt><dd>Add the sites you open most as tiles. Drag them to reorder, and sort them into groups like Work and Social. Right-click a tile to edit it.</dd></div>
+        <div><dt>Notes</dt><dd>Click <strong>Add Note</strong>, type, and press Enter. Click the tick when it’s done.</dd></div>
+        <div><dt>Your own quote</dt><dd>Right-click the quote to put in one that keeps you going.</dd></div>
+        <div><dt>Light or dark, your wallpaper</dt><dd>Pick a theme and set any picture as the background.</dd></div>
+        <div><dt>ChatGPT in one click</dt><dd>The round button at the bottom right opens ChatGPT in a small window.</dd></div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="setup-title">
+      <h2 id="setup-title">Add it to Chrome in two minutes</h2>
+      <p class="prose">It isn’t in the Chrome Web Store yet, so you add it yourself. It only takes a few clicks.</p>
+      <ol class="steps">
+        <li>
+          <h3>Download it</h3>
+          <p>Click the download button. You get one file, NN-tab.zip.</p>
+        </li>
+        <li>
+          <h3>Unzip it</h3>
+          <p>Right-click the file, choose <strong>Extract All</strong>, then <strong>Extract</strong>. You get a folder called NN-tab.</p>
+          <p class="note"><strong>Keep this folder.</strong> Move it somewhere it can stay, like your Documents folder. Chrome uses it every time it opens, so deleting it removes NN-tab.</p>
+        </li>
+        <li>
+          <h3>Open Chrome’s extensions page</h3>
+          <p>Type <strong>chrome://extensions</strong> in the address bar and press Enter. Switch on <strong>Developer mode</strong> at the top right.</p>
+          <p class="muted">Developer mode only lets you add extensions from a folder on your computer. Nothing else changes.</p>
+        </li>
+        <li>
+          <h3>Add NN-tab</h3>
+          <p>Click <strong>Load unpacked</strong> and choose the NN-tab folder. NN-tab appears in the list, switched on and ready.</p>
+        </li>
+      </ol>
+      <p class="muted ledger__foot">Using Edge or Brave? It works there too: type <strong>edge://extensions</strong> or <strong>brave://extensions</strong> instead. In Edge, Developer mode is in the menu on the left.</p>
+    </section>
+
+    <section aria-labelledby="settings-title" class="split menu-section">
+      <div>
+        <h2 id="settings-title">Settings and backup</h2>
+        <p>Click the NN-tab icon in Chrome’s toolbar. If you can’t see it, click the puzzle-piece icon at the top right and pin NN-tab.</p>
+        <figure class="shot shot--narrow">
+          <img src="/nn-tab/img/settings.webp" alt="The NN-tab settings window with theme, icon, wallpaper and backup options" width="320" height="664" loading="lazy">
+        </figure>
+      </div>
+      <dl class="options">
+        <div><dt>Theme</dt><dd>Switch between dark and light.</dd></div>
+        <div><dt>Wallpaper</dt><dd>Choose a picture from your computer, or remove it.</dd></div>
+        <div><dt>Sharper icons</dt><dd>Off at first: icons come from Chrome itself. Turn it on to look up clearer icons online. Chrome asks you first.</dd></div>
+        <div><dt>Backup</dt><dd>Save everything to a file and bring it back later, or move it to another computer.</dd></div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="private-title">
+      <h2 id="private-title">Private by default</h2>
+      <div class="prose">
+        <p>Your bookmarks, notes and settings stay on your computer. There’s no account, no tracking and nothing to sign up for.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="remove-title">
+      <h2 id="remove-title">Updating or removing it</h2>
+      <dl class="options options--wide">
+        <div><dt>Get a new version</dt><dd>Download it again and unzip it into the same NN-tab folder, replacing the old files. Then open <strong>chrome://extensions</strong> and click the round reload arrow on NN-tab.</dd></div>
+        <div><dt>Remove it</dt><dd>Open <strong>chrome://extensions</strong>, click <strong>Remove</strong> on NN-tab, then delete the NN-tab folder.</dd></div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="get-title" class="get-it">
+      <h2 id="get-title">Get NN-tab</h2>
+      <p>Free, for Chrome, Edge and Brave.</p>
+      <a class="button" href="https://github.com/mogdho/NN-tab/releases/latest/download/NN-tab.zip" download><svg class="button__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download NN-tab</a>
+      <p class="muted more-link">Made by Mogdho Paul. Curious how it works? <a href="https://github.com/mogdho/NN-tab">See it on GitHub</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="page">
+      <h2>Find me</h2>
+      <p>The quickest way to reach me is <a href="https://wa.me/+8801998955221">WhatsApp</a>. You can also <a href="mailto:mogdhapal@gmail.com">email me</a>.</p>
+      <ul class="profile-links">
+        <li><a href="https://www.facebook.com/mogdhopaul" rel="me">Facebook</a></li>
+        <li><a href="https://www.instagram.com/mogdhopaul/" rel="me">Instagram</a></li>
+        <li><a href="https://www.linkedin.com/in/mogdho-paul/" rel="me">LinkedIn</a></li>
+        <li><a href="https://github.com/mogdho" rel="me">GitHub</a></li>
+        <li><a href="https://www.youtube.com/@mogdhoPAUL" rel="me">YouTube</a></li>
+        <li><a href="https://t.me/MOGdhA" rel="me">Telegram</a></li>
+        <li><a href="https://maggy2minutes.wordpress.com/" rel="me">Blog</a></li>
+      </ul>
+      <p class="mrz" aria-hidden="true">P&lt;BGDPAUL&lt;&lt;MOGDHO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</p>
+      <p class="copyright">© 2026 Mogdho Paul</p>
+    </div>
+  </footer>
+</body>
+</html>
