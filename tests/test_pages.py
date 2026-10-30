@@ -143,12 +143,6 @@ class ToolPageRules(CommonPageRules):
         self.assertGreaterEqual(self.p.hrefs.count(url), 2)  # top of the page and at the end
         self.assertIn(f'href="{url}" download', self.p.html)
 
-    def test_logo_on_cover(self):
-        logo = next(i for i in self.p.imgs if "/img/logo.webp" in i["src"])
-        self.assertTrue((ROOT / self.page_key / "img" / "logo.webp").exists())
-        self.assertTrue(logo["src"].startswith(f"/{self.page_key}/img/logo.webp?v="))
-        self.assertEqual(logo["alt"], f'{TOOLS[self.page_key]["name"]} logo')
-
     def test_links_source(self):
         self.assertIn(TOOLS[self.page_key]["repo"], self.p.hrefs)
 
@@ -210,6 +204,21 @@ class PhotosPage(CommonPageRules, unittest.TestCase):
 
     def test_intro_mentions_name(self):
         self.assertIn("Mogdho Paul", self.p.text)
+
+    def test_gallery_data_for_image_search(self):
+        photos = json.loads((ROOT / "content" / "photos.json").read_text(encoding="utf-8"))
+        gallery = next(d for d in self.p.jsonld if d.get("@type") == "ImageGallery")
+        self.assertEqual(len(gallery["image"]), len(photos))
+        for img in gallery["image"]:
+            self.assertEqual(img["creator"]["name"], "Mogdho Paul")
+            self.assertTrue(img["contentUrl"].startswith("https://mogdhopaul.com/photos/img/"))
+            self.assertIn("Mogdho Paul", img["name"])
+
+    def test_photo_files_have_descriptive_names(self):
+        photos = json.loads((ROOT / "content" / "photos.json").read_text(encoding="utf-8"))
+        for p in photos:
+            self.assertTrue((ROOT / p["src"].lstrip("/")).exists(), p["src"])
+            self.assertTrue((ROOT / p["thumb"].lstrip("/")).exists(), p["thumb"])
 
 
 

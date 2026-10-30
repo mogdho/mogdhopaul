@@ -1,63 +1,92 @@
 [
   {
-    "id": "2026-10-29-d06f",
-    "place": "Bucharest",
-    "date": "2026-10-29",
-    "src": "/photos/img/2026-10-29-d06f-1200.webp",
-    "thumb": "/photos/img/2026-10-29-d06f-600.webp",
+    "id": "2024-05-06-joynal-abedin-park",
+    "place": "Joynal Abedin Park, Mymensingh",
+    "date": "2024-05-06",
+    "src": "/photos/img/2024-05-06-joynal-abedin-park-1200.webp",
+    "thumb": "/photos/img/2024-05-06-joynal-abedin-park-600.webp",
     "width": 1200,
-    "height": 1600,
-    "focus": {
-      "x": 50,
-      "y": 92
-    }
+    "height": 1200
   },
   {
-    "id": "2026-10-29-1627",
-    "place": "Paris",
-    "date": "2026-10-29",
-    "src": "/photos/img/2026-10-29-1627-1200.webp",
-    "thumb": "/photos/img/2026-10-29-1627-600.webp",
-    "width": 1084,
-    "height": 1091,
-    "focus": {
-      "x": 50,
-      "y": 8
-    }
+    "id": "2024-05-21-alutila",
+    "place": "Alutila, Khagrachari",
+    "date": "2024-05-21",
+    "src": "/photos/img/2024-05-21-alutila-1200.webp",
+    "thumb": "/photos/img/2024-05-21-alutila-600.webp",
+    "width": 1200,
+    "height": 1200
   },
   {
-    "id": "2026-10-29-77b6",
-    "place": "Paris",
-    "date": "2026-10-29",
-    "src": "/photos/img/2026-10-29-77b6-1200.webp",
-    "thumb": "/photos/img/2026-10-29-77b6-600.webp",
-    "width": 1084,
-    "height": 1118,
-    "focus": {
-      "x": 50,
-      "y": 100
-    }
+    "id": "2024-05-23-sajek-valley",
+    "place": "Sajek Valley, Bangladesh",
+    "date": "2024-05-23",
+    "src": "/photos/img/2024-05-23-sajek-valley-1200.webp",
+    "thumb": "/photos/img/2024-05-23-sajek-valley-600.webp",
+    "width": 1200,
+    "height": 1200
   },
   {
-    "id": "2026-10-29-be9f",
-    "place": "Bucharest",
-    "date": "2026-10-29",
-    "src": "/photos/img/2026-10-29-be9f-1200.webp",
-    "thumb": "/photos/img/2026-10-29-be9f-600.webp",
-    "width": 1084,
-    "height": 1242,
-    "focus": {
-      "x": 50,
-      "y": 0
-    }
+    "id": "2024-05-25-bagerhat",
+    "place": "Bagerhat, Bangladesh",
+    "date": "2024-05-25",
+    "src": "/photos/img/2024-05-25-bagerhat-1200.webp",
+    "thumb": "/photos/img/2024-05-25-bagerhat-600.webp",
+    "width": 1200,
+    "height": 1200
   },
   {
-    "id": "2026-10-29-3024",
-    "place": "Paris",
-    "date": "2026-10-29",
-    "src": "/photos/img/2026-10-29-3024-1200.webp",
-    "thumb": "/photos/img/2026-10-29-3024-600.webp",
-    "width": 718,
-    "height": 901
+    "id": "2024-05-27-sundarbans",
+    "place": "Sundarbans, Bangladesh",
+    "date": "2024-05-27",
+    "src": "/photos/img/2024-05-27-sundarbans-1200.webp",
+    "thumb": "/photos/img/2024-05-27-sundarbans-600.webp",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "2024-10-19-nadia",
+    "place": "Nadia, India",
+    "date": "2024-10-19",
+    "src": "/photos/img/2024-10-19-nadia-1200.webp",
+    "thumb": "/photos/img/2024-10-19-nadia-600.webp",
+    "width": 1200,
+    "height": 1200
+  },
+  {
+    "id": "2025-03-09-bucharest",
+    "place": "Bucharest, Romania",
+    "date": "2025-03-09",
+    "src": "/photos/img/2025-03-09-bucharest-1200.webp",
+    "thumb": "/photos/img/2025-03-09-bucharest-600.webp",
+    "width": 1200,
+    "height": 1500
+  },
+  {
+    "id": "2025-05-21-paris",
+    "place": "Paris, France",
+    "date": "2025-05-21",
+    "src": "/photos/img/2025-05-21-paris-1200.webp",
+    "thumb": "/photos/img/2025-05-21-paris-600.webp",
+    "width": 1200,
+    "height": 1500
+  },
+  {
+    "id": "2025-05-22-paris",
+    "place": "Paris, France",
+    "date": "2025-05-22",
+    "src": "/photos/img/2025-05-22-paris-1200.webp",
+    "thumb": "/photos/img/2025-05-22-paris-600.webp",
+    "width": 1200,
+    "height": 1500
+  },
+  {
+    "id": "2026-04-12-bucharest",
+    "place": "Bucharest, Romania",
+    "date": "2026-04-12",
+    "src": "/photos/img/2026-04-12-bucharest-1200.webp",
+    "thumb": "/photos/img/2026-04-12-bucharest-600.webp",
+    "width": 1200,
+    "height": 1600
   }
 ]

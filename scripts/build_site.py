@@ -14,8 +14,8 @@ import sys
 from pathlib import Path
 from string import Template
 
-from scripts.content import ContentError, inline, load_content, render_text
-from scripts.render_photos import render_items
+from scripts.content import IDENTITY_BANNED, ContentError, inline, load_content, render_text
+from scripts.render_photos import alt_text, render_items
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://mogdhopaul.com"
@@ -269,16 +269,9 @@ def download_button(tool, extra_class=""):
 
 def _cover(page, site, v=""):
     if page.startswith("tool:"):
-        slug = page[5:]
-        tool = TOOLS[slug]
-        logo = f"{slug}/img/logo.webp"  # square app icon, shown on a paper tile beside the name
-        logo_html = ("  <figure class=\"app-logo\">\n"
-                     f'    <img src="/{logo}{_version(logo)}" alt="{e(tool["name"])} logo" '
-                     'width="256" height="256" fetchpriority="high">\n'
-                     "  </figure>\n") if (ROOT / logo).exists() else ""
+        tool = TOOLS[page[5:]]
         return _indent(
-            '<div class="cover__body cover__body--tool">\n'
-            + logo_html +
+            '<div class="cover__body">\n'
             '  <div>\n'
             '    <p class="cover__kicker"><a href="/projects/">Projects</a>'
             f'<span aria-hidden="true"> / </span>{KINDS[tool["kind"]]["kicker"]}</p>\n'
@@ -322,7 +315,7 @@ def _cover(page, site, v=""):
         '</div>', 6)
 
 
-def _meta(page, site, v=""):
+def _meta(page, site, v="", photos=None):
     profiles = [p["url"] for p in site["profiles"]]
     if page.startswith("tool:"):
         slug = page[5:]
@@ -363,7 +356,35 @@ def _meta(page, site, v=""):
                 "extensions, an invoice generator and more.", "website", "")
     return ("Travel Photos by Mogdho Paul",
             "Travel photos by Mogdho Paul: old towns, cities and quiet places, each stamped with where and when it "
-            "was taken.", "website", "")
+            "was taken.", "website", _jsonld(_gallery(photos or [])))
+
+
+def public_place(place):
+    """The place as search engines see it. Parts the site keeps out of its search data (see
+    IDENTITY_BANNED, e.g. the city Mogdho Paul lives in) are left out: "Bucharest, Romania" -> "Romania"."""
+    parts = [p.strip() for p in (place or "").split(",") if p.strip() and not IDENTITY_BANNED.search(p)]
+    return ", ".join(parts) or None
+
+
+def _gallery(photos):
+    """Photos page structured data: each photo with its date, place and credit, for image search."""
+    person = {"@type": "Person", "name": "Mogdho Paul", "url": f"{SITE}/"}
+    images = []
+    for p in newest_first(photos):
+        place = public_place(p.get("place"))
+        img = {
+            "@type": "ImageObject",
+            "contentUrl": f"{SITE}{p['src']}", "thumbnailUrl": f"{SITE}{p['thumb']}",
+            "url": f"{SITE}/photos/#photo-{p['id']}",
+            "name": alt_text({**p, "place": place}), "dateCreated": p["date"],
+            "width": p["width"], "height": p["height"],
+            "creator": person, "creditText": "Mogdho Paul", "copyrightNotice": "© Mogdho Paul",
+        }
+        if place:
+            img["contentLocation"] = {"@type": "Place", "name": place}
+        images.append(img)
+    return {"@context": "https://schema.org", "@type": "ImageGallery", "url": f"{SITE}/photos/",
+            "name": "Travel photos by Mogdho Paul", "author": person, "image": images}
 
 
 def _main_block(page, content):
@@ -418,7 +439,7 @@ def build(root=None):
     css_v, js_v = _version("style.css"), _version("script.js")
     pages = {}
     for rel, page in PAGES.items():
-        title, description, og_type, jsonld = _meta(page, site, v)
+        title, description, og_type, jsonld = _meta(page, site, v, content["photos"])
         path = "/" if page == "home" else f"/{page.removeprefix('tool:')}/"
         nav = _indent("\n".join(
             f'<li><a href="{href}"{" aria-current=" + chr(34) + "page" + chr(34) if href == path else ""}>{label}</a></li>'

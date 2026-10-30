@@ -67,6 +67,13 @@ class RenderPhotos(unittest.TestCase):
 
 
 
+class PublicPlace(unittest.TestCase):
+    def test_city_kept_out_of_search_data(self):
+        self.assertEqual(build_site.public_place("Bucharest, Romania"), "Romania")
+        self.assertIsNone(build_site.public_place("Bucharest"))
+        self.assertEqual(build_site.public_place("Paris, France"), "Paris, France")
+
+
 class Build(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
