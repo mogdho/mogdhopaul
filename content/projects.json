@@ -24,7 +24,7 @@
     "home_blurb": "A private, one-tap tracker for the habit you're trying to cut down on.",
     "language": "vitejs",
     "group": "browser",
-    "featured": false
+    "featured": true
   },
   {
     "name": "AlwaysNumLock",
@@ -87,7 +87,7 @@
     "home_blurb": "",
     "language": "HTML",
     "group": "browser",
-    "featured": true
+    "featured": false
   },
   {
     "name": "video-showcase-paul",
