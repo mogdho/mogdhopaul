@@ -45,21 +45,21 @@
     "featured": false
   },
   {
+    "name": "remit-bd",
+    "url": "https://github.com/mogdho/remit-bd",
+    "description": "A calculator for sending money home: converts Romanian leu to Bangladeshi taka at current rates and adds Bangladesh's 2.5% government remittance incentive.",
+    "home_blurb": "",
+    "language": "HTML",
+    "group": "browser",
+    "featured": false
+  },
+  {
     "name": "leaflet",
     "url": "https://github.com/mogdho/leaflet",
     "description": "An invoice generator that runs entirely in your browser: fill in the items, and it calculates totals and exports a clean A4 PDF. Nothing is uploaded anywhere.",
     "home_blurb": "Makes A4 PDF invoices right in the browser. Nothing leaves your computer.",
     "language": "JavaScript",
     "group": "browser",
-    "featured": false
-  },
-  {
-    "name": "Highlighter",
-    "url": "https://github.com/mogdho/Highlighter--Chrome-Extension",
-    "description": "A simple, distraction-free text highlighter for Chrome.",
-    "home_blurb": "",
-    "language": "JavaScript",
-    "group": "extensions",
     "featured": false
   },
   {
@@ -81,21 +81,21 @@
     "featured": false
   },
   {
-    "name": "remit-bd",
-    "url": "https://github.com/mogdho/remit-bd",
-    "description": "A calculator for sending money home: converts Romanian leu to Bangladeshi taka at current rates and adds Bangladesh's 2.5% government remittance incentive.",
-    "home_blurb": "",
-    "language": "HTML",
-    "group": "browser",
-    "featured": false
-  },
-  {
     "name": "video-showcase-paul",
     "url": "https://github.com/mogdho/video-showcase-paul",
     "description": "The code behind my [video editing showcase](https://video-showcase.mogdhopaul.com/), a single-page portfolio for my edits.",
     "home_blurb": "",
     "language": "TypeScript",
     "group": "browser",
+    "featured": false
+  },
+  {
+    "name": "Highlighter",
+    "url": "https://github.com/mogdho/Highlighter--Chrome-Extension",
+    "description": "A simple, distraction-free text highlighter for Chrome.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "extensions",
     "featured": false
   }
 ]

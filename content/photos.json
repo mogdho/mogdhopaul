@@ -6,7 +6,11 @@
     "src": "/photos/img/2024-05-06-joynal-abedin-park-1200.webp",
     "thumb": "/photos/img/2024-05-06-joynal-abedin-park-600.webp",
     "width": 1200,
-    "height": 1200
+    "height": 1200,
+    "focus": {
+      "x": 50,
+      "y": 100
+    }
   },
   {
     "id": "2024-05-21-alutila",
@@ -33,16 +37,11 @@
     "src": "/photos/img/2024-05-25-bagerhat-1200.webp",
     "thumb": "/photos/img/2024-05-25-bagerhat-600.webp",
     "width": 1200,
-    "height": 1200
-  },
-  {
-    "id": "2024-05-27-sundarbans",
-    "place": "Sundarbans, Bangladesh",
-    "date": "2024-05-27",
-    "src": "/photos/img/2024-05-27-sundarbans-1200.webp",
-    "thumb": "/photos/img/2024-05-27-sundarbans-600.webp",
-    "width": 1200,
-    "height": 900
+    "height": 1200,
+    "focus": {
+      "x": 50,
+      "y": 100
+    }
   },
   {
     "id": "2024-10-19-nadia",
@@ -51,7 +50,11 @@
     "src": "/photos/img/2024-10-19-nadia-1200.webp",
     "thumb": "/photos/img/2024-10-19-nadia-600.webp",
     "width": 1200,
-    "height": 1200
+    "height": 1200,
+    "focus": {
+      "x": 50,
+      "y": 100
+    }
   },
   {
     "id": "2025-03-09-bucharest",
@@ -60,7 +63,11 @@
     "src": "/photos/img/2025-03-09-bucharest-1200.webp",
     "thumb": "/photos/img/2025-03-09-bucharest-600.webp",
     "width": 1200,
-    "height": 1500
+    "height": 1500,
+    "focus": {
+      "x": 50,
+      "y": 44
+    }
   },
   {
     "id": "2025-05-21-paris",
@@ -69,7 +76,11 @@
     "src": "/photos/img/2025-05-21-paris-1200.webp",
     "thumb": "/photos/img/2025-05-21-paris-600.webp",
     "width": 1200,
-    "height": 1500
+    "height": 1500,
+    "focus": {
+      "x": 50,
+      "y": 100
+    }
   },
   {
     "id": "2025-05-22-paris",
@@ -78,7 +89,11 @@
     "src": "/photos/img/2025-05-22-paris-1200.webp",
     "thumb": "/photos/img/2025-05-22-paris-600.webp",
     "width": 1200,
-    "height": 1500
+    "height": 1500,
+    "focus": {
+      "x": 50,
+      "y": 13
+    }
   },
   {
     "id": "2026-04-12-bucharest",
@@ -87,6 +102,10 @@
     "src": "/photos/img/2026-04-12-bucharest-1200.webp",
     "thumb": "/photos/img/2026-04-12-bucharest-600.webp",
     "width": 1200,
-    "height": 1600
+    "height": 1600,
+    "focus": {
+      "x": 50,
+      "y": 100
+    }
   }
 ]
