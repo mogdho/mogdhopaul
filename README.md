@@ -94,14 +94,14 @@ flowchart LR
 
 - **Content** lives in three files: `content/site.json` (text, links, skills), `content/projects.json` and `content/photos.json`.
 - **The admin** (`/admin/`) edits them in the browser and saves straight to this repository with a GitHub key. Photos are resized and stripped of location data on the device before upload. See the [admin guide](docs/admin-guide.md).
-- **The build** (`scripts/build_site.py`) turns content and `templates/` into the four public pages. Links to files that change carry a content hash (`style.css?v=…`), so the hosting cache never serves an old copy.
+- **The build** (`scripts/build_site.py`) turns content and `templates/` into the pages: home, about, projects, photos, the currency converter and one page per tool (AlwaysNumLock, NN-tab, How Many Times and the rest; listed in `TOOLS` in the build script). Links to files that change carry a content hash (`style.css?v=…`), so the hosting cache never serves an old copy.
 - **The tests** check content rules, page structure, SEO basics and style rules before anything goes live.
 
 ### Project layout
 
 ```
 content/        site text, projects and photo list (edited by the admin)
-templates/      page templates the build fills in
+templates/      page templates the build fills in (tools/ holds one per tool page)
 scripts/        the build: content checks, page rendering, photo markup
 admin/          the browser admin (no server)
 photos/img/     travel photos, resized by the admin
@@ -109,6 +109,8 @@ skill-icons/    single-colour skill icons saved by the admin
 fonts/          self-hosted web fonts
 tests/          Python and JavaScript tests
 docs/           admin guide and these README images
+currency-converter/  the converter's script (its page is built like the others)
+<tool>/         built tool pages, e.g. alwaysnumlock/, nn-tab/, how-many-time/, with their images
 ```
 
 ### Run it locally

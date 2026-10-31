@@ -1,0 +1,70 @@
+    <section aria-labelledby="calc-title" class="converter" data-converter>
+      <h2 id="calc-title" class="visually-hidden">Calculator</h2>
+      <form class="converter__form" novalidate>
+        <fieldset class="choice">
+          <legend>You’re sending</legend>
+          <label><input type="radio" name="currency" value="RON" checked><span>Romanian leu <abbr title="Romanian leu">RON</abbr></span></label>
+          <label><input type="radio" name="currency" value="EUR"><span>Euro <abbr title="Euro">EUR</abbr></span></label>
+        </fieldset>
+
+        <fieldset class="choice">
+          <legend>I know</legend>
+          <label><input type="radio" name="mode" value="send" checked><span>How much I’ll send</span></label>
+          <label><input type="radio" name="mode" value="receive"><span>How much should arrive</span></label>
+        </fieldset>
+
+        <div class="field">
+          <label for="amount" data-amount-label>Amount you send</label>
+          <div class="field__box">
+            <input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="500" value="500">
+            <span class="field__unit" data-amount-unit>RON</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="rate">Exchange rate</label>
+          <div class="field__box">
+            <span class="field__unit field__unit--before" data-rate-unit>1 RON =</span>
+            <input id="rate" name="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="25.50">
+            <span class="field__unit">TK</span>
+          </div>
+          <p class="field__note" data-rate-note role="status">Getting today’s rate…</p>
+        </div>
+      </form>
+
+      <div class="receipt" aria-live="polite">
+        <p class="receipt__title">Your transfer</p>
+        <dl class="receipt__rows">
+          <div><dt>You send</dt><dd><span data-out="send">–</span> <button type="button" class="copy" data-copy="send">Copy</button></dd></div>
+          <div><dt>Converted to taka</dt><dd data-out="base">–</dd></div>
+          <div class="receipt__bonus"><dt>Government incentive <span class="receipt__pct">+2.5%</span></dt><dd data-out="incentive">–</dd></div>
+          <div class="receipt__total"><dt>Arrives in Bangladesh</dt><dd data-out="total">–</dd></div>
+        </dl>
+        <p class="receipt__error" data-error hidden>Type an amount and a rate above 0 to see the result.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="quick-title">
+      <h2 id="quick-title">Common amounts</h2>
+      <p class="prose" data-quick-intro>What you’d send for these amounts to arrive, at the rate above. Tap one to put it in the calculator.</p>
+      <ul class="quick" data-quick></ul>
+    </section>
+
+    <section aria-labelledby="remitly-title" class="offer">
+      <h2 id="remitly-title">Send it with Remitly</h2>
+      <p class="prose" data-offer-text>Sign up with my link and get <strong>50 RON off</strong> your first transfer of 500 RON or more.</p>
+      <a class="button" href="https://remit.ly/2n0wkpg8" rel="sponsored noopener" target="_blank">Get the Remitly offer</a>
+      <p class="muted offer__note">This is my referral link, so I may get a small reward too. It costs you nothing extra. Remitly’s own rate can be a little different from the one above, so check the final amount in the app before you pay.</p>
+    </section>
+
+    <section aria-labelledby="how-title">
+      <h2 id="how-title">How it’s worked out</h2>
+      <dl class="options options--wide">
+        <div><dt>The rate</dt><dd>Today’s exchange rate is filled in for you. If your bank or app shows a different one, type it in instead and everything updates.</dd></div>
+        <div><dt>The 2.5% incentive</dt><dd>Bangladesh adds 2.5% on top of money sent home through a bank or a licensed service like Remitly. So 10,000 TK converted becomes 10,250 TK when it arrives.</dd></div>
+        <div><dt>Working backwards</dt><dd>Choose <strong>How much should arrive</strong> to see what you need to send for a set amount in taka, incentive included.</dd></div>
+      </dl>
+      <p class="muted more-link">Made by Mogdho Paul. The original version is <a href="https://github.com/mogdho/remit-bd">remit-bd on GitHub</a>.</p>
+    </section>
+    <noscript><p class="note">This calculator needs JavaScript. Turn it on in your browser to use it.</p></noscript>
+    <script src="/currency-converter/converter.js$js_v" defer></script>

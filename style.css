@@ -231,11 +231,6 @@ a {
   color: var(--ink-soft);
 }
 
-.mono {
-  font-family: var(--mono);
-  letter-spacing: 0.02em;
-}
-
 /* ---------- Cover (header field) ---------- */
 .cover {
   background: var(--cover);
@@ -1245,4 +1240,389 @@ kbd {
 .shot--chart {
   max-width: 24rem;
   transform: rotate(0.8deg);
+}
+
+/* ---------- Currency converter: a form on the visa page, the result printed as a slip ---------- */
+.converter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s6);
+  margin-top: var(--s7);
+  align-items: start;
+}
+
+@media (min-width: 48rem) {
+  .converter {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s7);
+  }
+}
+
+.converter__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s5);
+}
+
+.choice {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice legend {
+  width: 100%;
+  margin-bottom: var(--s2);
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice span {
+  display: inline-block;
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.choice abbr {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  text-decoration: none;
+  color: var(--ink-soft);
+}
+
+.choice span:hover {
+  border-color: var(--stamp);
+}
+
+.choice input:checked + span {
+  border-color: var(--stamp);
+  background: var(--stamp);
+  color: var(--paper);
+}
+
+.choice input:checked + span abbr {
+  color: inherit;
+}
+
+.choice input:focus-visible + span {
+  outline: 2px solid var(--stamp);
+  outline-offset: 3px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: var(--s2);
+  font-weight: 700;
+}
+
+.field__box {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0 var(--s4);
+  border: 1px solid var(--ink-soft);
+  border-radius: 4px;
+  background: var(--paper);
+}
+
+.field__box:focus-within {
+  outline: 2px solid var(--stamp);
+  outline-offset: 2px;
+}
+
+.field__box input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--s3) 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.field__box input:focus {
+  outline: none;
+}
+
+.field__unit {
+  flex: none;
+  font-family: var(--mono);
+  color: var(--ink-soft);
+}
+
+.field__note {
+  margin: var(--s2) 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.receipt {
+  padding: var(--s5);
+  background: var(--print);
+  box-shadow: var(--shadow);
+  color: var(--ink-on-print);
+  transform: rotate(0.6deg);
+}
+
+.receipt__title {
+  margin: 0;
+  padding-bottom: var(--s3);
+  border-bottom: 1px dashed var(--rule-on-print);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--soft-on-print);
+}
+
+.receipt__rows {
+  margin: 0;
+}
+
+.receipt__rows > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s1) var(--s4);
+  padding-block: var(--s3);
+  border-bottom: 1px dashed var(--rule-on-print);
+}
+
+.receipt__rows dt {
+  color: var(--soft-on-print);
+}
+
+.receipt__rows dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.receipt__bonus dd {
+  color: var(--stamp-on-print);
+}
+
+.receipt__pct {
+  display: inline-block;
+  margin-left: var(--s1);
+  padding: 0 0.35rem;
+  border: 3px double var(--stamp-on-print);
+  border-radius: 2px;
+  color: var(--stamp-on-print);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  transform: rotate(-3deg);
+}
+
+.receipt__rows .receipt__total {
+  padding-top: var(--s4);
+  border-bottom: 0;
+}
+
+.receipt__total dt {
+  font-weight: 700;
+  color: var(--ink-on-print);
+}
+
+.receipt__total dd {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+  font-weight: 400;
+}
+
+.receipt__error {
+  margin: var(--s3) 0 0;
+  color: var(--soft-on-print);
+  font-size: 0.9rem;
+}
+
+.copy {
+  margin-left: var(--s2);
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--rule-on-print);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--stamp-on-print);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.copy:hover {
+  border-color: var(--stamp-on-print);
+}
+
+.quick {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--s3);
+  margin: var(--s5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quick__item {
+  display: grid;
+  gap: var(--s1);
+  width: 100%;
+  padding: var(--s4);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.quick__item:hover {
+  border-color: var(--stamp);
+}
+
+.quick__tk {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+.quick__send {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--stamp);
+}
+
+.offer .button {
+  margin-top: var(--s2);
+}
+
+.offer__note {
+  max-width: var(--measure);
+  margin-top: var(--s4);
+  font-size: 0.9rem;
+}
+
+/* ---------- "More" in the main menu: a small paper card that drops from the cover ---------- */
+.site-nav__more {
+  position: relative;
+}
+
+.site-nav summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-block: var(--s2);
+  color: var(--on-cover-soft);
+  font-size: 0.95rem;
+  list-style: none;
+  cursor: pointer;
+}
+
+.site-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+/* a small chevron that turns when the menu is open */
+.site-nav summary::after {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-0.15rem) rotate(45deg);
+}
+
+.site-nav details[open] summary::after {
+  transform: translateY(0.1rem) rotate(-135deg);
+}
+
+.site-nav summary:hover,
+.site-nav details[open] summary,
+.site-nav__more.is-current summary {
+  color: var(--on-cover);
+}
+
+.site-nav summary:hover span,
+.site-nav__more.is-current summary span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.site-nav .site-nav__menu {
+  position: absolute;
+  top: calc(100% + var(--s1));
+  left: 0;
+  z-index: 20;
+  display: block;
+  min-width: 13rem;
+  max-width: calc(100vw - 2 * var(--gutter));
+  margin: 0;
+  padding: var(--s2);
+  background: var(--print);
+  box-shadow: var(--shadow);
+  list-style: none;
+}
+
+.site-nav .site-nav__menu a {
+  display: block;
+  padding: var(--s2) var(--s3);
+  border-radius: 3px;
+  color: var(--ink-on-print);
+  text-decoration: none;
+}
+
+.site-nav .site-nav__menu a:hover,
+.site-nav .site-nav__menu a[aria-current="page"] {
+  background: var(--rule-on-print);
+  color: var(--ink-on-print);
+  text-decoration: none;
+}
+
+.cover .site-nav__menu :focus-visible {
+  outline-color: var(--stamp-on-print);
+}
+
+/* on wide screens the menu sits at the right edge, so the card lines up with it */
+@media (min-width: 48rem) {
+  .site-nav .site-nav__menu {
+    left: auto;
+    right: 0;
+  }
+}
+
+/* on phones "More" can land anywhere in the wrapped menu, so the card hangs from the header's left edge,
+   just under the menu, and never runs off the screen */
+@media (max-width: 47.99rem) {
+  .site-header {
+    position: relative;
+  }
+
+  .site-nav__more {
+    position: static;
+  }
+
+  .site-nav .site-nav__menu {
+    top: calc(100% - var(--s4));
+    left: 0;
+  }
 }

@@ -3,31 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>yt-mini-PIP — Auto Picture-in-Picture for YouTube, by Mogdho Paul</title>
-  <meta name="description" content="Free Chrome extension by Mogdho Paul that pops a playing YouTube video into a small floating window when you switch tabs or apps.">
+  <title>Auto Picture-in-Picture for YouTube – yt-mini-PIP | Mogdho Paul</title>
+  <meta name="description" content="Pop a YouTube video into picture-in-picture automatically when you switch tabs or apps, and back when you return. Free Chrome extension by Mogdho Paul.">
   <meta name="author" content="Mogdho Paul">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mogdhopaul.com/yt-mini-pip/">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://mogdhopaul.com/yt-mini-pip/">
-  <meta property="og:title" content="yt-mini-PIP — Auto Picture-in-Picture for YouTube, by Mogdho Paul">
-  <meta property="og:description" content="Free Chrome extension by Mogdho Paul that pops a playing YouTube video into a small floating window when you switch tabs or apps.">
-  <meta property="og:image" content="https://mogdhopaul.com/mogdhopaul.jpeg?v=e9051e9209">
+  <meta property="og:title" content="Auto Picture-in-Picture for YouTube – yt-mini-PIP | Mogdho Paul">
+  <meta property="og:description" content="Pop a YouTube video into picture-in-picture automatically when you switch tabs or apps, and back when you return. Free Chrome extension by Mogdho Paul.">
+  <meta property="og:image" content="https://mogdhopaul.com/yt-mini-pip/og.jpg?v=fd1b1d34d4">
   <meta property="og:site_name" content="Mogdho Paul">
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="yt-mini-PIP — Auto Picture-in-Picture for YouTube, by Mogdho Paul">
-  <meta name="twitter:description" content="Free Chrome extension by Mogdho Paul that pops a playing YouTube video into a small floating window when you switch tabs or apps.">
-  <meta name="twitter:image" content="https://mogdhopaul.com/mogdhopaul.jpeg?v=e9051e9209">
+  <meta name="twitter:title" content="Auto Picture-in-Picture for YouTube – yt-mini-PIP | Mogdho Paul">
+  <meta name="twitter:description" content="Pop a YouTube video into picture-in-picture automatically when you switch tabs or apps, and back when you return. Free Chrome extension by Mogdho Paul.">
+  <meta name="twitter:image" content="https://mogdhopaul.com/yt-mini-pip/og.jpg?v=fd1b1d34d4">
   <meta name="theme-color" content="#0f4d3a">
 
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="preload" href="/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/style.css?v=2339430527">
-  <script src="/script.js?v=616594697f"></script>
+  <link rel="stylesheet" href="/style.css?v=c1e60c0ae0">
+  <script src="/script.js?v=cd9f9a8c85"></script>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDY4Z5D7MW"></script>
   <script>
@@ -43,7 +43,7 @@
     "@type": "SoftwareApplication",
     "name": "yt-mini-PIP",
     "url": "https://mogdhopaul.com/yt-mini-pip/",
-    "description": "Free Chrome extension by Mogdho Paul that pops a playing YouTube video into a small floating window when you switch tabs or apps.",
+    "description": "Pop a YouTube video into picture-in-picture automatically when you switch tabs or apps, and back when you return. Free Chrome extension by Mogdho Paul.",
     "operatingSystem": "Google Chrome",
     "applicationCategory": "BrowserApplication",
     "downloadUrl": "https://github.com/mogdho/yt-mini-PIP/releases/latest/download/yt-mini-pip-v1.1.zip",
@@ -60,6 +60,33 @@
     }
   }
   </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://mogdhopaul.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Projects",
+        "item": "https://mogdhopaul.com/projects/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "yt-mini-PIP",
+        "item": "https://mogdhopaul.com/yt-mini-pip/"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -74,6 +101,14 @@
             <li><a href="/about/">About</a></li>
             <li><a href="/photos/">Photos</a></li>
             <li><a href="/projects/">Projects</a></li>
+            <li class="site-nav__more">
+              <details>
+                <summary><span>More</span></summary>
+                <ul class="site-nav__menu">
+                  <li><a href="/currency-converter/">Currency converter</a></li>
+                </ul>
+              </details>
+            </li>
           </ul>
         </nav>
       </header>
@@ -94,7 +129,7 @@
 
   <main id="main" class="page">
     <section aria-labelledby="what-title">
-      <h2 id="what-title">What it does</h2>
+      <h2 id="what-title">What yt-mini-PIP does</h2>
       <div class="prose">
         <p class="lead">Watching a video and need to check something in another tab? The video follows you. It floats in a small window in the corner, so you can keep watching while you do something else.</p>
       </div>
@@ -153,6 +188,48 @@
       <p>Free, for Chrome, Edge and Brave.</p>
       <a class="button" href="https://github.com/mogdho/yt-mini-PIP/releases/latest/download/yt-mini-pip-v1.1.zip" download><svg class="button__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download yt-mini-PIP</a>
       <p class="muted more-link">Made by Mogdho Paul. Curious how it works? <a href="https://github.com/mogdho/yt-mini-PIP">See it on GitHub</a>.</p>
+    </section>
+
+    <section aria-labelledby="more-tools-title" class="related">
+      <h2 id="more-tools-title">More free tools by Mogdho Paul</h2>
+      <ul class="project-list">
+      <li class="project">
+        <h3><a href="/alwaysnumlock/">AlwaysNumLock</a></h3>
+        <p>Keeps Num Lock on in Windows, even after sleep and the lock screen.</p>
+        <span class="project__lang">Windows app</span>
+      </li>
+      <li class="project">
+        <h3><a href="/capslock-copypaste/">Capslock-CopyPaste</a></h3>
+        <p>Tap Caps Lock once to copy, twice to paste.</p>
+        <span class="project__lang">Windows app</span>
+      </li>
+      <li class="project">
+        <h3><a href="/copilot2gemini/">Copilot2Gemini</a></h3>
+        <p>Makes the Copilot key open Gemini, ChatGPT or Claude.</p>
+        <span class="project__lang">Windows app</span>
+      </li>
+      <li class="project">
+        <h3><a href="/nn-tab/">NN-tab</a></h3>
+        <p>A calm new tab page for Chrome: clock, bookmarks, notes.</p>
+        <span class="project__lang">Chrome extension</span>
+      </li>
+      <li class="project">
+        <h3><a href="/ytmodify/">ytModify</a></h3>
+        <p>Ambient glow, auto pop-out and fixed quality for YouTube.</p>
+        <span class="project__lang">Chrome extension</span>
+      </li>
+      <li class="project">
+        <h3><a href="/how-many-time/">How Many Times</a></h3>
+        <p>A private one-tap tracker for a habit you’re cutting down.</p>
+        <span class="project__lang">Web app</span>
+      </li>
+      <li class="project">
+        <h3><a href="/currency-converter/">Currency converter</a></h3>
+        <p>Leu or euro to taka, with the 2.5% incentive added.</p>
+        <span class="project__lang">Web tool</span>
+      </li>
+      </ul>
+      <p class="muted more-link"><a href="/projects/">All projects</a></p>
     </section>
   </main>
 

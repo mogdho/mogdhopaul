@@ -16,7 +16,8 @@ BANNED = ("Mugdho", "Mogdha", "AI-Assisted")
 URLS = {"home": "/", "about": "/about/", "projects": "/projects/", "photos": "/photos/",
         "alwaysnumlock": "/alwaysnumlock/", "capslock-copypaste": "/capslock-copypaste/",
         "copilot2gemini": "/copilot2gemini/", "nn-tab": "/nn-tab/", "yt-mini-pip": "/yt-mini-pip/",
-        "ytmodify": "/ytmodify/", "how-many-time": "/how-many-time/"}
+        "ytmodify": "/ytmodify/", "how-many-time": "/how-many-time/",
+        "converter": "/currency-converter/"}
 NAV_URLS = ("/", "/about/", "/photos/", "/projects/")
 MORSE = "-- --- --. -.. .... --- / .--. .- ..- .-.."
 
@@ -68,6 +69,11 @@ class CommonPageRules:
     def test_nav(self):
         for u in NAV_URLS:
             self.assertIn(u, self.p.hrefs)
+
+    def test_more_menu_has_converter(self):
+        self.assertIn('<summary><span>More</span></summary>', self.p.html)
+        menu = self.p.html[self.p.html.index('class="site-nav__menu"'):]
+        self.assertIn('href="/currency-converter/"', menu[:menu.index("</ul>")])
 
     def test_images_have_alt_and_size(self):
         for img in self.p.imgs:
@@ -142,6 +148,24 @@ class ToolPageRules(CommonPageRules):
         self.assertRegex(url, r"^https://github\.com/mogdho/[\w-]+/releases/latest/download/[\w.-]+\.(exe|zip)$")
         self.assertGreaterEqual(self.p.hrefs.count(url), 2)  # top of the page and at the end
         self.assertIn(f'href="{url}" download', self.p.html)
+
+    def test_links_to_other_tools(self):
+        # Pages that link to each other get found and ranked; discontinued tools aren't promoted.
+        for slug, tool in TOOLS.items():
+            if slug != self.page_key and not tool.get("discontinued"):
+                self.assertIn(f"/{slug}/", self.p.hrefs)
+        self.assertIn("/currency-converter/", self.p.hrefs)
+
+    def test_search_title_and_breadcrumbs(self):
+        tool = TOOLS[self.page_key]
+        self.assertIn(tool["name"], self.p.title)
+        self.assertLessEqual(len(self.p.meta["description"]), 155)
+        crumbs = next(d for d in self.p.jsonld if d.get("@type") == "BreadcrumbList")
+        self.assertEqual([i["name"] for i in crumbs["itemListElement"]], ["Home", "Projects", tool["name"]])
+
+    def test_own_share_image(self):
+        self.assertTrue(self.p.meta["og:image"].startswith(f"https://mogdhopaul.com/{self.page_key}/og.jpg?v="))
+        self.assertEqual(self.p.meta["og:image"], self.p.meta["twitter:image"])
 
     def test_links_source(self):
         self.assertIn(TOOLS[self.page_key]["repo"], self.p.hrefs)
@@ -220,6 +244,28 @@ class PhotosPage(CommonPageRules, unittest.TestCase):
             self.assertTrue((ROOT / p["src"].lstrip("/")).exists(), p["src"])
             self.assertTrue((ROOT / p["thumb"].lstrip("/")).exists(), p["thumb"])
 
+
+
+class ConverterPage(CommonPageRules, unittest.TestCase):
+    page_key = "converter"
+
+    def test_both_currencies(self):
+        for value in ('value="RON"', 'value="EUR"'):
+            self.assertIn(value, self.p.html)
+
+    def test_referral_link_is_marked(self):
+        self.assertIn("https://remit.ly/2n0wkpg8", self.p.hrefs)
+        self.assertIn('rel="sponsored noopener"', self.p.html)
+        self.assertIn("referral link", self.p.text)
+
+    def test_calculator_script(self):
+        self.assertRegex(self.p.html, r'src="/currency-converter/converter\.js\?v=\w+"')
+        js = (ROOT / "currency-converter" / "converter.js").read_text(encoding="utf-8")
+        self.assertIn("INCENTIVE = 0.025", js)
+        self.assertIn("2n0wkpg8", self.p.html)
+
+    def test_explains_the_incentive(self):
+        self.assertIn("2.5%", self.p.text)
 
 
 class Sitemap(unittest.TestCase):

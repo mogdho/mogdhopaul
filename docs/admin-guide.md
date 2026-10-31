@@ -44,6 +44,8 @@ The device remembers you until you press **Log out**.
 
 **Projects**
 - Edit any field, add or delete projects, and move them up or down.
+- **Section** puts a project under *Windows, made calmer*, *Chrome extensions* or *In the browser*.
+- Projects that have their own page on the site (such as AlwaysNumLock or NN-tab) link to it by themselves.
 - Tick **Show on home page** for exactly three.
 - The short version is used on the home page; leave it empty to use the full description.
 

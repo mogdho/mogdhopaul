@@ -45,7 +45,7 @@
     "featured": false
   },
   {
-    "name": "remit-bd",
+    "name": "remit-bd (discontinued)",
     "url": "https://github.com/mogdho/remit-bd",
     "description": "A calculator for sending money home: converts Romanian leu to Bangladeshi taka at current rates and adds Bangladesh's 2.5% government remittance incentive.",
     "home_blurb": "",
@@ -72,7 +72,7 @@
     "featured": false
   },
   {
-    "name": "yt-mini-PIP",
+    "name": "yt-mini-PIP (discontinued)",
     "url": "https://github.com/mogdho/yt-mini-PIP",
     "description": "Keeps a YouTube video playing in a small floating window when you switch tabs, and puts it back when you return.",
     "home_blurb": "",

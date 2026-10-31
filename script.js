@@ -22,3 +22,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   items.forEach(function (el) { observer.observe(el); });
 });
+
+// The "More" menu opens on its own (it's a <details>); this closes it on an outside click or Escape.
+document.addEventListener('DOMContentLoaded', function () {
+  var menu = document.querySelector('.site-nav__more details');
+  if (!menu) return;
+  document.addEventListener('click', function (e) {
+    if (menu.open && !menu.contains(e.target)) menu.open = false;
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menu.open) {
+      menu.open = false;
+      menu.querySelector('summary').focus();
+    }
+  });
+});

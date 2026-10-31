@@ -16,6 +16,7 @@ PAGES = {
     "yt-mini-pip": ROOT / "yt-mini-pip" / "index.html",
     "ytmodify": ROOT / "ytmodify" / "index.html",
     "how-many-time": ROOT / "how-many-time" / "index.html",
+    "converter": ROOT / "currency-converter" / "index.html",
 }
 
 
