@@ -1626,3 +1626,324 @@ kbd {
     left: 0;
   }
 }
+
+/* ---------- Blog: posts listed like visa-page entries, each date pressed as a stamp ---------- */
+.site-nav a[aria-current="true"] {
+  color: var(--on-cover);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin: var(--s6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips button {
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.chips button:hover {
+  border-color: var(--stamp);
+}
+
+.chips button[aria-pressed="true"] {
+  border-color: var(--stamp);
+  background: var(--stamp);
+  color: var(--paper);
+}
+
+.posts {
+  margin: var(--s6) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.post {
+  display: grid;
+  gap: var(--s3) var(--s6);
+  padding-block: var(--s6);
+  border-bottom: 1px solid var(--rule);
+}
+
+.post[hidden] {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .post {
+    grid-template-columns: 11rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.post__date {
+  justify-self: start;
+  padding: 0.3rem 0.55rem 0.25rem;
+  border: 4px double var(--stamp);
+  border-radius: 2px;
+  color: var(--stamp);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+  mix-blend-mode: var(--stamp-blend);
+}
+
+.post:nth-child(even) .post__date {
+  transform: rotate(2deg);
+}
+
+.post h2 {
+  margin: 0 0 var(--s3);
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+}
+
+.post h2 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.post p {
+  max-width: var(--measure);
+  margin: 0 0 var(--s3);
+}
+
+.post__meta {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+/* ---------- Blog post ---------- */
+.cover .cover__name--post {
+  max-width: 22ch;
+  font-size: clamp(2.1rem, 1.3rem + 3.4vw, 3.6rem);
+  line-height: 1.05;
+}
+
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  margin: var(--s5) 0 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--on-cover-soft);
+}
+
+.cover .byline a {
+  color: var(--on-cover-soft);
+}
+
+.article {
+  max-width: 44rem;
+  margin-top: var(--s7);
+}
+
+.article h2 {
+  margin-top: var(--s7);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  scroll-margin-top: var(--s5);
+}
+
+.article p,
+.article li {
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.article ol,
+.article ul {
+  padding-left: 1.4rem;
+}
+
+.article li {
+  margin-bottom: var(--s3);
+  padding-left: var(--s1);
+}
+
+.article li::marker {
+  font-family: var(--mono);
+  color: var(--stamp);
+}
+
+.article kbd {
+  font-size: 0.85rem;
+}
+
+.answer {
+  margin: 0 0 var(--s6);
+  padding: var(--s5);
+  border-left: 4px solid var(--stamp);
+  background: var(--paper-deep);
+}
+
+.answer p {
+  margin: 0;
+}
+
+.article .answer__label {
+  margin-bottom: var(--s2);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--stamp);
+}
+
+.toolcard {
+  display: grid;
+  gap: var(--s4);
+  margin: var(--s7) 0;
+  padding: var(--s5);
+  background: var(--print);
+  box-shadow: var(--shadow);
+  color: var(--ink-on-print);
+  transform: rotate(-0.6deg);
+}
+
+@media (min-width: 40rem) {
+  .toolcard {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.toolcard p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ink-on-print);
+}
+
+.toolcard .toolcard__kicker {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--soft-on-print);
+}
+
+.toolcard .toolcard__name {
+  margin: var(--s1) 0 var(--s2);
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+/* the card is a light print in both themes, so its button keeps the light-mode stamp colour */
+.toolcard .button {
+  justify-self: start;
+  background: var(--stamp-on-print);
+  color: #eef1e7;
+}
+
+.more-posts ul {
+  max-width: var(--measure);
+  padding-left: 1.2rem;
+}
+
+.more-posts li {
+  margin-bottom: var(--s3);
+}
+
+/* Blog images: the cover at the top of a post, and thumbnails on the blog page */
+.post-cover {
+  margin: 0 0 var(--s6);
+}
+
+.post-cover img {
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  background: #0b100e;
+}
+
+.post__thumb {
+  display: block;
+  max-width: 24rem;
+}
+
+.post__thumb img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  background: #0b100e;
+}
+
+@media (min-width: 48rem) {
+  .post.post--thumb {
+    grid-template-columns: 11rem minmax(0, 1fr) 15rem;
+  }
+
+  /* date, then the text, then the thumbnail on the right */
+  .post--thumb .post__thumb {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+/* Home page: the newest blog articles as three small cards */
+.home-posts {
+  display: grid;
+  gap: var(--s6) var(--s5);
+  margin: var(--s5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .home-posts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.home-post a {
+  display: grid;
+  gap: var(--s3);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.home-post img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  background: #0b100e;
+}
+
+.home-post__title {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.home-post a:hover .home-post__title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.home-post .post__meta {
+  margin: var(--s2) 0 0;
+}

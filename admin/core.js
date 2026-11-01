@@ -6,6 +6,23 @@ export const FEATURED_COUNT = 3;
 export const GROUPS = ['windows', 'extensions', 'browser'];
 export const SKILL_GROUPS = ['stack', 'tools'];
 
+// ---------- blog (mirrors TOPICS, SLUG and SUMMARY_MAX in scripts/content.py, and the tool pages in scripts/build_site.py) ----------
+export const TOPICS = { windows: 'Windows', chrome: 'Chrome', money: 'Money', other: 'Life' };
+export const POST_TOOLS = [
+  ['', 'None'], ['alwaysnumlock', 'AlwaysNumLock'], ['capslock-copypaste', 'Capslock-CopyPaste'],
+  ['copilot2gemini', 'Copilot2Gemini'], ['nn-tab', 'NN-tab'], ['yt-mini-pip', 'yt-mini-PIP'], ['ytmodify', 'ytModify'],
+  ['how-many-time', 'How Many Times'], ['currency-converter', 'Currency converter'],
+];
+export const SUMMARY_MAX = 140;
+export const SEO_TITLE_MAX = 56; // plus " | Mogdho Paul" = 70, about what Google shows
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** A web address from a title: "Why Num Lock turns off!" -> "why-num-lock-turns-off". */
+export function slugify(title) {
+  return (title || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80).replace(/-+$/, '');
+}
+
 // ---------- skill icons (Iconify: free icon library; single-colour sets only, in order of preference) ----------
 export const ICON_SETS = ['simple-icons', 'cib', 'devicon-plain', 'fa6-brands', 'tabler', 'ri', 'mdi', 'bi'];
 export const DEFAULT_SKILL_ICONS = { stack: 'tabler:code', tools: 'tabler:tools' }; // mirrors scripts/build_site.py
@@ -74,7 +91,7 @@ function urlProblem(url) {
 }
 
 /** Every problem in the content, as {field, message}; field names match scripts/content.py. */
-export function validateContent({ site, projects, photos }) {
+export function validateContent({ site, projects, photos, posts = [] }) {
   const errors = [];
   const add = (field, message) => { if (message) errors.push({ field, message }); };
   const text = (field, value, opts) => add(field, checkText(value, opts));
@@ -124,6 +141,26 @@ export function validateContent({ site, projects, photos }) {
     if (ph.place != null && ph.place !== '') text(`${f}.place`, ph.place);
     for (const key of ['src', 'thumb']) if (!IMG_PATH.test(ph[key] || '')) add(`${f}.${key}`, 'Image path is broken.');
     if (ph.focus !== undefined && !isFocus(ph.focus)) add(`${f}.focus`, 'Crop position is broken. Press “Centre” to reset it.');
+  });
+
+  const slugs = new Set();
+  posts.forEach((post, i) => {
+    const f = `posts[${i}]`;
+    for (const key of ['title', 'summary', 'body']) text(`${f}.${key}`, post[key]);
+    text(`${f}.answer`, post.answer, { required: false });
+    text(`${f}.seo_title`, post.seo_title || '', { required: false });
+    if ((post.seo_title || '').length > SEO_TITLE_MAX) {
+      add(`${f}.seo_title`, `Keep it under ${SEO_TITLE_MAX} characters so Google shows it whole; it’s ${post.seo_title.length} now.`);
+    }
+    if ((post.summary || '').length > SUMMARY_MAX) {
+      add(`${f}.summary`, `Keep it under ${SUMMARY_MAX} characters; it’s ${post.summary.length} now (Google shows it under the title).`);
+    }
+    if (!SLUG.test(post.slug || '')) add(`${f}.slug`, 'Use lowercase letters, numbers and dashes, like why-num-lock-turns-off.');
+    else if (slugs.has(post.slug)) add(`${f}.slug`, 'Another article already uses this address.');
+    slugs.add(post.slug);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(post.date || '') || Number.isNaN(Date.parse(post.date))) add(`${f}.date`, 'Pick a date.');
+    if (!(post.topic in TOPICS)) add(`${f}.topic`, 'Choose a topic.');
+    if (!POST_TOOLS.some(([slug]) => slug === (post.tool || ''))) add(`${f}.tool`, 'Choose a tool, or None.');
   });
   return errors;
 }
@@ -195,11 +232,12 @@ export function newPhotoId(date, taken, rand = Math.random) {
  * The content files a save writes. Images of removed photos are not deleted here: the build
  * deletes them in the same commit as the new pages, so the live site never links to a missing file.
  */
-export function filesToSave({ site, projects, photos }) {
+export function filesToSave({ site, projects, photos, posts }) {
   return [
     { path: 'content/site.json', text: toJson(site) },
     { path: 'content/projects.json', text: toJson(projects) },
     { path: 'content/photos.json', text: toJson(photos) },
+    { path: 'content/posts.json', text: toJson(posts) },
   ];
 }
 

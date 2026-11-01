@@ -2,7 +2,7 @@ import json
 import re
 import unittest
 
-from scripts.build_site import TOOLS, download_url, project_href
+from scripts.build_site import TOOLS, download_url, posts_newest_first, project_href
 from tests.helpers import PAGES, ROOT, parse
 
 # Expected values come from content/*.json, so edits made in the admin still pass.
@@ -17,8 +17,11 @@ URLS = {"home": "/", "about": "/about/", "projects": "/projects/", "photos": "/p
         "alwaysnumlock": "/alwaysnumlock/", "capslock-copypaste": "/capslock-copypaste/",
         "copilot2gemini": "/copilot2gemini/", "nn-tab": "/nn-tab/", "yt-mini-pip": "/yt-mini-pip/",
         "ytmodify": "/ytmodify/", "how-many-time": "/how-many-time/",
-        "converter": "/currency-converter/"}
-NAV_URLS = ("/", "/about/", "/photos/", "/projects/")
+        "converter": "/currency-converter/", "blog": "/blog/"}
+_POSTS = json.loads((ROOT / "content" / "posts.json").read_text(encoding="utf-8"))
+if _POSTS:
+    URLS["post"] = f"/blog/{_POSTS[0]['slug']}/"
+NAV_URLS = ("/", "/about/", "/photos/", "/projects/", "/blog/")
 MORSE = "-- --- --. -.. .... --- / .--. .- ..- .-.."
 
 
@@ -34,6 +37,10 @@ class CommonPageRules:
     def test_title_meta_no_video_role(self):
         for s in (self.p.title, self.p.meta["description"]):
             self.assertNotRegex(s.lower(), "video editor|motion designer")
+
+    def test_title_fits_in_google(self):
+        # Google shows about 70 characters of a title; past that it cuts the end, where the name is.
+        self.assertLessEqual(len(self.p.title), 75)
 
     def test_meta_description(self):
         d = self.p.meta["description"]
@@ -106,6 +113,15 @@ class HomePage(CommonPageRules, unittest.TestCase):
 
     def test_photo_strip(self):
         self.assertIn('class="photo-strip"', self.p.html)
+
+    def test_newest_three_posts(self):
+        if not _POSTS:
+            self.skipTest("no blog posts")
+        html = self.p.html
+        section = html[html.index('id="blog-title"'):html.index("</section>", html.index('id="blog-title"'))]
+        links = list(dict.fromkeys(re.findall(r'href="(/blog/[^"]+/)"', section)))
+        self.assertEqual(links, [f"/blog/{p['slug']}/" for p in posts_newest_first(_POSTS)[:3]])
+        self.assertIn('href="/blog/">All articles</a>', section)
 
 
 class AboutPage(CommonPageRules, unittest.TestCase):
@@ -268,11 +284,78 @@ class ConverterPage(CommonPageRules, unittest.TestCase):
         self.assertIn("2.5%", self.p.text)
 
 
+class BlogPage(CommonPageRules, unittest.TestCase):
+    page_key = "blog"
+
+    def test_lists_every_post_newest_first(self):
+        links = list(dict.fromkeys(h for h in self.p.hrefs if h.startswith("/blog/") and h != "/blog/"))  # thumbnail + title
+        expected = [f"/blog/{p['slug']}/" for p in posts_newest_first(_POSTS)]  # same date: added last first
+        self.assertEqual(links, expected)
+
+    def test_thumbnails(self):
+        for post in _POSTS:
+            thumb = f"/blog/{post['slug']}/thumb.webp"
+            if (ROOT / thumb.lstrip("/")).exists():
+                self.assertTrue(any(i["src"].startswith(thumb) for i in self.p.imgs), post["slug"])
+
+    def test_blog_data(self):
+        blog = next(d for d in self.p.jsonld if d.get("@type") == "Blog")
+        self.assertEqual(len(blog["blogPost"]), len(_POSTS))
+
+
+@unittest.skipUnless(_POSTS, "no blog posts")
+class PostPage(CommonPageRules, unittest.TestCase):
+    page_key = "post"
+
+    def setUp(self):
+        super().setUp()
+        self.post = _POSTS[0]
+
+    def test_article_data(self):
+        article = next(d for d in self.p.jsonld if d.get("@type") == "BlogPosting")
+        self.assertEqual(article["headline"], self.post["title"])
+        self.assertEqual(article["author"]["name"], "Mogdho Paul")
+        self.assertEqual(article["datePublished"], self.post["date"])
+        crumbs = next(d for d in self.p.jsonld if d.get("@type") == "BreadcrumbList")
+        self.assertEqual([i["name"] for i in crumbs["itemListElement"]], ["Home", "Blog", self.post["title"]])
+        self.assertEqual(self.p.meta["og:type"], "article")
+
+    def test_cover_image_and_share_preview(self):
+        cover = f"/blog/{self.post['slug']}/og.jpg"
+        if (ROOT / cover.lstrip("/")).exists():
+            img = next(i for i in self.p.imgs if i["src"].startswith(cover))
+            self.assertIn(self.post["title"], img["alt"])
+            self.assertTrue(self.p.meta["og:image"].startswith(f"https://mogdhopaul.com{cover}?v="))
+
+    def test_byline_and_blog_menu(self):
+        self.assertIn("By Mogdho Paul", self.p.text)
+        self.assertIn('<a href="/blog/" aria-current="true">Blog</a>', self.p.html)
+
+    def test_tool_card_links_to_tool(self):
+        if self.post["tool"]:
+            self.assertIn('class="toolcard"', self.p.html)
+            self.assertIn(f"/{self.post['tool']}/", self.p.hrefs)
+
+    def test_tool_page_links_back(self):
+        if self.post["tool"] in TOOLS:
+            tool_page = parse(ROOT / self.post["tool"] / "index.html")
+            self.assertIn(f"/blog/{self.post['slug']}/", tool_page.hrefs)
+
+
 class Sitemap(unittest.TestCase):
     def test_all_pages(self):
         xml = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
         for u in URLS.values():
             self.assertIn(f"<loc>https://mogdhopaul.com{u}</loc>", xml)
+        for post in _POSTS:
+            self.assertIn(f"<loc>https://mogdhopaul.com/blog/{post['slug']}/</loc>", xml)
+
+    def test_admin_tool_list_matches_the_site(self):
+        # The admin's "Tool it's about" list mirrors the tool pages in scripts/build_site.py.
+        js = (ROOT / "admin" / "core.js").read_text(encoding="utf-8")
+        block = js[js.index("export const POST_TOOLS"):js.index("export const SUMMARY_MAX")]
+        listed = set(re.findall(r"\['([a-z0-9-]+)', '", block))
+        self.assertEqual(listed, set(TOOLS) | {"currency-converter"})
 
 
 class Publishing(unittest.TestCase):

@@ -2,27 +2,32 @@
 
 Usage:  python -m scripts.build_site
 Writes the main pages (home, about, projects, photos), the currency converter, one page per tool
-in TOOLS (alwaysnumlock/index.html and so on, from templates/tools/), and removes images in
-photos/img/ and skill-icons/ that nothing uses. If the content breaks a site rule, nothing is written.
+in TOOLS (alwaysnumlock/index.html and so on, from templates/tools/), the blog (blog/index.html and
+one page per post in content/posts.json) and sitemap.xml. Removes images in photos/img/ and
+skill-icons/ that nothing uses and pages of deleted posts. If the content breaks a site rule,
+nothing is written.
 """
 import argparse
 import hashlib
 import html
 import json
 import re
+import shutil
 import sys
+from datetime import date
 from pathlib import Path
 from string import Template
 
-from scripts.content import IDENTITY_BANNED, ContentError, inline, load_content, render_text
-from scripts.render_photos import alt_text, render_items
+from scripts.content import (IDENTITY_BANNED, TOPICS, ContentError, inline, load_content, render_article,
+                             render_text, word_count)
+from scripts.render_photos import MONTHS, alt_text, render_items
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://mogdhopaul.com"
 PAGES = {"index.html": "home", "about/index.html": "about",
          "projects/index.html": "projects", "photos/index.html": "photos",
-         "currency-converter/index.html": "converter"}
-NAV = [("/", "Home"), ("/about/", "About"), ("/photos/", "Photos"), ("/projects/", "Projects")]
+         "currency-converter/index.html": "converter", "blog/index.html": "blog"}
+NAV = [("/", "Home"), ("/about/", "About"), ("/photos/", "Photos"), ("/projects/", "Projects"), ("/blog/", "Blog")]
 MORE = [("/currency-converter/", "Currency converter")]  # the "More" dropdown at the end of the menu
 STRIP_COUNT = 3  # newest photos on the home page; all of them are on the Photos page
 PORTRAIT_FILES = ("mogdhopaul.webp", "mogdhopaul.jpeg")  # replaced by the admin's Profile photo
@@ -284,7 +289,20 @@ def download_button(tool, extra_class=""):
             f'{DOWNLOAD_ICON}Download {e(tool["name"])}</a>')
 
 
-def _cover(page, site, v=""):
+def _cover(page, site, v="", posts=None):
+    if page.startswith("post:"):
+        post = next(p for p in posts if p["slug"] == page[5:])
+        return _indent(
+            '<div class="cover__body">\n'
+            '  <div>\n'
+            '    <p class="cover__kicker"><a href="/blog/">Blog</a>'
+            f'<span aria-hidden="true"> / </span>{TOPICS[post["topic"]]}</p>\n'
+            f'    <h1 class="cover__name cover__name--post">{e(post["title"])}</h1>\n'
+            '    <p class="byline"><span>By <a href="/about/">Mogdho Paul</a></span>'
+            f'<time datetime="{post["date"]}">{_long_date(post["date"])}</time>'
+            f'<span>{reading_minutes(post)} min read</span></p>\n'
+            '  </div>\n'
+            '</div>', 6)
     if page.startswith("tool:"):
         tool = TOOLS[page[5:]]
         return _indent(
@@ -319,6 +337,9 @@ def _cover(page, site, v=""):
         "about": ("About Mogdho Paul", inline(site["about"]["lead"])),
         "projects": ("Projects by Mogdho Paul",
                      "Small tools I built because something annoyed me enough. Each one is free and on GitHub."),
+        "blog": ("Blog",
+                 "Short, plain fixes for everyday annoyances on Windows, in Chrome and with sending money home. "
+                 "Written by Mogdho Paul."),
         "converter": ("Leu and euro to taka",
                       "See what you send from Romania or Europe and what arrives in Bangladesh, with the 2.5% "
                       "government incentive added."),
@@ -372,14 +393,217 @@ def _related(current):
             '    </section>\n')
 
 
+# ---------- blog ----------
+WORDS_PER_MINUTE = 200
+MORE_POSTS = 3  # other articles listed at the end of a post
+
+
+def posts_newest_first(posts):
+    """Newest date first; same date: the one added last first."""
+    return [p for _, p in sorted(enumerate(posts), key=lambda ip: (ip[1]["date"], ip[0]), reverse=True)]
+
+
+def _short_date(iso):
+    d = date.fromisoformat(iso)
+    return f"{d.day} {MONTHS[d.month - 1][:3]} {d.year}"
+
+
+def _long_date(iso):
+    d = date.fromisoformat(iso)
+    return f"{d.day} {MONTHS[d.month - 1]} {d.year}"
+
+
+def reading_minutes(post):
+    words = word_count(" ".join((post["answer"], post["body"])))
+    return max(1, round(words / WORDS_PER_MINUTE))
+
+
+def _post_tool(post):
+    """The page a post is about, as (name, path, label, short), or None."""
+    slug = post.get("tool") or ""
+    if slug == CONVERTER["path"].strip("/"):
+        return CONVERTER["name"], CONVERTER["path"], CONVERTER["label"], CONVERTER["short"]
+    if slug in TOOLS:
+        t = TOOLS[slug]
+        return t["name"], f"/{slug}/", KIND_LABELS[t["kind"]], t["short"]
+    return None
+
+
+def _check_post_tools(posts):
+    for i, post in enumerate(posts):
+        if post.get("tool") and _post_tool(post) is None:
+            raise ContentError(f"posts[{i}].tool: there is no tool page called {post['tool']!r}")
+
+
+def _post_items(posts):
+    """The blog page's list: each post with its date pressed as a stamp."""
+    items = []
+    for i, p in enumerate(posts_newest_first(posts)):
+        thumb = _post_cover(p, "thumb.webp")
+        # The thumbnail repeats the title link, so it's skipped by keyboard and screen readers.
+        pic = (f'  <a class="post__thumb" href="/blog/{p["slug"]}/" tabindex="-1" aria-hidden="true">'
+               f'<img src="{thumb}" alt="{e(p["title"])}" width="480" height="252"'
+               f'{"" if i < 2 else " loading=" + chr(34) + "lazy" + chr(34)} decoding="async"></a>\n') if thumb else ""
+        items.append(
+            f'<li class="post{" post--thumb" if thumb else ""}" data-topic="{p["topic"]}">\n'
+            f'  <time class="post__date" datetime="{p["date"]}">{_short_date(p["date"])}</time>\n'
+            + pic +
+            '  <div>\n'
+            f'    <h2><a href="/blog/{p["slug"]}/">{e(p["title"])}</a></h2>\n'
+            f'    <p>{e(p["summary"])}</p>\n'
+            f'    <p class="post__meta">{TOPICS[p["topic"]]} · {reading_minutes(p)} min read</p>\n'
+            '  </div>\n'
+            '</li>')
+    return _indent("\n".join(items), 6)
+
+
+def _topic_chips(posts):
+    """Filter buttons for the topics that have posts; script.js makes them work. Hidden with one topic."""
+    used = [k for k in TOPICS if any(p["topic"] == k for p in posts)]
+    if len(used) < 2:
+        return ""
+    chips = ['<li><button type="button" data-topic="" aria-pressed="true">All</button></li>']
+    chips += [f'<li><button type="button" data-topic="{k}" aria-pressed="false">{TOPICS[k]}</button></li>'
+              for k in used]
+    return ('    <ul class="chips" data-topic-filter aria-label="Show articles about" hidden>\n'
+            + "\n".join(f"      {c}" for c in chips) + "\n    </ul>\n")
+
+
+def _tool_card(post):
+    tool = _post_tool(post)
+    if not tool:
+        return ""
+    name, path, label, short = tool
+    action = "Open the converter" if path == CONVERTER["path"] else f"Get {name}"
+    # A fix for an annoyance (apps and extensions); a web tool is simply something to try.
+    kicker = "Try it" if label in ("Web app", CONVERTER["label"]) else "The one-click fix"
+    return ('<aside class="toolcard" aria-label="The tool for this">\n'
+            f'  <div><p class="toolcard__kicker">{kicker} · {label}</p>\n'
+            f'  <p class="toolcard__name">{e(name)}</p>\n'
+            f'  <p>{e(short)}</p></div>\n'
+            f'  <a class="button" href="{path}">{e(action)}</a>\n'
+            '</aside>')
+
+
+def _article_body(post):
+    """The post's text, with the tool card placed just before its second heading (or at the end)."""
+    body = render_article(post["body"])
+    card = _tool_card(post)
+    heads = [m.start() for m in re.finditer(r"<h2 ", body)]
+    if card and len(heads) >= 2:
+        return body[:heads[1]] + card + "\n" + body[heads[1]:]
+    return body + ("\n" + card if card else "")
+
+
+def _more_posts(post, posts):
+    others = [p for p in posts_newest_first(posts) if p["slug"] != post["slug"]][:MORE_POSTS]
+    if not others:
+        return ""
+    items = "\n".join(f'        <li><a href="/blog/{p["slug"]}/">{e(p["title"])}</a></li>' for p in others)
+    return ('    <section aria-labelledby="more-posts-title" class="more-posts">\n'
+            '      <h2 id="more-posts-title">More from the blog</h2>\n'
+            f'      <ul>\n{items}\n      </ul>\n'
+            '    </section>\n')
+
+
+HOME_POSTS = 3  # newest articles on the home page
+
+
+def _home_posts(posts):
+    """Home page: the newest articles as small cards. Nothing when there are no posts yet."""
+    newest = posts_newest_first(posts)[:HOME_POSTS]
+    if not newest:
+        return ""
+    cards = []
+    for p in newest:
+        thumb = _post_cover(p, "thumb.webp")
+        # the title sits right next to it in the same link, so screen readers skip the picture
+        pic = (f'          <img src="{thumb}" alt="{e(p["title"])}" aria-hidden="true" width="480" height="252" '
+               'loading="lazy" decoding="async">\n' if thumb else "")
+        cards.append(
+            '        <li class="home-post">\n'
+            f'          <a href="/blog/{p["slug"]}/">\n'
+            + ("  " + pic if pic else "") +
+            f'            <span class="home-post__title">{e(p["title"])}</span>\n'
+            '          </a>\n'
+            f'          <p class="post__meta"><time datetime="{p["date"]}">{_short_date(p["date"])}</time>'
+            f' · {TOPICS[p["topic"]]} · {reading_minutes(p)} min read</p>\n'
+            '        </li>')
+    return ('    <section aria-labelledby="blog-title">\n'
+            '      <div class="section-head">\n'
+            '        <h2 id="blog-title">From the blog</h2>\n'
+            '        <a href="/blog/">All articles</a>\n'
+            '      </div>\n'
+            '      <ul class="home-posts">\n' + "\n".join(cards) + '\n      </ul>\n'
+            '    </section>\n\n')
+
+
+def _from_the_blog(slug, posts):
+    """On a tool page: articles about that tool."""
+    mine = [p for p in posts_newest_first(posts) if p.get("tool") == slug]
+    if not mine:
+        return ""
+    items = "\n".join(f'        <li><a href="/blog/{p["slug"]}/">{e(p["title"])}</a></li>' for p in mine)
+    return ('\n\n    <section aria-labelledby="from-blog-title" class="more-posts">\n'
+            '      <h2 id="from-blog-title">From the blog</h2>\n'
+            f'      <ul>\n{items}\n      </ul>\n'
+            '    </section>')
+
+
+def _post_cover(post, name="og.jpg"):
+    """Path of the post's own image (made by scripts/post_images.py), or None if it hasn't been made."""
+    rel = f"blog/{post['slug']}/{name}"
+    return f"/{rel}{_version(rel)}" if (ROOT / rel).exists() else None
+
+
+def _post_image(post, fallback):
+    """A post shares its own cover image; without one, its tool's card; without that, the fallback."""
+    if _post_cover(post):
+        return f"{SITE}{_post_cover(post)}"
+    tool = _post_tool(post)
+    if tool:
+        og = tool[1].strip("/") + "/og.jpg"
+        if (ROOT / og).exists():
+            return f"{SITE}/{og}{_version(og)}"
+    return fallback
+
+
 def _og_image(rel, fallback):
     """The page's own share card (<folder>/og.jpg) if it has one, otherwise the portrait."""
     og = rel.removesuffix("index.html") + "og.jpg"
     return f"{SITE}/{og}{_version(og)}" if (ROOT / og).exists() else fallback
 
 
-def _meta(page, site, v="", photos=None):
+def _meta(page, site, v="", photos=None, posts=None):
     profiles = [p["url"] for p in site["profiles"]]
+    if page.startswith("post:"):
+        post = next(p for p in posts if p["slug"] == page[5:])
+        url = f"{SITE}/blog/{post['slug']}/"
+        article = {
+            "@context": "https://schema.org", "@type": "BlogPosting", "headline": post["title"],
+            "description": post["summary"], "url": url, "mainEntityOfPage": url,
+            "datePublished": post["date"], "dateModified": post.get("updated") or post["date"],
+            "author": AUTHOR, "publisher": AUTHOR, "inLanguage": "en",
+            "articleSection": TOPICS[post["topic"]], "wordCount": word_count(post["answer"] + " " + post["body"]),
+            "image": _post_image(post, f"{SITE}/mogdhopaul.jpeg{v}"),
+        }
+        tool = _post_tool(post)
+        if tool:
+            article["about"] = {"@type": "SoftwareApplication" if tool[1] != CONVERTER["path"] else "WebApplication",
+                                "name": tool[0], "url": f"{SITE}{tool[1]}"}
+        crumbs = _breadcrumbs([("Blog", "/blog/"), (post["title"], f"/blog/{post['slug']}/")])
+        title = post.get("seo_title") or post["title"]
+        return (f"{title} | Mogdho Paul", f"{post['summary']} By Mogdho Paul.", "article",
+                _jsonld(article) + _jsonld(crumbs))
+    if page == "blog":
+        blog = {"@context": "https://schema.org", "@type": "Blog", "name": "Mogdho Paul's blog",
+                "url": f"{SITE}/blog/", "author": AUTHOR, "inLanguage": "en",
+                "blogPost": [{"@type": "BlogPosting", "headline": p["title"], "url": f"{SITE}/blog/{p['slug']}/",
+                              "datePublished": p["date"], "author": AUTHOR} for p in posts_newest_first(posts)]}
+        return ("Blog: Plain Fixes for Windows, Chrome & Money | Mogdho Paul",
+                "Short how-to articles by Mogdho Paul: plain fixes for everyday annoyances on Windows and in Chrome, "
+                "and for sending money home to Bangladesh.", "website",
+                _jsonld(blog) + _jsonld(_breadcrumbs([("Blog", "/blog/")])))
     if page.startswith("tool:"):
         slug = page[5:]
         tool = TOOLS[slug]
@@ -459,7 +683,19 @@ def _gallery(photos):
 
 
 def _main_block(page, content):
-    site, projects = content["site"], content["projects"]
+    site, projects, posts = content["site"], content["projects"], content["posts"]
+    if page.startswith("post:"):
+        post = next(p for p in posts if p["slug"] == page[5:])
+        answer = (f'<div class="answer"><p class="answer__label">Short answer</p>\n<p>{inline(post["answer"])}</p></div>\n'
+                  if post["answer"].strip() else "")
+        cover = _post_cover(post)
+        figure = (f'<figure class="post-cover"><img src="{cover}" alt="{e(post["title"])}, by Mogdho Paul" '
+                  'width="1200" height="630" fetchpriority="high"></figure>\n') if cover else ""
+        return _template("post").substitute(
+            article=_indent(figure + answer + _article_body(post), 6), more=_more_posts(post, posts))
+    if page == "blog":
+        items = _post_items(posts) or '      <li class="empty-note">The first articles are on their way.</li>'
+        return _template("blog").substitute(chips=_topic_chips(posts), posts=items)
     if page.startswith("tool:"):
         slug = page[5:]
         tool = TOOLS[slug]
@@ -469,7 +705,8 @@ def _main_block(page, content):
         for key in ("install", "remove"):
             fields[key] = (_template(f"tools/_chrome-{key}").substitute(fields).strip()
                            if tool["kind"] == "chrome" else "")
-        return _template(f"tools/{slug}").substitute(fields).rstrip("\n") + _related(f"/{slug}/")
+        return (_template(f"tools/{slug}").substitute(fields).rstrip("\n") + _from_the_blog(slug, posts)
+                + _related(f"/{slug}/"))
     photos = newest_first(content["photos"])
     if page == "home":
         return _template("home").substitute(
@@ -478,6 +715,7 @@ def _main_block(page, content):
             intro=_indent(render_text(site["home"]["text"]), 8),
             skills=_skills(site["skills"]),
             projects=_project_items([p for p in projects if p["featured"]], 8, home=True),
+            blog=_home_posts(posts),
             video=_indent(render_text(site["home"]["video"]), 8),
         )
     if page == "about":
@@ -486,7 +724,7 @@ def _main_block(page, content):
         return _template("about").substitute(sections=_indent(sections, 6))
     if page == "converter":
         page_html = _template("converter").substitute(js_v=_version("currency-converter/converter.js"))
-        return page_html.rstrip("\n") + _related(CONVERTER["path"])
+        return page_html.rstrip("\n") + _from_the_blog("currency-converter", posts) + _related(CONVERTER["path"])
     if page == "projects":
         return _template("projects").substitute(
             windows=_project_items([p for p in projects if p["group"] == "windows"], 6, home=False),
@@ -500,7 +738,9 @@ def _nav(path):
     """The main menu: the main pages, then a "More" dropdown. A plain <details> menu, so it opens
     without JavaScript; script.js only closes it on an outside click or Escape."""
     def current(href):
-        return ' aria-current="page"' if href == path else ""
+        if href == path:
+            return ' aria-current="page"'
+        return ' aria-current="true"' if href != "/" and path.startswith(href) else ""  # e.g. Blog on a post
     items = [f'<li><a href="{href}"{current(href)}>{label}</a></li>' for href, label in NAV]
     inside = any(href == path for href, _ in MORE)
     links = [f'      <li><a href="{href}"{current(href)}>{label}</a></li>' for href, label in MORE]
@@ -526,24 +766,56 @@ def build(root=None):
         finally:
             ROOT = saved
     content = load_content(ROOT)
-    site = content["site"]
+    site, posts = content["site"], content["posts"]
+    _check_post_tools(posts)
     profiles = _indent("\n".join(f'<li><a href="{e(p["url"])}" rel="me">{e(p["label"])}</a></li>'
                                  for p in site["profiles"]), 8)
     v = _portrait_version()
+    portrait = f"{SITE}/mogdhopaul.jpeg{v}"
     css_v, js_v = _version("style.css"), _version("script.js")
     pages = {}
-    for rel, page in PAGES.items():
-        title, description, og_type, jsonld = _meta(page, site, v, content["photos"])
+    for rel, page in {**PAGES, **post_pages(posts)}.items():
+        title, description, og_type, jsonld = _meta(page, site, v, content["photos"], posts)
         path = "/" + rel.removesuffix("index.html")
-        nav = _indent(_nav(path), 12)
+        fallback = (_post_image(next(p for p in posts if p["slug"] == page[5:]), portrait)
+                    if page.startswith("post:") else portrait)
         pages[rel] = _template("base").substitute(
             title=e(title), description=e(description), canonical=f"{SITE}{path}", og_type=og_type,
-            jsonld=jsonld, cover_class="" if page == "home" else " cover--short", nav=nav,
-            css_v=css_v, js_v=js_v, cover=_cover(page, site, v),
-            image=_og_image(rel, f"{SITE}/mogdhopaul.jpeg{v}"),
-            main=_main_block(page, content).rstrip("\n"), whatsapp=e(site["contact"]["whatsapp"]), email=e(site["contact"]["email"]), profiles=profiles,
+            jsonld=jsonld, cover_class="" if page == "home" else " cover--short", nav=_indent(_nav(path), 12),
+            css_v=css_v, js_v=js_v, cover=_cover(page, site, v, posts), image=_og_image(rel, fallback),
+            main=_main_block(page, content).rstrip("\n"), whatsapp=e(site["contact"]["whatsapp"]),
+            email=e(site["contact"]["email"]), profiles=profiles,
         )
     return pages
+
+
+def post_pages(posts):
+    return {f"blog/{p['slug']}/index.html": f"post:{p['slug']}" for p in posts}
+
+
+def sitemap(rels, posts):
+    """sitemap.xml for every built page. Dates are given only where they are known: a post's date
+    (or its update) and, for the blog page, its newest post."""
+    lastmod = {f"blog/{p['slug']}/index.html": p.get("updated") or p["date"] for p in posts}
+    if posts:
+        lastmod["blog/index.html"] = max(lastmod.values())
+    urls = []
+    for rel in rels:
+        loc = f"{SITE}/" + rel.removesuffix("index.html")
+        when = f"\n    <lastmod>{lastmod[rel]}</lastmod>" if rel in lastmod else ""
+        urls.append(f"  <url>\n    <loc>{loc}</loc>{when}\n  </url>")
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(urls) + "\n</urlset>\n")
+
+
+def stale_post_folders(root, posts):
+    """Folders in blog/ left by deleted posts (only folders holding nothing but a built page)."""
+    keep = {p["slug"] for p in posts}
+    blog = Path(root) / "blog"
+    if not blog.exists():
+        return []
+    return sorted(d for d in blog.iterdir() if d.is_dir() and d.name not in keep
+                  and {f.name for f in d.iterdir()} <= {"index.html", "og.jpg", "thumb.webp"})
 
 
 def unused_skill_icons(root, site):
@@ -576,10 +848,15 @@ def main(argv=None):
         out = ROOT / rel
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(page, encoding="utf-8")
+    (ROOT / "sitemap.xml").write_text(sitemap(pages, content["posts"]), encoding="utf-8")
     removed = unused_images(ROOT, photos) + unused_skill_icons(ROOT, content["site"])
     for path in removed:
         path.unlink()
-    print(f"Built {len(pages)} pages, {len(photos)} photos, removed {len(removed)} unused image(s).")
+    gone = stale_post_folders(ROOT, content["posts"])
+    for folder in gone:
+        shutil.rmtree(folder)
+    print(f"Built {len(pages)} pages ({len(content['posts'])} blog posts), {len(photos)} photos, "
+          f"removed {len(removed)} unused image(s) and {len(gone)} deleted post(s).")
     return 0
 
 

@@ -37,3 +37,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+// Blog topic buttons: show only the articles about one topic. Without JavaScript they stay hidden
+// and every article is listed.
+document.addEventListener('DOMContentLoaded', function () {
+  var filter = document.querySelector('[data-topic-filter]');
+  if (!filter) return;
+  var buttons = filter.querySelectorAll('button');
+  var posts = document.querySelectorAll('.post[data-topic]');
+  filter.hidden = false;
+  buttons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      var topic = button.getAttribute('data-topic');
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b === button)); });
+      posts.forEach(function (post) { post.hidden = topic !== '' && post.getAttribute('data-topic') !== topic; });
+    });
+  });
+});

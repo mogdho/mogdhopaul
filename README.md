@@ -92,9 +92,10 @@ flowchart LR
   C -. "tests fail" .-> F["Site keeps its<br>last good version"]
 ```
 
-- **Content** lives in three files: `content/site.json` (text, links, skills), `content/projects.json` and `content/photos.json`.
+- **Content** lives in four files: `content/site.json` (text, links, skills), `content/projects.json`, `content/photos.json` and `content/posts.json` (blog articles).
 - **The admin** (`/admin/`) edits them in the browser and saves straight to this repository with a GitHub key. Photos are resized and stripped of location data on the device before upload. See the [admin guide](docs/admin-guide.md).
-- **The build** (`scripts/build_site.py`) turns content and `templates/` into the pages: home, about, projects, photos, the currency converter and one page per tool (AlwaysNumLock, NN-tab, How Many Times and the rest; listed in `TOOLS` in the build script). Links to files that change carry a content hash (`style.css?v=…`), so the hosting cache never serves an old copy.
+- **The build** (`scripts/build_site.py`) turns content and `templates/` into the pages: home, about, projects, photos, the blog and its articles, the currency converter and one page per tool (AlwaysNumLock, NN-tab, How Many Times and the rest; listed in `TOOLS` in the build script). Links to files that change carry a content hash (`style.css?v=…`), so the hosting cache never serves an old copy.
+- **Blog images** (`scripts/post_images.py`) draw each post's cover card with headless Chrome, only for new or renamed posts; the online build runs it before building the pages.
 - **The tests** check content rules, page structure, SEO basics and style rules before anything goes live.
 
 ### Project layout
@@ -111,6 +112,7 @@ tests/          Python and JavaScript tests
 docs/           admin guide and these README images
 currency-converter/  the converter's script (its page is built like the others)
 <tool>/         built tool pages, e.g. alwaysnumlock/, nn-tab/, how-many-time/, with their images
+blog/           built blog pages (written in the admin; sitemap.xml is built too)
 ```
 
 ### Run it locally

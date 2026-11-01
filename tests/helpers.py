@@ -17,7 +17,12 @@ PAGES = {
     "ytmodify": ROOT / "ytmodify" / "index.html",
     "how-many-time": ROOT / "how-many-time" / "index.html",
     "converter": ROOT / "currency-converter" / "index.html",
+    "blog": ROOT / "blog" / "index.html",
 }
+# The first blog post, checked with the same page rules as the rest of the site.
+_POSTS = json.loads((ROOT / "content" / "posts.json").read_text(encoding="utf-8"))
+if _POSTS:
+    PAGES["post"] = ROOT / "blog" / _POSTS[0]["slug"] / "index.html"
 
 
 class Page(HTMLParser):

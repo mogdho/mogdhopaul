@@ -1,7 +1,7 @@
 // Admin page: log in with a GitHub key, edit content/*.json and photos, save as one commit, watch publishing.
 import {
-  DEFAULT_SKILL_ICONS, FEATURED_COUNT, ICON_SETS, dragFocus, filesToSave, iconQueries, isSupportedImage, newPhotoId, newestFirst,
-  rankIcons, skillIconPath, validateContent, watchPublishing,
+  DEFAULT_SKILL_ICONS, FEATURED_COUNT, ICON_SETS, POST_TOOLS, SEO_TITLE_MAX, SUMMARY_MAX, TOPICS, dragFocus, filesToSave, iconQueries,
+  isSupportedImage, newPhotoId, newestFirst, rankIcons, skillIconPath, slugify, validateContent, watchPublishing,
 } from './core.js';
 import { AuthError, ConflictError, Repo } from './github.js';
 import { PORTRAIT_SIZE, cropImage, resizeImage } from './images.js';
@@ -13,7 +13,8 @@ const demo = new URLSearchParams(location.search).has('demo');
 
 const state = {
   repo: null, sha: null, original: null,
-  site: null, projects: [], photos: [],
+  site: null, projects: [], photos: [], posts: [],
+  autoSlug: new WeakSet(), // new articles whose address still follows their title
   newImages: new Map(), // repo path -> Blob, for photos added since the last save
   previews: new Map(), // photo id -> object URL
   portrait: null, // a newly chosen profile photo, until it is saved
@@ -86,8 +87,10 @@ function show(view) {
   $('user').hidden = view !== 'editor' || demo;
 }
 
+const TABS = ['photos', 'projects', 'blog', 'text'];
+
 function selectTab(name) {
-  for (const t of ['photos', 'projects', 'text']) {
+  for (const t of TABS) {
     $(`tab-${t}`).setAttribute('aria-selected', String(t === name));
     $(`panel-${t}`).hidden = t !== name;
   }
@@ -97,6 +100,7 @@ function selectTab(name) {
 function renderAll() {
   renderPhotos();
   renderProjects();
+  renderBlog();
   renderText();
 }
 
@@ -518,6 +522,80 @@ function renderProjects() {
   } }, 'Add project'));
 }
 
+// ---------- blog ----------
+const ARTICLE_HINT = 'Blank line = new paragraph. ## Heading · lines starting with "- " or "1. " make a list · '
+  + '**bold** · `Num Lock` shows a key · [text](https://…) for a link.';
+
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function renderBlog() {
+  const panel = $('panel-blog');
+  panel.replaceChildren(
+    el('h1', { text: 'Blog' }),
+    el('p', { class: 'panel-intro', text: 'Articles on mogdhopaul.com/blog/, newest date first. '
+      + 'The tool you pick gets a card in the middle of the article that links to it.' }),
+    el('button', { type: 'button', class: 'button', onclick: () => {
+      const post = { slug: '', title: '', date: today(), topic: 'windows', tool: '', summary: '', answer: '', body: '' };
+      state.posts.unshift(post);
+      state.autoSlug.add(post);
+      markDirty();
+      renderBlog();
+      panel.querySelector('input')?.focus();
+    } }, 'Write a new article'),
+  );
+  if (!state.posts.length) {
+    panel.append(el('p', { class: 'muted', text: 'No articles yet.' }));
+    return;
+  }
+  panel.append(el('ol', { class: 'entry-list' }, state.posts.map((post, i) => {
+    const f = `posts[${i}]`;
+    const live = !state.autoSlug.has(post) && post.slug;
+    const slugField = field({ label: 'Address', value: post.slug, field: `${f}.slug`,
+      hint: 'mogdhopaul.com/blog/<address>/ — lowercase words and dashes. Changing it later breaks old links.',
+      onInput: (v) => { post.slug = v.trim(); state.autoSlug.delete(post); } });
+    const titleField = field({ label: 'Title', value: post.title, field: `${f}.title`, onInput: (v) => {
+      post.title = v;
+      if (state.autoSlug.has(post)) {
+        post.slug = slugify(v);
+        slugField.querySelector('input').value = post.slug;
+      }
+    } });
+    const count = el('span', { class: 'field__count' });
+    const showCount = () => { count.textContent = `${(post.summary || '').length} / ${SUMMARY_MAX}`; };
+    showCount();
+    const summaryField = field({ label: 'Summary', value: post.summary, field: `${f}.summary`,
+      hint: 'Shown on the blog page and under the title in Google.',
+      onInput: (v) => { post.summary = v; showCount(); } });
+    summaryField.querySelector('.field__label').append(' ', count);
+    return el('li', { class: 'entry' },
+      el('div', { class: 'entry__head' },
+        el('h3', { text: post.title || 'New article' }),
+        el('div', { class: 'entry__actions' },
+          live ? el('a', { class: 'button button--quiet', href: `/blog/${post.slug}/`, target: '_blank', rel: 'noopener' }, 'View') : null,
+          el('button', { type: 'button', class: 'button button--quiet danger', onclick: () => {
+            if (confirm(`Delete “${post.title || 'this article'}”?`)) { state.posts.splice(i, 1); markDirty(); renderBlog(); }
+          } }, 'Delete'))),
+      titleField,
+      slugField,
+      el('div', { class: 'entry__row' },
+        field({ label: 'Date', type: 'date', value: post.date, field: `${f}.date`, onInput: (v) => { post.date = v; } }),
+        field({ label: 'Topic', value: post.topic, field: `${f}.topic`, options: Object.entries(TOPICS), onInput: (v) => { post.topic = v; } }),
+        field({ label: 'Tool it’s about', value: post.tool || '', field: `${f}.tool`, options: POST_TOOLS, onInput: (v) => { post.tool = v; } })),
+      field({ label: 'Title in Google (optional)', value: post.seo_title || '', field: `${f}.seo_title`, required: false,
+        hint: `For long titles: a shorter one, under ${SEO_TITLE_MAX} characters, for the Google result and shared links.`,
+        onInput: (v) => { if (v.trim()) post.seo_title = v; else delete post.seo_title; } }),
+      summaryField,
+      field({ label: 'Short answer (optional)', value: post.answer, field: `${f}.answer`, multiline: true, required: false,
+        hint: 'The answer in two or three sentences, shown in a box at the top. Google often uses it.',
+        onInput: (v) => { post.answer = v; } }),
+      field({ label: 'Article', value: post.body, field: `${f}.body`, multiline: true, hint: ARTICLE_HINT,
+        onInput: (v) => { post.body = v; } }));
+  })));
+}
+
 function moveItem(list, i, step, rerender) {
   const j = i + step;
   [list[i], list[j]] = [list[j], list[i]];
@@ -603,7 +681,7 @@ function base64FromBytes(bytes) {
 }
 
 async function save() {
-  const content = { site: state.site, projects: state.projects, photos: state.photos };
+  const content = { site: state.site, projects: state.projects, photos: state.photos, posts: state.posts };
   const errors = validateContent(content);
   showErrors(errors);
   if (errors.length) {
@@ -687,16 +765,16 @@ async function load() {
   show('loading');
   try {
     state.sha = await state.repo.headSha();
-    const [site, projects, photos] = await Promise.all(
-      ['site', 'projects', 'photos'].map((n) => state.repo.readJson(`content/${n}.json`, state.sha)));
-    Object.assign(state, { site, projects, photos, dirty: false });
-    state.original = structuredClone({ site, projects, photos });
+    const [site, projects, photos, posts] = await Promise.all(
+      ['site', 'projects', 'photos', 'posts'].map((n) => state.repo.readJson(`content/${n}.json`, state.sha)));
+    Object.assign(state, { site, projects, photos, posts, dirty: false, autoSlug: new WeakSet() });
+    state.original = structuredClone({ site, projects, photos, posts });
     state.newImages.clear();
     state.portrait = null;
     renderAll();
     show('editor');
     const tab = new URLSearchParams(location.search).get('tab');
-    if (['photos', 'projects', 'text'].includes(tab)) selectTab(tab);
+    if (TABS.includes(tab)) selectTab(tab);
     document.fonts?.ready.then(() => document.querySelectorAll('textarea').forEach(fitTextarea));
     setStatus('No changes yet.');
     $('save').disabled = true;
@@ -724,7 +802,7 @@ function logout() {
 }
 
 function start() {
-  for (const t of ['photos', 'projects', 'text']) $(`tab-${t}`).addEventListener('click', () => selectTab(t));
+  for (const t of TABS) $(`tab-${t}`).addEventListener('click', () => selectTab(t));
   document.querySelector('.tabs').addEventListener('keydown', (e) => {
     if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
     const tabs = [...document.querySelectorAll('[role="tab"]')];

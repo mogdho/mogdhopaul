@@ -67,6 +67,28 @@ class RenderPhotos(unittest.TestCase):
 
 
 
+class PostImages(unittest.TestCase):
+    def test_image_remade_only_when_title_or_topic_changes(self):
+        from scripts import post_images
+        post = {"slug": "a", "title": "Title", "topic": "windows", "summary": "s", "body": "b"}
+        key = post_images.image_key(post)
+        self.assertEqual(key, post_images.image_key({**post, "summary": "changed", "body": "changed"}))
+        self.assertNotEqual(key, post_images.image_key({**post, "title": "New title"}))
+        self.assertNotEqual(key, post_images.image_key({**post, "topic": "chrome"}))
+
+    def test_card_has_title_topic_and_author(self):
+        from scripts import post_images
+        page = post_images.card_html({"title": "Fish & chips", "topic": "money"}, "file:///fonts")
+        for text in ("Fish &amp; chips", "Blog · Money", "By Mogdho Paul", "mogdhopaul.com"):
+            self.assertIn(text, page)
+
+    def test_every_post_has_its_images(self):
+        posts = json.loads((ROOT / "content" / "posts.json").read_text(encoding="utf-8"))
+        for post in posts:
+            for name in ("og.jpg", "thumb.webp"):
+                self.assertTrue((ROOT / "blog" / post["slug"] / name).exists(), f"{post['slug']}/{name}")
+
+
 class PublicPlace(unittest.TestCase):
     def test_city_kept_out_of_search_data(self):
         self.assertEqual(build_site.public_place("Bucharest, Romania"), "Romania")
@@ -84,6 +106,10 @@ class Build(unittest.TestCase):
     def test_committed_pages_are_fresh(self):
         for rel, page in self.pages.items():
             self.assertEqual((ROOT / rel).read_text(encoding="utf-8"), page, rel)
+
+    def test_committed_sitemap_is_fresh(self):
+        posts = json.loads((ROOT / "content" / "posts.json").read_text(encoding="utf-8"))
+        self.assertEqual((ROOT / "sitemap.xml").read_text(encoding="utf-8"), build_site.sitemap(self.pages, posts))
 
     def test_committed_admin_page_is_fresh(self):
         self.assertEqual((ROOT / "admin" / "index.html").read_text(encoding="utf-8"), build_site._admin_page())
@@ -261,6 +287,79 @@ class Main(unittest.TestCase):
         self.assertEqual(re.findall(r'href="/photos/#photo-(\w+)"', home), ["d", "c", "b"])
         photos_page = (self.tmp / "photos" / "index.html").read_text(encoding="utf-8")
         self.assertEqual(re.findall(r'id="photo-(\w+)"', photos_page), ["d", "c", "b", "a", "old"])
+
+    def post(self, slug="how-to-x", date="2026-01-02", tool="", topic="windows"):
+        return {"slug": slug, "title": f"Title {slug}", "date": date, "topic": topic, "tool": tool,
+                "summary": "A short summary.", "answer": "",
+                "body": "Para one.\n\n## First\n\nText.\n\n## Second\n\nMore."}
+
+    def test_posts_build_pages_and_sitemap(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.extend([self.post("old", "2026-01-01"),
+                                                              self.post("new", "2026-02-01")])))
+        self.assertEqual(build_site.main([]), 0)
+        blog = (self.tmp / "blog" / "index.html").read_text(encoding="utf-8")
+        self.assertLess(blog.index("/blog/new/"), blog.index("/blog/old/"))
+        self.assertTrue((self.tmp / "blog" / "old" / "index.html").exists())
+        xml = (self.tmp / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn("<loc>https://mogdhopaul.com/blog/new/</loc>\n    <lastmod>2026-02-01</lastmod>", xml)
+
+    def test_deleted_post_page_removed(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.append(self.post("gone"))))
+        build_site.main([])
+        self.assertTrue((self.tmp / "blog" / "gone").exists())
+        self.edit("posts", lambda ps: ps.clear())
+        build_site.main([])
+        self.assertFalse((self.tmp / "blog" / "gone").exists())
+        self.assertIn("first articles are on their way", (self.tmp / "blog" / "index.html").read_text(encoding="utf-8"))
+
+    def test_tool_card_before_second_heading(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.append(self.post("x", tool="nn-tab"))))
+        build_site.main([])
+        page = (self.tmp / "blog" / "x" / "index.html").read_text(encoding="utf-8")
+        self.assertLess(page.index('id="first"'), page.index('class="toolcard"'))
+        self.assertLess(page.index('class="toolcard"'), page.index('id="second"'))
+
+    def test_home_has_no_blog_section_without_posts(self):
+        self.edit("posts", lambda ps: ps.clear())
+        build_site.main([])
+        self.assertNotIn('id="blog-title"', (self.tmp / "index.html").read_text(encoding="utf-8"))
+
+    def test_post_without_image_still_builds(self):
+        # Images are made by scripts/post_images.py; a post without one just has no picture.
+        self.edit("posts", lambda ps: (ps.clear(), ps.append(self.post("plain"))))
+        self.assertEqual(build_site.main([]), 0)
+        page = (self.tmp / "blog" / "plain" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("post-cover", page)
+        self.assertNotIn("post__thumb", (self.tmp / "blog" / "index.html").read_text(encoding="utf-8"))
+
+    def test_deleted_post_images_removed(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.append(self.post("gone"))))
+        build_site.main([])
+        for name in ("og.jpg", "thumb.webp"):
+            (self.tmp / "blog" / "gone" / name).write_bytes(b"x")
+        self.edit("posts", lambda ps: ps.clear())
+        build_site.main([])
+        self.assertFalse((self.tmp / "blog" / "gone").exists())
+
+    def test_short_google_title(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.append({**self.post("x"), "title": "A very long article title",
+                                                              "seo_title": "Short title"})))
+        build_site.main([])
+        page = (self.tmp / "blog" / "x" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("<title>Short title | Mogdho Paul</title>", page)
+        self.assertIn(">A very long article title</h1>", page)
+
+    def test_too_long_google_title_writes_nothing(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.append({**self.post("x"), "seo_title": "x" * 57})))
+        before = self.snapshot()
+        self.assertEqual(build_site.main([]), 1)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_unknown_tool_writes_nothing(self):
+        self.edit("posts", lambda ps: (ps.clear(), ps.append(self.post("x", tool="no-such-tool"))))
+        before = self.snapshot()
+        self.assertEqual(build_site.main([]), 1)
+        self.assertEqual(self.snapshot(), before)
 
     def test_zero_photos_shows_empty_note(self):
         self.edit("photos", lambda ps: ps.clear())

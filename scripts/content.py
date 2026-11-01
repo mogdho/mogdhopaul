@@ -3,6 +3,7 @@
 Text fields are plain paragraphs (blank line = new paragraph) with one link syntax:
 [link text](address), where the address is https://, http://, mailto: or a site path (/photos/).
 Everything else, including any HTML, is escaped and shown as plain text.
+Blog articles (content/posts.json) also allow ## headings, lists, **bold** and `keys`: see render_article.
 """
 import html
 import json
@@ -23,6 +24,12 @@ HTML_TAG = re.compile(r"</?[a-z!]", re.I)
 BANNED_PHRASES = ("ai-assisted",)
 IDENTITY_NAME = "Mogdho Paul"
 IDENTITY_BANNED = re.compile(r"video editor|motion designer|bucharest", re.I)
+# Blog: topics a post can have, its address (lowercase words joined by -), and the summary length
+# that fits in a Google result together with " By Mogdho Paul."
+TOPICS = {"windows": "Windows", "chrome": "Chrome", "money": "Money", "other": "Life"}
+SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+SUMMARY_MAX = 140
+SEO_TITLE_MAX = 56  # plus " | Mogdho Paul" = 70, about what Google shows
 
 
 class ContentError(ValueError):
@@ -47,6 +54,43 @@ def inline(text):
 def render_text(text):
     paras = [p.strip() for p in re.split(r"\n\s*\n", text or "") if p.strip()]
     return "\n".join(f"<p>{inline(p)}</p>" for p in paras)
+
+
+def _rich(text):
+    """inline(), plus **bold** and `Key` (drawn as a keycap)."""
+    out = inline(text)
+    out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
+    return re.sub(r"`([^`\n]+)`", r"<kbd>\1</kbd>", out)
+
+
+def heading_id(text):
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
+
+def render_article(text):
+    """A blog post body as HTML. Blocks are separated by blank lines:
+    "## Heading", lines starting with "- " (a list) or "1. " (a numbered list), or a paragraph.
+    Inside text: **bold**, `Key` and [link](https://…). Anything else is escaped."""
+    blocks = []
+    for block in (b.strip() for b in re.split(r"\n\s*\n", text or "")):
+        if not block:
+            continue
+        lines = block.splitlines()
+        if block.startswith("## "):
+            title = block[3:].strip()
+            blocks.append(f'<h2 id="{heading_id(title)}">{_rich(title)}</h2>')
+        elif all(re.match(r"- ", line) for line in lines):
+            blocks.append("<ul>\n" + "\n".join(f"<li>{_rich(line[2:].strip())}</li>" for line in lines) + "\n</ul>")
+        elif all(re.match(r"\d+\. ", line) for line in lines):
+            items = (re.sub(r"^\d+\.\s+", "", line) for line in lines)
+            blocks.append("<ol>\n" + "\n".join(f"<li>{_rich(i)}</li>" for i in items) + "\n</ol>")
+        else:
+            blocks.append(f"<p>{_rich(block)}</p>")
+    return "\n".join(blocks)
+
+
+def word_count(text):
+    return len(re.findall(r"[A-Za-z0-9’']+", text or ""))
 
 
 def _check_text(value, field, required=True):
@@ -152,6 +196,40 @@ def validate(content):
         if "focus" in ph and not _is_focus(ph["focus"]):
             raise ContentError(f"{f}.focus: must be x and y from 0 to 100")
 
+    _validate_posts(content.get("posts", []))
+
+
+def _validate_posts(posts):
+    if not isinstance(posts, list):
+        raise ContentError("posts: must be a list")
+    seen = set()
+    for i, post in enumerate(posts):
+        f = f"posts[{i}]"
+        for key in ("title", "summary", "body"):
+            _check_text(_get(post, key, f"{f}.{key}"), f"{f}.{key}")
+        _check_text(_get(post, "answer", f"{f}.answer"), f"{f}.answer", required=False)
+        seo = post.get("seo_title", "")
+        _check_text(seo, f"{f}.seo_title", required=False)
+        if len(seo) > SEO_TITLE_MAX:
+            raise ContentError(f"{f}.seo_title: keep it under {SEO_TITLE_MAX} characters so Google shows it whole")
+        if len(post["summary"]) > SUMMARY_MAX:
+            raise ContentError(f"{f}.summary: keep it under {SUMMARY_MAX} characters (Google shows it under the title)")
+        slug = _get(post, "slug", f"{f}.slug")
+        if not isinstance(slug, str) or not SLUG.match(slug):
+            raise ContentError(f"{f}.slug: use lowercase letters, numbers and dashes, like why-num-lock-turns-off")
+        if slug in seen:
+            raise ContentError(f"{f}.slug: another article already uses this address")
+        seen.add(slug)
+        try:
+            date.fromisoformat(_get(post, "date", f"{f}.date"))
+        except (TypeError, ValueError):
+            raise ContentError(f"{f}.date: must look like 2025-05-14") from None
+        if _get(post, "topic", f"{f}.topic") not in TOPICS:
+            raise ContentError(f"{f}.topic: must be one of {', '.join(TOPICS)}")
+        tool = _get(post, "tool", f"{f}.tool")
+        if tool and not (isinstance(tool, str) and SLUG.match(tool)):
+            raise ContentError(f"{f}.tool: must be one of the tool pages, or empty")
+
 
 def _is_focus(focus):
     """Crop position: which part of the photo stays in the frame, as x/y percentages."""
@@ -162,7 +240,7 @@ def _is_focus(focus):
 def load_content(root):
     root = Path(root)
     content = {}
-    for name in ("site", "projects", "photos"):
+    for name in ("site", "projects", "photos", "posts"):
         try:
             content[name] = json.loads((root / "content" / f"{name}.json").read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:

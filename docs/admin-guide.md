@@ -49,6 +49,23 @@ The device remembers you until you press **Log out**.
 - Tick **Show on home page** for exactly three.
 - The short version is used on the home page; leave it empty to use the full description.
 
+**Blog**
+- **Write a new article** adds one at the top, dated today. Its **Address** (the end of
+  mogdhopaul.com/blog/…/) is made from the title as you type; don't change it after it's published,
+  or old links stop working.
+- **Topic** sorts it on the blog page. **Tool it's about** adds a card in the middle
+  of the article that links to that tool's page, and the tool's page links back to the article.
+- **Title in Google** (optional): for a long title, a shorter one (under 56 characters) for Google and
+  shared links, so the result isn't cut off. The article keeps its full title.
+- **Summary** is shown on the blog page and under the title in Google: keep it under 140 characters.
+- **Short answer** (optional) is shown in a box at the top. Answer the question in two or three sentences.
+- In the **Article** box: a blank line starts a new paragraph. `## ` at the start of a line makes a
+  heading, lines starting with `- ` or `1. ` make a list, `**bold**` is bold, `` `Num Lock` `` shows a
+  key, and `[text](https://…)` is a link.
+- Each article gets its cover image (the dark green card with its title and your name) by itself when
+  you publish. It is made again if you change the title or topic.
+- **Delete** removes the article, its page and its image.
+
 **Text & links**
 - Your identity line, home intro, video-editing text, About page sections, WhatsApp, email and
   profile links.

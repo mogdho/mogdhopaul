@@ -1,7 +1,7 @@
 import copy
 import unittest
 
-from scripts.content import ContentError, inline, load_content, render_text, validate
+from scripts.content import ContentError, inline, load_content, render_article, render_text, validate
 from tests.helpers import ROOT
 
 
@@ -28,6 +28,22 @@ class RenderText(unittest.TestCase):
 
     def test_empty(self):
         self.assertEqual(render_text("  "), "")
+
+
+class RenderArticle(unittest.TestCase):
+    def test_blocks(self):
+        out = render_article("Intro **bold** and `Num Lock`.\n\n## Why it happens\n\n- one\n- two\n\n"
+                             "1. first\n2. second")
+        self.assertIn("<p>Intro <strong>bold</strong> and <kbd>Num Lock</kbd>.</p>", out)
+        self.assertIn('<h2 id="why-it-happens">Why it happens</h2>', out)
+        self.assertIn("<ul>\n<li>one</li>\n<li>two</li>\n</ul>", out)
+        self.assertIn("<ol>\n<li>first</li>\n<li>second</li>\n</ol>", out)
+
+    def test_escapes_and_links(self):
+        out = render_article("<script>x</script> [tool](/nn-tab/) [bad](javascript:x)")
+        self.assertIn("&lt;script&gt;", out)
+        self.assertIn('<a href="/nn-tab/">tool</a>', out)
+        self.assertNotIn('href="javascript', out)
 
 
 class Validate(unittest.TestCase):

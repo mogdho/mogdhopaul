@@ -41,6 +41,12 @@ jobs:
         with:
           node-version: "24"
 
+      # Blog cover images: made only for new or renamed posts (Chrome is already on the runner).
+      - name: Make images for new blog posts
+        run: |
+          pip install --quiet pillow
+          python -m scripts.post_images
+
       - name: Build pages from content
         run: python -m scripts.build_site
 
@@ -59,7 +65,7 @@ jobs:
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A index.html about projects photos admin/index.html skill-icons alwaysnumlock capslock-copypaste copilot2gemini nn-tab yt-mini-pip ytmodify how-many-time currency-converter
+            git add -A index.html about projects photos admin/index.html skill-icons alwaysnumlock capslock-copypaste copilot2gemini nn-tab yt-mini-pip ytmodify how-many-time currency-converter blog sitemap.xml
             git commit -m "chore: rebuild pages"
             git pull --rebase
             git push

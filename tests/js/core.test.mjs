@@ -4,11 +4,11 @@ import { readFileSync } from 'node:fs';
 import {
   checkText, isAllowedUrl, validateContent, targetSize, isSupportedImage,
   newPhotoId, toJson, filesToSave, watchPublishing, isFocus, dragFocus, cropRect,
-  isIconId, skillIconPath, iconQueries, rankIcons, DEFAULT_SKILL_ICONS, newestFirst,
+  isIconId, skillIconPath, iconQueries, rankIcons, DEFAULT_SKILL_ICONS, newestFirst, slugify, SUMMARY_MAX,
 } from '../../admin/core.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../../content/${name}.json`, import.meta.url), 'utf8'));
-const content = () => ({ site: load('site'), projects: load('projects'), photos: load('photos') });
+const content = () => ({ site: load('site'), projects: load('projects'), photos: load('photos'), posts: load('posts') });
 const withFeatured = (n) => { const c = content(); c.projects.forEach((p, i) => { p.featured = i < n; }); return c; };
 const withProfileUrl = (url) => { const c = content(); c.site.profiles[0].url = url; return c; };
 const p = (id) => ({ id, place: null, date: '2025-05-14', src: `/photos/img/${id}-1200.webp`, thumb: `/photos/img/${id}-600.webp`, width: 1200, height: 900 });
@@ -116,11 +116,12 @@ test('checkText rejects AI-Assisted', () => assert.match(checkText('An AI-Assist
 test('checkText flags typed HTML', () => assert.match(checkText('I am <b>bold</b>'), /HTML/));
 test('checkText allows a plain less-than sign', () => assert.equal(checkText('Loads in < 1 second, 3<4.'), null));
 
-test('filesToSave writes the three content files and never deletes images', () => {
+test('filesToSave writes the four content files and never deletes images', () => {
   const c = content();
   c.photos = [];
   const files = filesToSave(c);
-  assert.deepEqual(files.map((f) => f.path), ['content/site.json', 'content/projects.json', 'content/photos.json']);
+  assert.deepEqual(files.map((f) => f.path),
+    ['content/site.json', 'content/projects.json', 'content/photos.json', 'content/posts.json']);
   assert.ok(files.every((f) => !f.delete && typeof f.text === 'string'));
   assert.equal(files[2].text, '[]\n');
 });
@@ -152,3 +153,24 @@ test('watchPublishing gives up after five minutes', async () => {
   const forever = { buildStatus: async () => 'pending' };
   assert.equal(await watchPublishing(forever, 'sha', { ...clock(), onStatus() {} }), 'timeout');
 });
+
+// ---------- blog ----------
+const post = (over = {}) => ({ slug: 'why-x', title: 'Why X', date: '2026-10-31', topic: 'windows', tool: '',
+  summary: 'Short.', answer: '', body: 'Text.', ...over });
+const withPosts = (...posts) => ({ ...content(), posts });
+
+test('slugify makes a web address from a title', () => {
+  assert.equal(slugify('Why Num Lock turns off, after sleep!'), 'why-num-lock-turns-off-after-sleep');
+  assert.equal(slugify('  Café & crème  '), 'cafe-creme');
+});
+test('validateContent accepts a good post', () => assert.deepEqual(validateContent(withPosts(post())), []));
+test('validateContent checks post address, date, topic and tool', () => {
+  const errors = validateContent(withPosts(post({ slug: 'Bad Slug', date: '', topic: 'x', tool: 'nope' })));
+  assert.deepEqual(errors.map((e) => e.field), ['posts[0].slug', 'posts[0].date', 'posts[0].topic', 'posts[0].tool']);
+});
+test('validateContent flags a repeated address and a long summary', () => {
+  const errors = validateContent(withPosts(post(), post({ summary: 'x'.repeat(SUMMARY_MAX + 1) })));
+  assert.deepEqual(errors.map((e) => e.field), ['posts[1].summary', 'posts[1].slug']);
+});
+test('validateContent checks article text like other text', () =>
+  assert.deepEqual(validateContent(withPosts(post({ body: 'Hi <b>there</b>' }))).map((e) => e.field), ['posts[0].body']));
