@@ -61,6 +61,22 @@ $main
 
   <footer class="site-footer">
     <div class="page">
+      <div class="newsletter">
+        <div>
+          <h2 id="nl-title">Get the newsletter</h2>
+          <p>One useful day-to-day tip each week: Chrome, Windows, money, travel.</p>
+        </div>
+        <form class="newsletter__form" action="https://assets.mailerlite.com/jsonp/2766333/forms/203146168597743038/subscribe" method="post" aria-labelledby="nl-title" data-newsletter>
+          <label class="visually-hidden" for="nl-email">Email address</label>
+          <div class="newsletter__row">
+            <input id="nl-email" type="email" name="fields[email]" placeholder="you@example.com" autocomplete="email" required>
+            <input type="hidden" name="ml-submit" value="1">
+            <input type="hidden" name="anticsrf" value="true">
+            <button class="button" type="submit">Subscribe</button>
+          </div>
+          <p class="newsletter__note" aria-live="polite" data-newsletter-status>One short email a week. No spam, unsubscribe anytime.</p>
+        </form>
+      </div>
       <h2>Find me</h2>
       <p>The quickest way to reach me is <a href="$whatsapp">WhatsApp</a>. You can also <a href="mailto:$email">email me</a>.</p>
       <ul class="profile-links">

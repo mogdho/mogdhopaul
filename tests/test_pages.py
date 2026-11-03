@@ -22,7 +22,8 @@ _POSTS = json.loads((ROOT / "content" / "posts.json").read_text(encoding="utf-8"
 if _POSTS:
     URLS["post"] = f"/blog/{_POSTS[0]['slug']}/"
 NAV_URLS = ("/", "/about/", "/photos/", "/projects/", "/blog/")
-MORSE = "-- --- --. -.. .... --- / .--. .- ..- .-.."
+NEWSLETTER_ACTION = "https://assets.mailerlite.com/jsonp/2766333/forms/203146168597743038/subscribe"
+MORSE ="-- --- --. -.. .... --- / .--. .- ..- .-.."
 
 
 class CommonPageRules:
@@ -72,6 +73,13 @@ class CommonPageRules:
     def test_footer_links(self):
         for u in SAME_AS + CONTACT:
             self.assertIn(u, self.p.hrefs)
+
+    def test_footer_newsletter_form(self):
+        footer = self.p.html.split('<footer class="site-footer">', 1)[1]
+        self.assertIn(f'action="{NEWSLETTER_ACTION}"', footer)
+        self.assertRegex(footer, r'<input[^>]*type="email"[^>]*name="fields\[email\]"[^>]*required')
+        self.assertIn('<label class="visually-hidden" for="nl-email">', footer)
+        self.assertIn('aria-live="polite"', footer)
 
     def test_nav(self):
         for u in NAV_URLS:

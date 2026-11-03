@@ -38,6 +38,31 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+// Footer newsletter: sends the email to MailerLite in the background and shows the result in place.
+// Without JavaScript the form still posts straight to MailerLite.
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.querySelector('[data-newsletter]');
+  if (!form || !window.fetch) return;
+  var status = form.querySelector('[data-newsletter-status]');
+  var button = form.querySelector('button');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    button.disabled = true;
+    status.textContent = 'Sending…';
+    fetch(form.action, { method: 'POST', body: new FormData(form) })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data.success) throw new Error('rejected');
+        form.reset();
+        status.textContent = 'Almost done: check your inbox and confirm your email.';
+      })
+      .catch(function () {
+        status.textContent = 'That did not go through. Check the address and try again.';
+      })
+      .then(function () { button.disabled = false; });
+  });
+});
+
 // Blog topic buttons: show only the articles about one topic. Without JavaScript they stay hidden
 // and every article is listed.
 document.addEventListener('DOMContentLoaded', function () {
