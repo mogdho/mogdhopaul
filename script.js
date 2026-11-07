@@ -38,29 +38,63 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// Footer newsletter: sends the email to MailerLite in the background and shows the result in place.
-// Without JavaScript the form still posts straight to MailerLite.
+// Newsletter: remembers on this device that the popup was shown or the reader subscribed.
+var NEWSLETTER_KEY = 'mp-newsletter-popup';
+function newsletterSeen() {
+  try { return localStorage.getItem(NEWSLETTER_KEY); } catch (e) { return 'storage-blocked'; }
+}
+function rememberNewsletter(value) {
+  try { localStorage.setItem(NEWSLETTER_KEY, value); } catch (e) { /* private mode: nothing to keep */ }
+}
+
+// Newsletter forms (footer and popup): send the email to MailerLite in the background and show the
+// result in place. Without JavaScript the forms still post straight to MailerLite.
 document.addEventListener('DOMContentLoaded', function () {
-  var form = document.querySelector('[data-newsletter]');
-  if (!form || !window.fetch) return;
-  var status = form.querySelector('[data-newsletter-status]');
-  var button = form.querySelector('button');
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    button.disabled = true;
-    status.textContent = 'Sending…';
-    fetch(form.action, { method: 'POST', body: new FormData(form) })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (!data.success) throw new Error('rejected');
-        form.reset();
-        status.textContent = 'Almost done: check your inbox and confirm your email.';
-      })
-      .catch(function () {
-        status.textContent = 'That did not go through. Check the address and try again.';
-      })
-      .then(function () { button.disabled = false; });
+  if (!window.fetch) return;
+  document.querySelectorAll('[data-newsletter]').forEach(function (form) {
+    var status = form.querySelector('[data-newsletter-status]');
+    var button = form.querySelector('button');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      button.disabled = true;
+      status.textContent = 'Sending…';
+      fetch(form.action, { method: 'POST', body: new FormData(form) })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (!data.success) throw new Error('rejected');
+          form.reset();
+          rememberNewsletter('subscribed');
+          status.textContent = 'Almost done: check your inbox and confirm your email.';
+        })
+        .catch(function () {
+          status.textContent = 'That did not go through. Check the address and try again.';
+        })
+        .then(function () { button.disabled = false; });
+    });
   });
+});
+
+// Newsletter popup on articles and project pages: opens once per device, when the reader is halfway
+// down the page. A centred dialog on wide screens; a small bar at the bottom on phones, so it never
+// covers the article (Google penalises full-screen popups on mobile).
+document.addEventListener('DOMContentLoaded', function () {
+  var popup = document.querySelector('[data-newsletter-popup]');
+  if (!popup || typeof popup.showModal !== 'function' || newsletterSeen()) return;
+  var phone = window.matchMedia('(max-width: 40rem)');
+
+  function onScroll() {
+    var room = document.documentElement.scrollHeight - window.innerHeight;
+    if (room <= 0 || window.scrollY / room < 0.5) return;
+    window.removeEventListener('scroll', onScroll);
+    if (newsletterSeen()) return;  // subscribed in the footer meanwhile
+    rememberNewsletter('shown');
+    if (phone.matches) popup.show(); else popup.showModal();
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  popup.querySelector('[data-popup-close]').addEventListener('click', function () { popup.close(); });
+  // a click on the dimmed area outside the card closes it too
+  popup.addEventListener('click', function (e) { if (e.target === popup) popup.close(); });
 });
 
 // Blog topic buttons: show only the articles about one topic. Without JavaScript they stay hidden

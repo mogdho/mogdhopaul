@@ -44,8 +44,8 @@
   --ink: #17201c;
   --ink-soft: #46534d;
   --rule: #c9d1c2;
-  --stamp: #5b3e96;
-  --stamp-on-print: #5b3e96; /* prints stay light paper in both modes */
+  --stamp: #0f4d3a; /* accent: cover green (buttons, stamps, links) */
+  --stamp-on-print: #0f4d3a; /* prints stay light paper in both modes */
   --ink-on-print: #17201c;
   --soft-on-print: #46534d;
   --rule-on-print: #c9d1c2;
@@ -83,7 +83,7 @@
     --ink: #e3e8dd;
     --ink-soft: #a8b3ac;
     --rule: #2c3833;
-    --stamp: #b9a3ea;
+    --stamp: #86c9a8;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 20px -8px rgb(0 0 0 / 0.6);
     --stamp-blend: normal;
   }
@@ -714,13 +714,19 @@ main {
 @media (min-width: 48rem) {
   .newsletter {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    align-items: end;
+    align-items: center;
     gap: var(--s7);
   }
 }
 
 .newsletter h2 {
-  margin-bottom: var(--s2);
+  margin-bottom: var(--s1);
+  font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem);
+  line-height: 1.1;
+}
+
+.newsletter .newsletter__form {
+  gap: var(--s2);
 }
 
 .newsletter p {
@@ -771,6 +777,146 @@ main {
 
 .newsletter__note {
   font-size: 0.85rem;
+}
+
+/* in the footer the field and button are a size smaller, so they don't outweigh the heading */
+.newsletter .newsletter__row input,
+.newsletter .newsletter__row .button {
+  min-height: 2.75rem;
+  font-size: 1rem;
+}
+
+.newsletter .newsletter__row .button {
+  padding-block: var(--s2);
+}
+
+/* newsletter popup: a light print card (same in both themes), centred with the page dimmed;
+   on phones a small bar along the bottom that leaves the article readable */
+.nl-popup {
+  width: min(32rem, calc(100% - 2 * var(--gutter)));
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-on-print);
+}
+
+.nl-popup::backdrop {
+  background: rgb(10 30 24 / 0.55);
+}
+
+.nl-popup__card {
+  position: relative;
+  padding: var(--s6);
+  border: 1px solid var(--rule-on-print);
+  border-radius: 8px;
+  background: var(--print);
+  box-shadow: var(--shadow);
+}
+
+.nl-popup[open] .nl-popup__card {
+  animation: nl-popup-in 0.4s var(--ease-out);
+}
+
+@keyframes nl-popup-in {
+  from { opacity: 0; transform: translateY(12px); }
+}
+
+.nl-popup__close {
+  position: absolute;
+  top: var(--s2);
+  right: var(--s2);
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--soft-on-print);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nl-popup__close:hover {
+  background: var(--rule-on-print);
+  color: var(--ink-on-print);
+}
+
+.nl-popup__kicker {
+  margin: 0 0 var(--s2);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--stamp-on-print);
+}
+
+.nl-popup h2 {
+  margin: 0 0 var(--s2);
+  color: var(--ink-on-print);
+}
+
+.nl-popup__lead {
+  margin: 0 0 var(--s4);
+  color: var(--soft-on-print);
+}
+
+.nl-popup .newsletter__row input {
+  border-color: var(--soft-on-print);
+  background: #fff;
+  color: var(--ink-on-print);
+}
+
+.nl-popup .newsletter__row input::placeholder {
+  color: var(--soft-on-print);
+  opacity: 1;
+}
+
+.nl-popup .newsletter__row .button {
+  border: 0;
+  background: var(--stamp-on-print);
+  color: var(--print);
+}
+
+.nl-popup .newsletter__note {
+  margin: 0;
+  color: var(--soft-on-print);
+}
+
+.nl-popup :focus-visible {
+  outline-color: var(--stamp-on-print);
+}
+
+@media (max-width: 40rem) {
+  .nl-popup {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    margin: 0;
+    z-index: 10;
+  }
+
+  .nl-popup__card {
+    padding: var(--s4) var(--s4) var(--s3);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .nl-popup__kicker,
+  .nl-popup__lead {
+    display: none;
+  }
+
+  .nl-popup h2 {
+    padding-right: var(--s7);
+    font-size: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nl-popup[open] .nl-popup__card {
+    animation: none;
+  }
 }
 
 .profile-links {
@@ -893,7 +1039,7 @@ html.js .fade.is-visible .photo__label {
   color: var(--on-cover-soft);
 }
 
-/* the download button: a solid stamp-violet block; on the cover it turns cream on green */
+/* the download button: a solid stamp-green block; on the cover it turns cream on green */
 .button {
   display: inline-flex;
   align-items: center;

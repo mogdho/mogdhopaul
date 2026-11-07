@@ -23,7 +23,9 @@ if _POSTS:
     URLS["post"] = f"/blog/{_POSTS[0]['slug']}/"
 NAV_URLS = ("/", "/about/", "/photos/", "/projects/", "/blog/")
 NEWSLETTER_ACTION = "https://assets.mailerlite.com/jsonp/2766333/forms/203146168597743038/subscribe"
-MORSE ="-- --- --. -.. .... --- / .--. .- ..- .-.."
+POPUP_ACTION = "https://assets.mailerlite.com/jsonp/2766333/forms/203507418593756671/subscribe"
+POPUP_PAGES = {"projects", "converter", "post", *TOOLS}
+MORSE = "-- --- --. -.. .... --- / .--. .- ..- .-.."
 
 
 class CommonPageRules:
@@ -80,6 +82,13 @@ class CommonPageRules:
         self.assertRegex(footer, r'<input[^>]*type="email"[^>]*name="fields\[email\]"[^>]*required')
         self.assertIn('<label class="visually-hidden" for="nl-email">', footer)
         self.assertIn('aria-live="polite"', footer)
+
+    def test_newsletter_popup_only_on_articles_and_projects(self):
+        has_popup = "data-newsletter-popup" in self.p.html
+        self.assertEqual(has_popup, self.page_key in POPUP_PAGES, self.page_key)
+        if has_popup:
+            self.assertIn(f'action="{POPUP_ACTION}"', self.p.html)
+            self.assertIn('<label class="visually-hidden" for="nlp-email">', self.p.html)
 
     def test_nav(self):
         for u in NAV_URLS:

@@ -756,6 +756,35 @@ def _nav(path):
     return "\n".join(items)
 
 
+POPUP_FORM = "https://assets.mailerlite.com/jsonp/2766333/forms/203507418593756671/subscribe"
+
+
+def _newsletter_popup(page):
+    """The newsletter popup, only on articles and project pages. script.js opens it once per device."""
+    if not (page.startswith(("post:", "tool:")) or page in ("projects", "converter")):
+        return ""
+    return f"""
+  <dialog class="nl-popup" aria-labelledby="nlp-title" data-newsletter-popup>
+    <div class="nl-popup__card">
+      <button class="nl-popup__close" type="button" aria-label="Close" data-popup-close>&times;</button>
+      <p class="nl-popup__kicker">From Mogdho &middot; weekly</p>
+      <h2 id="nlp-title">The tricks I&rsquo;d tell a friend</h2>
+      <p class="nl-popup__lead">Every week, the things that made my days easier: a tool, a shortcut, a money tip. Short enough for a coffee break.</p>
+      <form class="newsletter__form" action="{POPUP_FORM}" method="post" data-newsletter>
+        <label class="visually-hidden" for="nlp-email">Email address</label>
+        <div class="newsletter__row">
+          <input id="nlp-email" type="email" name="fields[email]" placeholder="you@example.com" autocomplete="email" required>
+          <input type="hidden" name="ml-submit" value="1">
+          <input type="hidden" name="anticsrf" value="true">
+          <button class="button" type="submit">Count me in</button>
+        </div>
+        <p class="newsletter__note" aria-live="polite" data-newsletter-status>No spam, ever. Leave with one click.</p>
+      </form>
+    </div>
+  </dialog>
+"""
+
+
 def build(root=None):
     """All pages as {relative path: html}. Raises ContentError if the content breaks a rule."""
     global ROOT
@@ -784,7 +813,7 @@ def build(root=None):
             jsonld=jsonld, cover_class="" if page == "home" else " cover--short", nav=_indent(_nav(path), 12),
             css_v=css_v, js_v=js_v, cover=_cover(page, site, v, posts), image=_og_image(rel, fallback),
             main=_main_block(page, content).rstrip("\n"), whatsapp=e(site["contact"]["whatsapp"]),
-            email=e(site["contact"]["email"]), profiles=profiles,
+            email=e(site["contact"]["email"]), profiles=profiles, popup=_newsletter_popup(page),
         )
     return pages
 

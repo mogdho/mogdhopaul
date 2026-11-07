@@ -5,7 +5,7 @@
 # mogdhopaul.com
 
 **The personal site of Mogdho Paul**, a developer and SEO specialist from Bangladesh,<br>
-designed like a passport notebook: a green cover, visa-page paper and violet entry stamps.
+designed like a passport notebook: a green cover, visa-page paper and green entry stamps.
 
 [**Visit the site →**](https://mogdhopaul.com) &nbsp;·&nbsp; [Admin guide](docs/admin-guide.md)
 
@@ -30,7 +30,7 @@ and the footer ends with a real **passport code line**.
 
 ### Colour palette
 
-<img src="docs/readme/palette.png" width="100%" alt="Colour palette in light and dark mode: cover green, paper, print, ink, soft ink and stamp violet">
+<img src="docs/readme/palette.png" width="100%" alt="Colour palette in light and dark mode: cover green, paper, print, ink, soft ink and stamp green">
 
 | | Role | Light | | Dark |
 |:-:|:--|:--|:-:|:--|
@@ -43,8 +43,8 @@ and the footer ends with a real **passport code line**.
 | <img src="docs/readme/swatches/17201c.svg" width="44"> | **Ink**: main text | `#17201C` | <img src="docs/readme/swatches/e3e8dd.svg" width="44"> | `#E3E8DD` |
 | <img src="docs/readme/swatches/46534d.svg" width="44"> | **Soft ink**: secondary text | `#46534D` | <img src="docs/readme/swatches/a8b3ac.svg" width="44"> | `#A8B3AC` |
 | <img src="docs/readme/swatches/c9d1c2.svg" width="44"> | **Rule**: divider lines | `#C9D1C2` | <img src="docs/readme/swatches/2c3833.svg" width="44"> | `#2C3833` |
-| <img src="docs/readme/swatches/5b3e96.svg" width="44"> | **Stamp violet**: stamps, links, skill badges | `#5B3E96` | <img src="docs/readme/swatches/b9a3ea.svg" width="44"> | `#B9A3EA` |
-| <img src="docs/readme/swatches/c9b6f2.svg" width="44"> | **Lilac**: logo underline | `#C9B6F2` | | same |
+| <img src="docs/readme/swatches/0f4d3a.svg" width="44"> | **Stamp green**: buttons, stamps, links, skill badges | `#0F4D3A` | <img src="docs/readme/swatches/86c9a8.svg" width="44"> | `#86C9A8` |
+| <img src="docs/readme/swatches/86c9a8.svg" width="44"> | **Mint**: logo underline | `#86C9A8` | | same |
 
 Prints stay light paper in both themes, like real photographs. In light mode the stamp ink is
 blended into the paper (`multiply`) so it reads as pressed ink rather than a flat colour.
@@ -73,7 +73,7 @@ Sizes that say "52–96 px" grow smoothly with the screen width.
 
 ### Details
 
-- **Photos** are paper prints with a soft shadow, each tilted a little (−1.2° to +1.4°), and a violet stamp with the place and date.
+- **Photos** are paper prints with a soft shadow, each tilted a little (−1.2° to +1.4°), and a green stamp with the place and date.
 - **Skills** are round double-ring entry stamps, pressed slightly crooked, holding single-colour icons.
 - **Profile photo** sits on the cover like a passport photo, tilted −1.5°.
 - **Logo** is “MP” in Share Tech Mono, cream on cover green, with a lilac underline.

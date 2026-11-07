@@ -362,7 +362,7 @@
 }
 
 .crop:focus-visible {
-  outline: 2px solid #5b3e96;
+  outline: 2px solid #0f4d3a;
   outline-offset: 2px;
 }
 
@@ -458,7 +458,7 @@
 .admin-photo .crop-help .link-button {
   justify-self: start;
   margin: 0;
-  color: #5b3e96;
+  color: #0f4d3a;
 }
 
 .admin-photo .field {
@@ -487,7 +487,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5b3e96;
+  color: #0f4d3a;
 }
 
 .empty-note--admin {
@@ -553,7 +553,7 @@
   background: var(--print);
   border: 1px solid var(--rule);
   color: #17201c; /* entries stay light paper in both modes */
-  --stamp: #5b3e96;
+  --stamp: #0f4d3a;
   --ink-soft: #46534d;
 }
 
@@ -622,14 +622,14 @@
   background: #fbfcf8;
   border: 1px solid #c9d1c2;
   border-radius: 4px;
-  color: #5b3e96;
+  color: #0f4d3a;
   cursor: pointer;
 }
 
 .icon-picker__choice:hover,
 .icon-picker__choice:focus-visible {
-  border-color: #5b3e96;
-  outline: 2px solid #5b3e96;
+  border-color: #0f4d3a;
+  outline: 2px solid #0f4d3a;
   outline-offset: 1px;
 }
 
