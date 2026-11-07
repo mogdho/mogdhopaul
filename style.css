@@ -711,7 +711,8 @@ main {
   border-bottom: 1px dashed var(--on-cover-soft);
 }
 
-@media (min-width: 48rem) {
+/* side by side only when the form column is wide enough for the field and button on one line */
+@media (min-width: 60rem) {
   .newsletter {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     align-items: center;
@@ -739,14 +740,18 @@ main {
   gap: var(--s3);
 }
 
+/* field and button always share one line; the field gives up the width */
 .newsletter__row {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--s2);
 }
 
+.newsletter__row .button {
+  flex: none;
+}
+
 .newsletter__row input {
-  flex: 1 1 14rem;
+  flex: 1 1 auto;
   min-width: 0;
   min-height: 3rem;
   padding: 0 var(--s4);
@@ -795,6 +800,8 @@ main {
 .nl-popup {
   width: min(32rem, calc(100% - 2 * var(--gutter)));
   max-width: none;
+  max-height: calc(100dvh - 2 * var(--s4));
+  overflow: auto;
   padding: 0;
   border: 0;
   border-radius: 8px;
@@ -888,7 +895,8 @@ main {
   outline-color: var(--stamp-on-print);
 }
 
-@media (max-width: 40rem) {
+/* phones, upright or sideways: the bottom bar (keep in step with PHONE_POPUP in script.js) */
+@media (max-width: 40rem), (max-height: 30rem) {
   .nl-popup {
     position: fixed;
     inset: auto 0 0 0;
@@ -897,9 +905,16 @@ main {
     z-index: 10;
   }
 
+  /* a bottom sheet: rounded top, soft shadow above it, clear of the phone's home bar */
   .nl-popup__card {
-    padding: var(--s4) var(--s4) var(--s3);
-    border-radius: 8px 8px 0 0;
+    padding: var(--s4) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom, 0px));
+    border-width: 1px 0 0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px -10px rgb(0 0 0 / 0.45);
+  }
+
+  .nl-popup[open] .nl-popup__card {
+    animation-name: nl-sheet-in;
   }
 
   .nl-popup__kicker,
@@ -908,9 +923,46 @@ main {
   }
 
   .nl-popup h2 {
-    padding-right: var(--s7);
-    font-size: 1.2rem;
+    margin-bottom: var(--s3);
+    padding-right: 2.75rem;  /* room for the close button */
+    font-size: 1.15rem;
+    line-height: 1.3;
   }
+
+  .nl-popup__close {
+    top: var(--s2);
+    right: var(--s2);
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.4rem;
+  }
+
+  .nl-popup .newsletter__row {
+    flex-wrap: nowrap;
+  }
+
+  .nl-popup .newsletter__row input {
+    flex: 1 1 auto;
+    min-height: 2.75rem;
+    padding-inline: var(--s3);
+    font-size: 1rem;
+  }
+
+  .nl-popup .newsletter__row .button {
+    flex: none;
+    min-height: 2.75rem;
+    padding: var(--s2) var(--s4);
+    font-size: 1rem;
+    box-shadow: none;
+  }
+
+  .nl-popup .newsletter__note {
+    font-size: 0.8rem;
+  }
+}
+
+@keyframes nl-sheet-in {
+  from { transform: translateY(100%); }
 }
 
 @media (prefers-reduced-motion: reduce) {

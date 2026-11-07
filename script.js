@@ -80,7 +80,19 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
   var popup = document.querySelector('[data-newsletter-popup]');
   if (!popup || typeof popup.showModal !== 'function' || newsletterSeen()) return;
-  var phone = window.matchMedia('(max-width: 40rem)');
+  // phones, upright or sideways (keep in step with the matching @media rule in style.css)
+  var phone = window.matchMedia('(max-width: 40rem), (max-height: 30rem)');
+
+  function open() {
+    if (phone.matches) {
+      // the bar must not take focus: that would draw a focus ring and could pop up the keyboard
+      popup.show();
+      if (popup.contains(document.activeElement)) document.activeElement.blur();
+    } else {
+      popup.showModal();
+      popup.querySelector('input[type="email"]').focus();
+    }
+  }
 
   function onScroll() {
     var room = document.documentElement.scrollHeight - window.innerHeight;
@@ -88,9 +100,16 @@ document.addEventListener('DOMContentLoaded', function () {
     window.removeEventListener('scroll', onScroll);
     if (newsletterSeen()) return;  // subscribed in the footer meanwhile
     rememberNewsletter('shown');
-    if (phone.matches) popup.show(); else popup.showModal();
+    open();
   }
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  // rotating the device (or resizing the window) while it's open: reopen it in the right form
+  phone.addEventListener('change', function () {
+    if (!popup.open) return;
+    popup.close();
+    open();
+  });
 
   popup.querySelector('[data-popup-close]').addEventListener('click', function () { popup.close(); });
   // a click on the dimmed area outside the card closes it too
