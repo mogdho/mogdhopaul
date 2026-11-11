@@ -39,6 +39,15 @@ e = html.escape
 # is templates/tools/<slug>.html. Download buttons point at the newest GitHub release, so a new
 # release needs no site change.
 TOOLS = {
+    "quicknotes": {
+        "name": "QuickNotes",
+        "repo": "https://github.com/mogdho/QuickNotes",
+        "lead": "Copy text from anything on your screen: photos, videos, PDFs and apps, in Bangla, English, "
+                "Hindi and more. Double-tap Right Alt, drag over the text, and it’s copied.",
+        "title": "Copy Text From Any Image or Screen on Windows – QuickNotes | Mogdho Paul",
+        "description": "Copy text from photos, videos, PDFs and apps on Windows, even in Bangla and Hindi. Double-tap Right Alt and drag. Free app by Mogdho Paul.",
+        "short": "Copy text from any photo, video or app, even in Bangla.",
+    },
     "alwaysnumlock": {
         "name": "AlwaysNumLock",
         "repo": "https://github.com/mogdho/AlwaysNumLock",

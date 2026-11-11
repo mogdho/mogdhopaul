@@ -9,7 +9,7 @@ export const SKILL_GROUPS = ['stack', 'tools'];
 // ---------- blog (mirrors TOPICS, SLUG and SUMMARY_MAX in scripts/content.py, and the tool pages in scripts/build_site.py) ----------
 export const TOPICS = { windows: 'Windows', chrome: 'Chrome', money: 'Money', other: 'Life' };
 export const POST_TOOLS = [
-  ['', 'None'], ['alwaysnumlock', 'AlwaysNumLock'], ['capslock-copypaste', 'Capslock-CopyPaste'],
+  ['', 'None'], ['quicknotes', 'QuickNotes'], ['alwaysnumlock', 'AlwaysNumLock'], ['capslock-copypaste', 'Capslock-CopyPaste'],
   ['copilot2gemini', 'Copilot2Gemini'], ['nn-tab', 'NN-tab'], ['yt-mini-pip', 'yt-mini-PIP'], ['ytmodify', 'ytModify'],
   ['how-many-time', 'How Many Times'], ['currency-converter', 'Currency converter'],
 ];

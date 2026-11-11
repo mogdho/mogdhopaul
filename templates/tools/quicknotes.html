@@ -1,0 +1,106 @@
+    <section aria-labelledby="what-title">
+      <h2 id="what-title">What $name does</h2>
+      <div class="prose">
+        <p class="lead">Ever needed the text from a photo, a paused video or a scanned PDF, and ended up typing it out by hand? QuickNotes reads it for you. Drag a box over the text, and it lands on your clipboard, ready to paste.</p>
+      </div>
+      <ul class="ledger">
+        <li class="ledger__head" aria-hidden="true"><span></span><span>Normally</span><span>With QuickNotes</span></li>
+        <li><span class="ledger__when">Text in a photo or a screenshot</span><span class="ledger__before"><span class="visually-hidden">Normally: </span>Type it out</span><span class="ledger__after"><span class="visually-hidden">With QuickNotes: </span>Drag, copied</span></li>
+        <li><span class="ledger__when">Subtitles or a slide in a paused video</span><span class="ledger__before"><span class="visually-hidden">Normally: </span>Type it out</span><span class="ledger__after"><span class="visually-hidden">With QuickNotes: </span>Drag, copied</span></li>
+        <li><span class="ledger__when">A scanned PDF you can’t select</span><span class="ledger__before"><span class="visually-hidden">Normally: </span>Can’t copy</span><span class="ledger__after"><span class="visually-hidden">With QuickNotes: </span>Copied</span></li>
+        <li><span class="ledger__when">An error message or a button in an app</span><span class="ledger__before"><span class="visually-hidden">Normally: </span>Can’t copy</span><span class="ledger__after"><span class="visually-hidden">With QuickNotes: </span>Copied</span></li>
+        <li><span class="ledger__when">Bangla or Hindi text</span><span class="ledger__before"><span class="visually-hidden">Normally: </span>Most readers fail</span><span class="ledger__after"><span class="visually-hidden">With QuickNotes: </span>Read correctly</span></li>
+      </ul>
+      <p class="muted ledger__foot">It waits quietly by the clock. Right Alt keeps working as usual: only a quick double-tap starts a scan. A typical scan takes about two seconds.</p>
+    </section>
+
+    <section aria-labelledby="use-title">
+      <h2 id="use-title">How to use it</h2>
+      <dl class="keys">
+        <div><dt><kbd>Right Alt</kbd> <span class="keys__how">tap twice quickly</span></dt><dd>The screen dims. Drag over the text you want, and it’s read and copied</dd></div>
+        <div><dt><kbd>Ctrl</kbd> + <kbd>V</kbd></dt><dd>Pastes the text wherever you like</dd></div>
+        <div><dt><kbd>Esc</kbd> <span class="keys__how">or right-click</span></dt><dd>Cancels the scan. Whatever you had copied before stays on your clipboard</dd></div>
+      </dl>
+      <p class="muted">A small note tells you what’s happening: <strong>Reading text…</strong>, then <strong>Copied</strong> with a soft sound. If there was nothing to read, it says <strong>No text found</strong>.</p>
+    </section>
+
+    <section aria-labelledby="setup-title">
+      <h2 id="setup-title">Set it up in two minutes</h2>
+      <ol class="steps">
+        <li>
+          <h3>Download it</h3>
+          <p>Click the download button. You get one small file, QuickNotes.exe. There is nothing to install.</p>
+        </li>
+        <li>
+          <h3>Double-click the file</h3>
+          <p>A small scan icon appears next to the clock.</p>
+          <p class="note"><strong>See “Windows protected your PC”?</strong> Click <strong>More info</strong>, then <strong>Run anyway</strong>. Windows shows this for small apps from independent makers. It doesn’t mean something is wrong.</p>
+        </li>
+        <li>
+          <h3>Add your free Gemini key, once</h3>
+          <p>QuickNotes uses Google Gemini to read text, which is why it understands Bangla and other languages. The key is free, and a setup window walks you through it the first time:</p>
+          <ol class="plain-steps">
+            <li>Click <strong>Open AI Studio</strong> and sign in with your Google account.</li>
+            <li>Click <strong>Create API key</strong>, then <strong>Copy</strong>. The key appears in the QuickNotes window by itself.</li>
+            <li>Click <strong>Test</strong>. When it says the key works, click <strong>Save</strong>.</li>
+          </ol>
+          <p class="muted">Your key is locked to your Windows account, so only you, on this PC, can use it.</p>
+        </li>
+        <li>
+          <h3>That’s it</h3>
+          <p>Double-tap Right Alt and try it. To have QuickNotes ready every time you turn on your PC, right-click the scan icon and tick <strong>Start with Windows</strong>.</p>
+          <p class="muted">Can’t see the icon? Click the small up arrow next to the clock.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="menu-title" class="split menu-section">
+      <div>
+        <h2 id="menu-title">The menu by the clock</h2>
+        <p>Right-click the scan icon to change how it works.</p>
+        <div class="tray" aria-hidden="true">
+          <p class="tray__title">QuickNotes</p>
+          <p class="tray__item">Scan text on screen</p>
+          <p class="tray__item">How to use</p>
+          <p class="tray__item tray__item--split">Pause</p>
+          <p class="tray__item is-checked">Start with Windows</p>
+          <p class="tray__item is-checked">Sound when copied</p>
+          <p class="tray__item">Change Gemini API key</p>
+          <p class="tray__item tray__item--split">Exit</p>
+        </div>
+      </div>
+      <dl class="options">
+        <div><dt>Scan text on screen</dt><dd>The same as double-tapping Right Alt. Double-clicking the icon does it too.</dd></div>
+        <div><dt>How to use</dt><dd>Opens a short guide with a <strong>Try it now</strong> button.</dd></div>
+        <div><dt>Pause</dt><dd>Right Alt goes back to completely normal until you resume. The icon fades.</dd></div>
+        <div><dt>Start with Windows</dt><dd>Starts it by itself every time you sign in.</dd></div>
+        <div><dt>Sound when copied</dt><dd>A soft sound when the text is ready, so you don’t have to look.</dd></div>
+        <div><dt>Change Gemini API key</dt><dd>Paste a new key, for example if the old one stops working.</dd></div>
+        <div><dt>Exit</dt><dd>Closes it until you open it again.</dd></div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="privacy-title">
+      <h2 id="privacy-title">What happens to your screen</h2>
+      <ul class="plain-steps">
+        <li><strong>Only the box you drag is sent</strong> to Google Gemini to read the text. Nothing else leaves your PC.</li>
+        <li><strong>Nothing is saved:</strong> no screenshots and no text files. The text only goes to your clipboard.</li>
+        <li><strong>On Google’s free plan, Google may use what you send to improve its products.</strong> Don’t scan passwords, bank details or other private information.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="remove-title">
+      <h2 id="remove-title">Removing it</h2>
+      <ol class="plain-steps">
+        <li>Right-click the scan icon and untick <strong>Start with Windows</strong>.</li>
+        <li>Right-click the icon again and click <strong>Exit</strong>.</li>
+        <li>Delete QuickNotes.exe. To remove your saved key and settings too, type <strong>%AppData%</strong> into the File Explorer address bar and delete the <strong>QuickNotes</strong> folder.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="get-title" class="get-it">
+      <h2 id="get-title">Get QuickNotes</h2>
+      <p>Free, for Windows 10 and 11.</p>
+      $button
+      <p class="muted more-link">Made by Mogdho Paul. Curious how it works? <a href="$repo">See it on GitHub</a>.</p>
+    </section>

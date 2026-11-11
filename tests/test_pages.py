@@ -14,7 +14,7 @@ SAME_AS = [p["url"] for p in _SITE["profiles"]]
 CONTACT = [f"mailto:{_SITE['contact']['email']}", _SITE["contact"]["whatsapp"]]
 BANNED = ("Mugdho", "Mogdha", "AI-Assisted")
 URLS = {"home": "/", "about": "/about/", "projects": "/projects/", "photos": "/photos/",
-        "alwaysnumlock": "/alwaysnumlock/", "capslock-copypaste": "/capslock-copypaste/",
+        "quicknotes": "/quicknotes/", "alwaysnumlock": "/alwaysnumlock/", "capslock-copypaste": "/capslock-copypaste/",
         "copilot2gemini": "/copilot2gemini/", "nn-tab": "/nn-tab/", "yt-mini-pip": "/yt-mini-pip/",
         "ytmodify": "/ytmodify/", "how-many-time": "/how-many-time/",
         "converter": "/currency-converter/", "blog": "/blog/"}
@@ -223,6 +223,15 @@ class ToolPageRules(CommonPageRules):
         # Pages are for everyday users: no script files, code or install-a-runtime steps.
         for word in ("AutoHotkey", ".ahk", "script", "registry", "taskschd", "admin rights"):
             self.assertNotIn(word.lower(), self.p.text.lower())
+
+
+class QuickNotesPage(ToolPageRules, unittest.TestCase):
+    page_key = "quicknotes"
+
+    def test_privacy_warning(self):
+        # the selected area goes to Google Gemini, so the page has to say so and warn about private data
+        self.assertIn("Gemini", self.p.text)
+        self.assertIn("passwords", self.p.text)
 
 
 class AlwaysNumLockPage(ToolPageRules, unittest.TestCase):

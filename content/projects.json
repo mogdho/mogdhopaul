@@ -1,5 +1,14 @@
 [
   {
+    "name": "QuickNotes",
+    "url": "https://github.com/mogdho/QuickNotes",
+    "description": "Copies text from anything on your screen, such as photos, videos, PDFs and apps, in any language, including Bangla. Double-tap Right Alt and drag over it.",
+    "home_blurb": "",
+    "language": "AutoHotkey",
+    "group": "windows",
+    "featured": false
+  },
+  {
     "name": "NN-tab",
     "url": "https://github.com/mogdho/NN-tab",
     "description": "A very minimal new tab page for Chrome, for people who want a quiet screen when they open a tab.",
