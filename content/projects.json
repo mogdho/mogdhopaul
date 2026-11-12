@@ -1,21 +1,21 @@
 [
   {
-    "name": "QuickNotes",
-    "url": "https://github.com/mogdho/QuickNotes",
-    "description": "Copies text from anything on your screen, such as photos, videos, PDFs and apps, in any language, including Bangla. Double-tap Right Alt and drag over it.",
-    "home_blurb": "",
-    "language": "AutoHotkey",
-    "group": "windows",
-    "featured": false
-  },
-  {
     "name": "Desk Widgets",
     "url": "https://github.com/mogdho/deskwidget",
     "description": "Light, good-looking widgets for the Windows desktop: clocks, a calendar, weather, world times, a Wi-Fi, Bluetooth and sound panel, a photo and a daily quote.",
     "home_blurb": "",
     "language": "C#",
     "group": "windows",
-    "featured": false
+    "featured": true
+  },
+  {
+    "name": "QuickNotes",
+    "url": "https://github.com/mogdho/QuickNotes",
+    "description": "Copies text from anything on your screen, such as photos, videos, PDFs and apps, in any language, including Bangla. Double-tap Right Alt and drag over it.",
+    "home_blurb": "",
+    "language": "AutoHotkey",
+    "group": "windows",
+    "featured": true
   },
   {
     "name": "NN-tab",
@@ -33,7 +33,7 @@
     "home_blurb": "Turns the Copilot key on Windows into a Google Gemini key, and keeps its window behaving.",
     "language": "AutoHotkey",
     "group": "windows",
-    "featured": true
+    "featured": false
   },
   {
     "name": "HMT(How Many Time)",
@@ -42,7 +42,7 @@
     "home_blurb": "A private, one-tap tracker for the habit you're trying to cut down on.",
     "language": "vitejs",
     "group": "browser",
-    "featured": true
+    "featured": false
   },
   {
     "name": "AlwaysNumLock",
