@@ -10,6 +10,7 @@ PAGES = {
     "projects": ROOT / "projects" / "index.html",
     "photos": ROOT / "photos" / "index.html",
     "quicknotes": ROOT / "quicknotes" / "index.html",
+    "deskwidget": ROOT / "deskwidget" / "index.html",
     "alwaysnumlock": ROOT / "alwaysnumlock" / "index.html",
     "capslock-copypaste": ROOT / "capslock-copypaste" / "index.html",
     "copilot2gemini": ROOT / "copilot2gemini" / "index.html",

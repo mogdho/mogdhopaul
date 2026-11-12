@@ -14,7 +14,7 @@ SAME_AS = [p["url"] for p in _SITE["profiles"]]
 CONTACT = [f"mailto:{_SITE['contact']['email']}", _SITE["contact"]["whatsapp"]]
 BANNED = ("Mugdho", "Mogdha", "AI-Assisted")
 URLS = {"home": "/", "about": "/about/", "projects": "/projects/", "photos": "/photos/",
-        "quicknotes": "/quicknotes/", "alwaysnumlock": "/alwaysnumlock/", "capslock-copypaste": "/capslock-copypaste/",
+        "quicknotes": "/quicknotes/", "deskwidget": "/deskwidget/", "alwaysnumlock": "/alwaysnumlock/", "capslock-copypaste": "/capslock-copypaste/",
         "copilot2gemini": "/copilot2gemini/", "nn-tab": "/nn-tab/", "yt-mini-pip": "/yt-mini-pip/",
         "ytmodify": "/ytmodify/", "how-many-time": "/how-many-time/",
         "converter": "/currency-converter/", "blog": "/blog/"}
@@ -232,6 +232,19 @@ class QuickNotesPage(ToolPageRules, unittest.TestCase):
         # the selected area goes to Google Gemini, so the page has to say so and warn about private data
         self.assertIn("Gemini", self.p.text)
         self.assertIn("passwords", self.p.text)
+
+
+class DeskWidgetsPage(ToolPageRules, unittest.TestCase):
+    page_key = "deskwidget"
+
+    def test_shows_the_widgets(self):
+        self.assertIn('src="/deskwidget/img/desktop.webp"', self.p.html)
+        for widget in ("World Times", "At a Glance", "Control Panel", "Photo Card", "Focus Timer"):
+            self.assertIn(widget, self.p.text)
+
+    def test_credits_the_original(self):
+        # it's based on an MIT-licensed project, so the page says so
+        self.assertIn("https://github.com/whoissaaif/desk-widgets", self.p.hrefs)
 
 
 class AlwaysNumLockPage(ToolPageRules, unittest.TestCase):

@@ -48,6 +48,17 @@ TOOLS = {
         "description": "Copy text from photos, videos, PDFs and apps on Windows, even in Bangla and Hindi. Double-tap Right Alt and drag. Free app by Mogdho Paul.",
         "short": "Copy text from any photo, video or app, even in Bangla.",
     },
+    "deskwidget": {
+        "name": "Desk Widgets",
+        "repo": "https://github.com/mogdho/deskwidget",
+        "file": "DeskWidgets.exe",
+        "screenshot": "/deskwidget/img/desktop.webp",
+        "lead": "Beautiful widgets for your Windows desktop: clocks, a calendar, weather, world times, "
+                "a quick control panel, a photo and a daily quote. Light on memory, nothing to install.",
+        "title": "Free Desktop Widgets for Windows 11 & 10 – Desk Widgets | Mogdho Paul",
+        "description": "Clocks, calendar, weather, world times and a Wi-Fi, Bluetooth and sound panel on your Windows desktop. Free, light and private. By Mogdho Paul.",
+        "short": "Clocks, weather, a calendar and more on your Windows desktop.",
+    },
     "alwaysnumlock": {
         "name": "AlwaysNumLock",
         "repo": "https://github.com/mogdho/AlwaysNumLock",
