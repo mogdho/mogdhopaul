@@ -1,5 +1,14 @@
 [
   {
+    "name": "ytModify",
+    "url": "https://github.com/mogdho/ytModify-extension",
+    "description": "Makes YouTube nicer to watch: a soft glow around the video, auto pop-out when you switch tabs, the quality you want for each view and a bigger player.",
+    "home_blurb": "",
+    "language": "JavaScript",
+    "group": "extensions",
+    "featured": true
+  },
+  {
     "name": "QuickNotes",
     "url": "https://github.com/mogdho/QuickNotes",
     "description": "Copies text from anything on your screen, such as photos, videos, PDFs and apps, in any language, including Bangla. Double-tap Right Alt and drag over it.",
@@ -79,15 +88,6 @@
     "language": "JavaScript",
     "group": "browser",
     "featured": false
-  },
-  {
-    "name": "ytModify",
-    "url": "https://github.com/mogdho/ytModify-extension",
-    "description": "Makes YouTube nicer to watch: a soft glow around the video, auto pop-out when you switch tabs, the quality you want for each view and a bigger player.",
-    "home_blurb": "",
-    "language": "JavaScript",
-    "group": "extensions",
-    "featured": true
   },
   {
     "name": "yt-mini-PIP (discontinued)",
