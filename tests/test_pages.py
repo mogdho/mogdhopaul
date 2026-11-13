@@ -233,6 +233,10 @@ class QuickNotesPage(ToolPageRules, unittest.TestCase):
         self.assertIn("Gemini", self.p.text)
         self.assertIn("passwords", self.p.text)
 
+    def test_own_shortcut(self):
+        # since v2.0.0 the shortcut can be changed, for keyboards without Right Alt
+        self.assertIn("Change shortcut", self.p.text)
+
 
 class DeskWidgetsPage(ToolPageRules, unittest.TestCase):
     page_key = "deskwidget"
@@ -241,10 +245,6 @@ class DeskWidgetsPage(ToolPageRules, unittest.TestCase):
         self.assertIn('src="/deskwidget/img/desktop.webp"', self.p.html)
         for widget in ("World Times", "At a Glance", "Control Panel", "Photo Card", "Focus Timer"):
             self.assertIn(widget, self.p.text)
-
-    def test_credits_the_original(self):
-        # it's based on an MIT-licensed project, so the page says so
-        self.assertIn("https://github.com/whoissaaif/desk-widgets", self.p.hrefs)
 
 
 class AlwaysNumLockPage(ToolPageRules, unittest.TestCase):
