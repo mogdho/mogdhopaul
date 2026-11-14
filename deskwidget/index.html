@@ -26,8 +26,8 @@
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="preload" href="/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/style.css?v=4f3826310e">
-  <script src="/script.js?v=683420df74"></script>
+  <link rel="stylesheet" href="/style.css?v=75154113d5">
+  <script src="/script.js?v=bf9e6ee770"></script>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDY4Z5D7MW"></script>
   <script>
@@ -155,6 +155,81 @@
         <div><dt>Custom Quote</dt><dd>Your own words, in the same style. Click to edit.</dd></div>
       </dl>
       <p class="muted">Every widget comes in three looks: <strong>Dark</strong>, <strong>Light</strong>, or <strong>Vibrant</strong>, which shows your wallpaper softly blurred behind the card. They use very little memory, and they rest while your PC is locked.</p>
+    </section>
+
+    <section aria-labelledby="ai-title" class="ask-ai" data-ask-ai>
+      <h2 id="ai-title">Ask your AI</h2>
+      <p>Copy this into ChatGPT, Gemini, Claude or any AI chat. It will explain Desk Widgets and walk you through setting it up, one step at a time, in your own language.</p>
+      <div class="ask-ai__tabs" role="tablist" aria-label="Kind of AI" hidden>
+        <button type="button" role="tab" id="ai-tab-guide" aria-controls="ai-guide" aria-selected="true">Guide me</button>
+        <button type="button" role="tab" id="ai-tab-agent" aria-controls="ai-agent" aria-selected="false" tabindex="-1">Set it up for me</button>
+      </div>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-guide" aria-labelledby="ai-tab-guide">
+        <h3 class="ask-ai__label">Guide me</h3>
+        <p class="muted">For any AI chat, free or paid: it explains the app and walks you through it.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">I&#x27;d like your help with Desk Widgets, a free app by Mogdho Paul. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About Desk Widgets:
+- What it does: puts good-looking widgets on the Windows desktop, under your windows: Analog Clock, World Times (2 to 5 cities), Calendar, At a Glance (weather, date, sunrise or sunset and a world clock), Control Panel (Wi-Fi, Bluetooth, brightness, volume, microphone mute, speaker and microphone), Photo Card, Focus Timer (15 to 60 minutes), a daily Quote and a Custom Quote.
+- Looks: every widget can be Dark, Light or Vibrant (your wallpaper softly blurred behind it). Drag a widget to move it, drag a corner to resize it, right-click it for Appearance, Size, Opacity, Lock Position, Lock Menu and Remove Widget.
+- How to use: open the Desk Widgets window (Start menu, the icon by the clock, or the exe again), then drag a widget onto the desktop or double-click it. Closing the window keeps the widgets running. Settings in the app: Start with Windows, High Priority, OLED Pixel Shift, Locked Widgets, light or dark look.
+- Works on: Windows 10 and 11. One file, DeskWidgets.exe (0.2 MB). Nothing to install; it adds itself to the Start menu on first run. A portable version (DeskWidgets-Portable.zip) keeps its settings in its own folder, handy for a USB stick. Free and open source (MIT licence).
+- Resource use (measured): about 80 to 130 MB of memory, depending on how many widgets and photos are open, and almost no CPU (0.04%) while idle. Drawing pauses while the PC is locked.
+- Privacy: no account, no tracking, no ads. Only the weather in At a Glance goes online: the city is looked up once with the free Open-Meteo service, then only its map position is sent every 15 minutes.
+- Windows may show &quot;Windows protected your PC&quot; because the app isn&#x27;t code-signed: click More info, then Run anyway. Windows shows this for small apps from independent makers.
+- Settings and photo copies are kept in %AppData%\DeskWidgets.
+- To remove it: switch off Start with Windows in the app&#x27;s Settings, quit it from the icon by the clock, then delete DeskWidgets.exe and the %AppData%\DeskWidgets folder.
+- Checksums: each release has a SHA256SUMS.txt file next to the download, at https://github.com/mogdho/deskwidget/releases/latest/download/SHA256SUMS.txt
+- Official download: https://github.com/mogdho/deskwidget/releases/latest/download/DeskWidgets.exe
+- Its page: https://mogdhopaul.com/deskwidget/
+
+Please:
+1. In two or three sentences, tell me what Desk Widgets does and whether it suits me. Ask what I&#x27;d mainly use it for.
+2. Then guide me through setting it up, one step at a time. Wait for me to say &quot;done&quot; before the next step.
+3. After that, answer my questions.</pre>
+        </details>
+      </div>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-agent" aria-labelledby="ai-tab-agent">
+        <h3 class="ask-ai__label">Set it up for me</h3>
+        <p class="muted">For AI agents that can work on your PC, such as Claude Code, Codex or Gemini CLI. It asks before every step.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">You are an AI agent that can run commands on my Windows PC. Please set up Desk Widgets, a free app by Mogdho Paul, for me. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About Desk Widgets:
+- What it does: puts good-looking widgets on the Windows desktop, under your windows: Analog Clock, World Times (2 to 5 cities), Calendar, At a Glance (weather, date, sunrise or sunset and a world clock), Control Panel (Wi-Fi, Bluetooth, brightness, volume, microphone mute, speaker and microphone), Photo Card, Focus Timer (15 to 60 minutes), a daily Quote and a Custom Quote.
+- Looks: every widget can be Dark, Light or Vibrant (your wallpaper softly blurred behind it). Drag a widget to move it, drag a corner to resize it, right-click it for Appearance, Size, Opacity, Lock Position, Lock Menu and Remove Widget.
+- How to use: open the Desk Widgets window (Start menu, the icon by the clock, or the exe again), then drag a widget onto the desktop or double-click it. Closing the window keeps the widgets running. Settings in the app: Start with Windows, High Priority, OLED Pixel Shift, Locked Widgets, light or dark look.
+- Works on: Windows 10 and 11. One file, DeskWidgets.exe (0.2 MB). Nothing to install; it adds itself to the Start menu on first run. A portable version (DeskWidgets-Portable.zip) keeps its settings in its own folder, handy for a USB stick. Free and open source (MIT licence).
+- Resource use (measured): about 80 to 130 MB of memory, depending on how many widgets and photos are open, and almost no CPU (0.04%) while idle. Drawing pauses while the PC is locked.
+- Privacy: no account, no tracking, no ads. Only the weather in At a Glance goes online: the city is looked up once with the free Open-Meteo service, then only its map position is sent every 15 minutes.
+- Windows may show &quot;Windows protected your PC&quot; because the app isn&#x27;t code-signed: click More info, then Run anyway. Windows shows this for small apps from independent makers.
+- Settings and photo copies are kept in %AppData%\DeskWidgets.
+- To remove it: switch off Start with Windows in the app&#x27;s Settings, quit it from the icon by the clock, then delete DeskWidgets.exe and the %AppData%\DeskWidgets folder.
+- Checksums: each release has a SHA256SUMS.txt file next to the download, at https://github.com/mogdho/deskwidget/releases/latest/download/SHA256SUMS.txt
+- Official download: https://github.com/mogdho/deskwidget/releases/latest/download/DeskWidgets.exe
+- Its page: https://mogdhopaul.com/deskwidget/
+
+Rules:
+- Show me each command and wait for my OK before you run it.
+- Download only from the official link above, nowhere else.
+- After downloading, show me the file&#x27;s size and its SHA-256 hash.
+- Don&#x27;t change security settings, and don&#x27;t turn off SmartScreen or antivirus.
+
+Steps:
+1. Check that this PC runs Windows 10 or 11.
+2. Create the folder %LOCALAPPDATA%\Programs\Desk Widgets and download DeskWidgets.exe and SHA256SUMS.txt into it.
+3. Check that the SHA-256 hash of DeskWidgets.exe matches the line for it in SHA256SUMS.txt. If it doesn&#x27;t match, stop and tell me.
+4. Start DeskWidgets.exe. If Windows shows &quot;Windows protected your PC&quot;, tell me to click More info, then Run anyway.
+5. Ask which widgets I&#x27;d like (for example World Times, At a Glance or Control Panel), then tell me how to drag them onto the desktop from the Desk Widgets window. You can&#x27;t place them for me.
+6. Ask whether Desk Widgets should start with Windows. If yes, tell me to open Settings in the app and switch on Start with Windows. Use the app&#x27;s own option; don&#x27;t add startup entries yourself.
+7. Finish with a short summary: where the file is, how to add or remove widgets, and how to remove the app.</pre>
+        </details>
+      </div>
     </section>
 
     <section aria-labelledby="setup-title">

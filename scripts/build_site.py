@@ -18,6 +18,7 @@ from datetime import date
 from pathlib import Path
 from string import Template
 
+from scripts.ai_facts import AI_FACTS
 from scripts.content import (IDENTITY_BANNED, TOPICS, ContentError, inline, load_content, render_article,
                              render_text, word_count)
 from scripts.render_photos import MONTHS, alt_text, render_items
@@ -702,6 +703,87 @@ def _gallery(photos):
             "name": "Travel photos by Mogdho Paul", "author": AUTHOR, "image": images}
 
 
+def ai_prompts(slug, tool):
+    """Two prompts a visitor can paste into their own AI: one for any chat (explain it and guide me
+    step by step) and one for AI agents that can set the app up on the PC. Both carry the facts, so
+    a chat that can't open web pages still answers correctly. Empty when the tool has no facts yet."""
+    ai = AI_FACTS.get(slug)
+    if not ai or tool.get("discontinued"):
+        return None
+    name, page = tool["name"], f"{SITE}/{slug}/"
+    link = "Open the app" if tool["kind"] == "web" else "Official download"
+    facts = "\n".join(f"- {line}" for line in [
+        *ai["facts"],
+        f"{link}: {download_url(tool)}",
+        f"Its page: {page}",
+    ])
+    rules = ("Use only the facts below (and its page, if you can open it). If something isn't covered, "
+             "say you're not sure instead of guessing. Reply in the language I write in.")
+    guide = (f"I'd like your help with {name}, a free app by Mogdho Paul. {rules}\n\n"
+             f"About {name}:\n{facts}\n\n"
+             "Please:\n"
+             f"1. In two or three sentences, tell me what {name} does and whether it suits me. "
+             "Ask what I'd mainly use it for.\n"
+             "2. Then guide me through setting it up, one step at a time. Wait for me to say \"done\" "
+             "before the next step.\n"
+             "3. After that, answer my questions.")
+    if not ai.get("agent_steps"):  # browser tools: a click in the browser is always needed
+        return guide, None
+    steps = "\n".join(f"{n}. {s}" for n, s in enumerate(ai["agent_steps"], 1))
+    agent = (f"You are an AI agent that can run commands on my Windows PC. Please set up {name}, "
+             f"a free app by Mogdho Paul, for me. {rules}\n\n"
+             f"About {name}:\n{facts}\n\n"
+             "Rules:\n"
+             "- Show me each command and wait for my OK before you run it.\n"
+             "- Download only from the official link above, nowhere else.\n"
+             "- After downloading, show me the file's size and its SHA-256 hash.\n"
+             "- Don't change security settings, and don't turn off SmartScreen or antivirus.\n"
+             + "".join(f"- {r}\n" for r in ai.get("agent_rules", []))
+             + f"\nSteps:\n{steps}")
+    return guide, agent
+
+
+def _ask_ai(slug, tool):
+    """The "Ask your AI" section on a tool page: two tabs, each with a Copy prompt button. The prompt
+    itself is folded away under "See what's in the prompt", for anyone who wants to check it first.
+    Without JavaScript both panels are shown one under the other."""
+    prompts = ai_prompts(slug, tool)
+    if not prompts:
+        return ""
+    guide, agent = prompts
+    panels = [("guide", "Guide me", "For any AI chat, free or paid: it explains the app and walks you through it.", guide)]
+    if agent:
+        panels.append(("agent", "Set it up for me", "For AI agents that can work on your PC, such as Claude Code, "
+                       "Codex or Gemini CLI. It asks before every step.", agent))
+    tabs = "\n".join(
+        f'        <button type="button" role="tab" id="ai-tab-{key}" aria-controls="ai-{key}" '
+        f'aria-selected="{"true" if i == 0 else "false"}"{"" if i == 0 else " tabindex=\"-1\""}>{label}</button>'
+        for i, (key, label, _, _) in enumerate(panels))
+    blocks = "\n".join(
+        f'      <div class="ask-ai__panel" role="tabpanel" id="ai-{key}" aria-labelledby="ai-tab-{key}">\n'
+        f'        <h3 class="ask-ai__label">{label}</h3>\n'
+        f'        <p class="muted">{note}</p>\n'
+        f'        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button>'
+        f' <span class="ask-ai__status" aria-live="polite"></span></p>\n'
+        '        <details class="ask-ai__peek">\n'
+        '          <summary>See what’s in the prompt</summary>\n'
+        f'          <pre class="ask-ai__prompt">{e(text)}</pre>\n'
+        '        </details>\n'
+        '      </div>'
+        for key, label, note, text in panels)
+    return (
+        '    <section aria-labelledby="ai-title" class="ask-ai" data-ask-ai>\n'
+        '      <h2 id="ai-title">Ask your AI</h2>\n'
+        f'      <p>Copy this into ChatGPT, Gemini, Claude or any AI chat. It will explain {e(tool["name"])} and '
+        'walk you through setting it up, one step at a time, in your own language.</p>\n'
+        + (('      <div class="ask-ai__tabs" role="tablist" aria-label="Kind of AI" hidden>\n'
+            f'{tabs}\n'
+            '      </div>\n') if len(panels) > 1 else '')
+        + f'{blocks}\n'
+        '    </section>\n'
+    )
+
+
 def _main_block(page, content):
     site, projects, posts = content["site"], content["projects"], content["posts"]
     if page.startswith("post:"):
@@ -725,6 +807,7 @@ def _main_block(page, content):
         for key in ("install", "remove"):
             fields[key] = (_template(f"tools/_chrome-{key}").substitute(fields).strip()
                            if tool["kind"] == "chrome" else "")
+        fields["ai"] = _ask_ai(slug, tool)
         return (_template(f"tools/{slug}").substitute(fields).rstrip("\n") + _from_the_blog(slug, posts)
                 + _related(f"/{slug}/"))
     photos = newest_first(content["photos"])

@@ -26,8 +26,8 @@
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="preload" href="/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/style.css?v=4f3826310e">
-  <script src="/script.js?v=683420df74"></script>
+  <link rel="stylesheet" href="/style.css?v=75154113d5">
+  <script src="/script.js?v=bf9e6ee770"></script>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDY4Z5D7MW"></script>
   <script>
@@ -143,6 +143,77 @@
       <div class="prose">
         <p>It works with text, pictures and files: anything you can copy and paste. A small note pops up next to your mouse so you know it worked, like <span class="pop">Copied!</span> or <span class="pop">Pasted!</span></p>
         <p>If nothing was selected, it says <span class="pop">Nothing copied!</span> and keeps what you copied before, so you never lose your clipboard by accident.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="ai-title" class="ask-ai" data-ask-ai>
+      <h2 id="ai-title">Ask your AI</h2>
+      <p>Copy this into ChatGPT, Gemini, Claude or any AI chat. It will explain Capslock-CopyPaste and walk you through setting it up, one step at a time, in your own language.</p>
+      <div class="ask-ai__tabs" role="tablist" aria-label="Kind of AI" hidden>
+        <button type="button" role="tab" id="ai-tab-guide" aria-controls="ai-guide" aria-selected="true">Guide me</button>
+        <button type="button" role="tab" id="ai-tab-agent" aria-controls="ai-agent" aria-selected="false" tabindex="-1">Set it up for me</button>
+      </div>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-guide" aria-labelledby="ai-tab-guide">
+        <h3 class="ask-ai__label">Guide me</h3>
+        <p class="muted">For any AI chat, free or paid: it explains the app and walks you through it.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">I&#x27;d like your help with Capslock-CopyPaste, a free app by Mogdho Paul. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About Capslock-CopyPaste:
+- What it does: turns Caps Lock into copy and paste. Tap Caps Lock once to copy what&#x27;s selected, twice quickly to paste. Ctrl + Caps Lock twice pastes as plain text (no fonts, colours or links). Shift + Caps Lock turns real CAPITALS on or off. Works with text, pictures and files in every app.
+- Feedback: a small note next to the mouse says Copied! or Pasted!. If nothing was selected it says Nothing copied! and keeps the clipboard as it was.
+- Works on: Windows 10 and 11. One file, Capslock-CopyPaste.exe (1.3 MB). Nothing to install. Free and open source.
+- Resource use (measured): about 4.1 MB of memory (12.2 MB shown in Task Manager) and 0% CPU while it waits.
+- Windows may show &quot;Windows protected your PC&quot; because the app isn&#x27;t code-signed: click More info, then Run anyway. Windows shows this for small apps from independent makers.
+- When it first starts, Windows asks whether the app may make changes: click Yes. This lets it work in every app, including Task Manager.
+- Menu by the clock (right-click the up-arrow icon): Pause (Caps Lock works normally until clicked again; double-clicking the icon does the same), Start with Windows, Exit.
+- Troubleshooting: if tapping twice copies instead of pasting, tap a little faster. If nothing happens, check the icon is there and not faded (paused).
+- To remove it: untick Start with Windows, click Exit, then delete Capslock-CopyPaste.exe.
+- Official download: https://github.com/mogdho/Capslock-CopyPaste/releases/latest/download/Capslock-CopyPaste.exe
+- Its page: https://mogdhopaul.com/capslock-copypaste/
+
+Please:
+1. In two or three sentences, tell me what Capslock-CopyPaste does and whether it suits me. Ask what I&#x27;d mainly use it for.
+2. Then guide me through setting it up, one step at a time. Wait for me to say &quot;done&quot; before the next step.
+3. After that, answer my questions.</pre>
+        </details>
+      </div>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-agent" aria-labelledby="ai-tab-agent">
+        <h3 class="ask-ai__label">Set it up for me</h3>
+        <p class="muted">For AI agents that can work on your PC, such as Claude Code, Codex or Gemini CLI. It asks before every step.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">You are an AI agent that can run commands on my Windows PC. Please set up Capslock-CopyPaste, a free app by Mogdho Paul, for me. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About Capslock-CopyPaste:
+- What it does: turns Caps Lock into copy and paste. Tap Caps Lock once to copy what&#x27;s selected, twice quickly to paste. Ctrl + Caps Lock twice pastes as plain text (no fonts, colours or links). Shift + Caps Lock turns real CAPITALS on or off. Works with text, pictures and files in every app.
+- Feedback: a small note next to the mouse says Copied! or Pasted!. If nothing was selected it says Nothing copied! and keeps the clipboard as it was.
+- Works on: Windows 10 and 11. One file, Capslock-CopyPaste.exe (1.3 MB). Nothing to install. Free and open source.
+- Resource use (measured): about 4.1 MB of memory (12.2 MB shown in Task Manager) and 0% CPU while it waits.
+- Windows may show &quot;Windows protected your PC&quot; because the app isn&#x27;t code-signed: click More info, then Run anyway. Windows shows this for small apps from independent makers.
+- When it first starts, Windows asks whether the app may make changes: click Yes. This lets it work in every app, including Task Manager.
+- Menu by the clock (right-click the up-arrow icon): Pause (Caps Lock works normally until clicked again; double-clicking the icon does the same), Start with Windows, Exit.
+- Troubleshooting: if tapping twice copies instead of pasting, tap a little faster. If nothing happens, check the icon is there and not faded (paused).
+- To remove it: untick Start with Windows, click Exit, then delete Capslock-CopyPaste.exe.
+- Official download: https://github.com/mogdho/Capslock-CopyPaste/releases/latest/download/Capslock-CopyPaste.exe
+- Its page: https://mogdhopaul.com/capslock-copypaste/
+
+Rules:
+- Show me each command and wait for my OK before you run it.
+- Download only from the official link above, nowhere else.
+- After downloading, show me the file&#x27;s size and its SHA-256 hash.
+- Don&#x27;t change security settings, and don&#x27;t turn off SmartScreen or antivirus.
+
+Steps:
+1. Check that this PC runs Windows 10 or 11.
+2. Create the folder %LOCALAPPDATA%\Programs\Capslock-CopyPaste and download Capslock-CopyPaste.exe into it.
+3. Start Capslock-CopyPaste.exe. If Windows shows &quot;Windows protected your PC&quot;, tell me to click More info, then Run anyway. If Windows asks whether the app may make changes, tell me to click Yes.
+4. Ask whether Capslock-CopyPaste should start with Windows. If yes, tell me to right-click its icon by the clock and tick Start with Windows. Use the app&#x27;s own option; don&#x27;t add startup entries yourself.
+5. Finish with a short summary: where the file is, how to use Capslock-CopyPaste, and how to remove it.</pre>
+        </details>
       </div>
     </section>
 

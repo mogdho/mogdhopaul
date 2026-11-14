@@ -26,8 +26,8 @@
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="preload" href="/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/style.css?v=4f3826310e">
-  <script src="/script.js?v=683420df74"></script>
+  <link rel="stylesheet" href="/style.css?v=75154113d5">
+  <script src="/script.js?v=bf9e6ee770"></script>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDY4Z5D7MW"></script>
   <script>
@@ -150,6 +150,36 @@
         <div><dt>Light or dark, your wallpaper</dt><dd>Pick a theme and set any picture as the background.</dd></div>
         <div><dt>ChatGPT in one click</dt><dd>The round button at the bottom right opens ChatGPT in a small window.</dd></div>
       </dl>
+    </section>
+
+    <section aria-labelledby="ai-title" class="ask-ai" data-ask-ai>
+      <h2 id="ai-title">Ask your AI</h2>
+      <p>Copy this into ChatGPT, Gemini, Claude or any AI chat. It will explain NN-tab and walk you through setting it up, one step at a time, in your own language.</p>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-guide" aria-labelledby="ai-tab-guide">
+        <h3 class="ask-ai__label">Guide me</h3>
+        <p class="muted">For any AI chat, free or paid: it explains the app and walks you through it.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">I&#x27;d like your help with NN-tab, a free app by Mogdho Paul. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About NN-tab:
+- What it does: replaces Chrome&#x27;s new tab page with a calm one: a big clock and date, bookmark tiles (drag to reorder, sort into groups, right-click to edit), a short notes list, your own quote, a dark or light theme with any wallpaper, and a button that opens ChatGPT in a small window.
+- Works in: Chrome, Edge and Brave on a computer. One file, NN-tab.zip (1.9 MB). Free and open source.
+- How to add it (it isn&#x27;t in the Chrome Web Store yet): download NN-tab.zip, right-click it and choose Extract All, then Extract, which gives a folder called NN-tab. Move that folder somewhere it can stay, like Documents, because Chrome uses it every time. Open chrome://extensions, switch on Developer mode at the top right, click Load unpacked and choose the NN-tab folder. In Edge use edge://extensions (Developer mode is in the menu on the left); in Brave use brave://extensions.
+- Settings: click the NN-tab icon in the toolbar (pin it from the puzzle-piece icon if it&#x27;s hidden): Theme, Wallpaper, Sharper icons (looks up clearer icons online, off at first), and Backup to a file.
+- Privacy: bookmarks, notes and settings stay on the computer. No account and no tracking.
+- Resource use: no measured figures. It&#x27;s a small extension; if asked, say so and suggest checking Chrome&#x27;s own Task Manager (Shift + Esc) instead of guessing.
+- To update: download it again, unzip it into the same NN-tab folder, then click the reload arrow on NN-tab in chrome://extensions. To remove: click Remove on NN-tab in chrome://extensions, then delete the NN-tab folder.
+- Official download: https://github.com/mogdho/NN-tab/releases/latest/download/NN-tab.zip
+- Its page: https://mogdhopaul.com/nn-tab/
+
+Please:
+1. In two or three sentences, tell me what NN-tab does and whether it suits me. Ask what I&#x27;d mainly use it for.
+2. Then guide me through setting it up, one step at a time. Wait for me to say &quot;done&quot; before the next step.
+3. After that, answer my questions.</pre>
+        </details>
+      </div>
     </section>
 
     <section aria-labelledby="setup-title">

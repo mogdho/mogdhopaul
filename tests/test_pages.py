@@ -224,6 +224,19 @@ class ToolPageRules(CommonPageRules):
         for word in ("AutoHotkey", ".ahk", "script", "registry", "taskschd", "admin rights"):
             self.assertNotIn(word.lower(), self.p.text.lower())
 
+    def test_ask_your_ai_box(self):
+        # every live tool page has prompts to paste into an AI, right above its set-up steps;
+        # Windows apps also get one for AI agents, browser tools can't be set up without a click
+        tool, html = TOOLS[self.page_key], self.p.html
+        if tool.get("discontinued"):
+            self.assertNotIn("data-ask-ai", html)
+            return
+        self.assertIn("Ask your AI", self.p.text)
+        self.assertEqual(html.count('class="ask-ai__prompt"'), 2 if tool["kind"] == "windows" else 1)
+        self.assertIn(download_url(tool), self.p.text)
+        after_box = html[html.index('id="ai-title"') + 1:]
+        self.assertIn('<h2 id="setup-title"', after_box[:after_box.index("<h2 ") + 30])
+
 
 class QuickNotesPage(ToolPageRules, unittest.TestCase):
     page_key = "quicknotes"
@@ -232,6 +245,16 @@ class QuickNotesPage(ToolPageRules, unittest.TestCase):
         # the selected area goes to Google Gemini, so the page has to say so and warn about private data
         self.assertIn("Gemini", self.p.text)
         self.assertIn("passwords", self.p.text)
+
+    def test_ask_your_ai(self):
+        # a prompt to paste into any AI chat, and one for AI agents that set the app up
+        html, text = self.p.html, self.p.text
+        self.assertIn("Ask your AI", text)
+        self.assertEqual(html.count('class="ask-ai__prompt"'), 2)
+        self.assertIn(download_url(TOOLS["quicknotes"]), text)   # the official file, in the prompt itself
+        self.assertIn("6.5 MB", text)                              # measured, so the AI doesn't guess
+        self.assertIn("before you run", text)                      # the agent asks first
+        self.assertIn("Never ask for", text)                       # and keeps away from the Gemini key
 
     def test_own_shortcut(self):
         # since v2.0.0 the shortcut can be changed, for keyboards without Right Alt

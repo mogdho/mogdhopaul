@@ -26,8 +26,8 @@
   <link rel="apple-touch-icon" href="/favicon.png">
   <link rel="preload" href="/fonts/young-serif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/style.css?v=4f3826310e">
-  <script src="/script.js?v=683420df74"></script>
+  <link rel="stylesheet" href="/style.css?v=75154113d5">
+  <script src="/script.js?v=bf9e6ee770"></script>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LDY4Z5D7MW"></script>
   <script>
@@ -142,6 +142,78 @@
         <li><span class="ledger__when">You type your PIN to sign in</span><span class="ledger__before"><span class="visually-hidden">Normally: </span>Sometimes off</span><span class="ledger__after"><span class="visually-hidden">With AlwaysNumLock: </span>On, if you choose</span></li>
       </ul>
       <p class="muted ledger__foot">It runs quietly by the clock and uses almost no memory. Need the number pad as arrow keys for a game? Pause it with one click.</p>
+    </section>
+
+    <section aria-labelledby="ai-title" class="ask-ai" data-ask-ai>
+      <h2 id="ai-title">Ask your AI</h2>
+      <p>Copy this into ChatGPT, Gemini, Claude or any AI chat. It will explain AlwaysNumLock and walk you through setting it up, one step at a time, in your own language.</p>
+      <div class="ask-ai__tabs" role="tablist" aria-label="Kind of AI" hidden>
+        <button type="button" role="tab" id="ai-tab-guide" aria-controls="ai-guide" aria-selected="true">Guide me</button>
+        <button type="button" role="tab" id="ai-tab-agent" aria-controls="ai-agent" aria-selected="false" tabindex="-1">Set it up for me</button>
+      </div>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-guide" aria-labelledby="ai-tab-guide">
+        <h3 class="ask-ai__label">Guide me</h3>
+        <p class="muted">For any AI chat, free or paid: it explains the app and walks you through it.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">I&#x27;d like your help with AlwaysNumLock, a free app by Mogdho Paul. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About AlwaysNumLock:
+- What it does: keeps Num Lock switched on, so the number pad always types numbers: after an accidental press, after sleep, after the lock screen, and (if chosen) at the Windows sign-in screen for number PINs.
+- Works on: Windows 10 and 11. One file, AlwaysNumLock.exe (1.3 MB). Nothing to install. Free and open source.
+- Resource use (measured): about 3.7 MB of memory (10.5 MB shown in Task Manager) and almost no CPU (0.01%).
+- Windows may show &quot;Windows protected your PC&quot; because the app isn&#x27;t code-signed: click More info, then Run anyway. Windows shows this for small apps from independent makers.
+- When it first starts, Windows asks whether the app may make changes: click Yes.
+- First run: it asks whether Num Lock should also be on at the Windows sign-in screen. Yes is useful for people who sign in with a number PIN.
+- Menu by the clock (right-click the 1-2-3 icon): Pause (turn Num Lock off for a while, for example in a game; double-clicking the icon does the same), Start with Windows, Num Lock on at sign-in screen, Exit.
+- Settings: a small settings file with the same name, next to AlwaysNumLock.exe.
+- To remove it: untick Start with Windows (and Num Lock on at sign-in screen if wanted), click Exit, then delete AlwaysNumLock.exe and the settings file next to it.
+- Official download: https://github.com/mogdho/AlwaysNumLock/releases/latest/download/AlwaysNumLock.exe
+- Its page: https://mogdhopaul.com/alwaysnumlock/
+
+Please:
+1. In two or three sentences, tell me what AlwaysNumLock does and whether it suits me. Ask what I&#x27;d mainly use it for.
+2. Then guide me through setting it up, one step at a time. Wait for me to say &quot;done&quot; before the next step.
+3. After that, answer my questions.</pre>
+        </details>
+      </div>
+      <div class="ask-ai__panel" role="tabpanel" id="ai-agent" aria-labelledby="ai-tab-agent">
+        <h3 class="ask-ai__label">Set it up for me</h3>
+        <p class="muted">For AI agents that can work on your PC, such as Claude Code, Codex or Gemini CLI. It asks before every step.</p>
+        <p class="ask-ai__actions"><button class="button" type="button" data-copy-prompt>Copy prompt</button> <span class="ask-ai__status" aria-live="polite"></span></p>
+        <details class="ask-ai__peek">
+          <summary>See what’s in the prompt</summary>
+          <pre class="ask-ai__prompt">You are an AI agent that can run commands on my Windows PC. Please set up AlwaysNumLock, a free app by Mogdho Paul, for me. Use only the facts below (and its page, if you can open it). If something isn&#x27;t covered, say you&#x27;re not sure instead of guessing. Reply in the language I write in.
+
+About AlwaysNumLock:
+- What it does: keeps Num Lock switched on, so the number pad always types numbers: after an accidental press, after sleep, after the lock screen, and (if chosen) at the Windows sign-in screen for number PINs.
+- Works on: Windows 10 and 11. One file, AlwaysNumLock.exe (1.3 MB). Nothing to install. Free and open source.
+- Resource use (measured): about 3.7 MB of memory (10.5 MB shown in Task Manager) and almost no CPU (0.01%).
+- Windows may show &quot;Windows protected your PC&quot; because the app isn&#x27;t code-signed: click More info, then Run anyway. Windows shows this for small apps from independent makers.
+- When it first starts, Windows asks whether the app may make changes: click Yes.
+- First run: it asks whether Num Lock should also be on at the Windows sign-in screen. Yes is useful for people who sign in with a number PIN.
+- Menu by the clock (right-click the 1-2-3 icon): Pause (turn Num Lock off for a while, for example in a game; double-clicking the icon does the same), Start with Windows, Num Lock on at sign-in screen, Exit.
+- Settings: a small settings file with the same name, next to AlwaysNumLock.exe.
+- To remove it: untick Start with Windows (and Num Lock on at sign-in screen if wanted), click Exit, then delete AlwaysNumLock.exe and the settings file next to it.
+- Official download: https://github.com/mogdho/AlwaysNumLock/releases/latest/download/AlwaysNumLock.exe
+- Its page: https://mogdhopaul.com/alwaysnumlock/
+
+Rules:
+- Show me each command and wait for my OK before you run it.
+- Download only from the official link above, nowhere else.
+- After downloading, show me the file&#x27;s size and its SHA-256 hash.
+- Don&#x27;t change security settings, and don&#x27;t turn off SmartScreen or antivirus.
+
+Steps:
+1. Check that this PC runs Windows 10 or 11.
+2. Create the folder %LOCALAPPDATA%\Programs\AlwaysNumLock and download AlwaysNumLock.exe into it.
+3. Start AlwaysNumLock.exe. If Windows shows &quot;Windows protected your PC&quot;, tell me to click More info, then Run anyway. If Windows asks whether the app may make changes, tell me to click Yes.
+4. When it asks whether Num Lock should be on at the sign-in screen, explain the choice and let me answer it myself.
+5. Ask whether AlwaysNumLock should start with Windows. If yes, tell me to right-click its icon by the clock and tick Start with Windows. Use the app&#x27;s own option; don&#x27;t add startup entries yourself.
+6. Finish with a short summary: where the file is, how to use AlwaysNumLock, and how to remove it.</pre>
+        </details>
+      </div>
     </section>
 
     <section aria-labelledby="setup-title">

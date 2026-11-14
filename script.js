@@ -132,3 +132,62 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+// "Ask your AI" on tool pages: two tabs (chat or agent) and a Copy button for each prompt.
+// Without JavaScript both prompts are shown, one under the other, and can be selected by hand.
+document.addEventListener('DOMContentLoaded', function () {
+  var box = document.querySelector('[data-ask-ai]');
+  if (!box) return;
+  var tablist = box.querySelector('[role="tablist"]');
+  var tabs = Array.prototype.slice.call(box.querySelectorAll('[role="tab"]'));
+  var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function select(i, focus) {
+    tabs.forEach(function (t, n) {
+      var on = n === i;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      panels[n].hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+  }
+  if (tablist) {  // browser tools have one prompt and no tabs
+    tablist.hidden = false;
+    select(0, false);
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(i, false); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        select((i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length, true);
+      }
+    });
+  });
+
+  box.querySelectorAll('[data-copy-prompt]').forEach(function (button) {
+    var panel = button.closest('[role="tabpanel"]');
+    var prompt = panel.querySelector('.ask-ai__prompt');
+    var status = panel.querySelector('.ask-ai__status');
+    function done(ok) {
+      status.textContent = ok ? 'Copied. Now paste it into your AI chat.' : 'Select the text above and copy it with Ctrl + C.';
+    }
+    button.addEventListener('click', function () {
+      var text = prompt.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallback()); });
+      } else {
+        done(fallback());
+      }
+      function fallback() {
+        panel.querySelector('details').open = true;  // the text must be visible to be selected
+        var range = document.createRange();
+        range.selectNodeContents(prompt);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        try { return document.execCommand('copy'); } catch (err) { return false; }
+      }
+    });
+  });
+});
